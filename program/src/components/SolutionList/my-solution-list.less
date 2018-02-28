@@ -1,0 +1,104 @@
+
+.demand-list{
+  padding:  0;
+  max-width: 1100px;
+  margin: 0 auto;
+  background-color: #fff;
+}
+
+/* 需求代表单个组件样式 */
+.ly-item{
+  width: 100%;
+  //margin-bottom: 12px;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #ddd;
+  display: block;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+  background-color: #fff;
+  &:hover{
+    background-color: #F8F9FB;
+  }
+  .demand-abstract{
+    .title{
+      position: relative;
+      font-size: 1.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      color: #414a60;
+      .ant-badge{
+        font-size: 1.5rem;
+      }
+      .ant-badge-count{
+        right: -6.5em;
+      }
+    }
+    .type{
+      font-size: 1rem;
+      color:#666;
+      padding: 3px 8px;
+    }
+    .status{
+      font-size: 0.8rem;
+      color: #888;
+      padding: 5px 0 5px 8px;
+      position: absolute;
+      right: 5.5rem;
+    }
+    .status.pass{
+        color: #3c763d;
+    }
+      .type.active{
+      background-color: #E9ECEF;
+    }
+    >span{
+      display: inline-block;
+      font-size: 0.8rem;
+      min-width: 50px;
+      margin-right: 1.2rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      cursor: pointer;
+    }
+    .price{
+      color: #ff6600;
+      font-weight: 500;
+    }
+    .limit{
+      color: #414a60;
+      font-size: 0.8rem;
+    }
+  }
+
+  .demand-info{
+    -webkit-box-orient: vertical !important;
+    color: red;
+    .desc{
+      color: #61687c;
+      max-height: 3.6rem;
+      line-height: 1.8rem;
+      display: -webkit-box;
+      -webkit-box-orient: vertical !important;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+  }
+
+  .demand-remark{
+    >span{
+      font-size: 0.8rem;
+      display: inline-block;
+      margin-right: 8px;
+      color: #999;
+    }
+    .ly-btn-group{
+      display: inline-block;
+      float: right;
+      >button{
+        margin-left: 1rem;
+        //color: #666;
+      }
+    }
+  }
+}
