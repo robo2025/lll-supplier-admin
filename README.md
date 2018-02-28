@@ -1,5 +1,5 @@
-# operation-admin
-运营管理系统后台
+# supplier-admin
+供应商管理系统后台
 
 ## 前序准备
 
