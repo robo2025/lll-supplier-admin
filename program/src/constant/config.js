@@ -9,7 +9,13 @@ export const URL = 'https://login.robo2025.com';
 // export const URL = 'http://120.27.46.167:8011';
 
 // 网站内容接口URL
-export const URL1 = 'http://139.199.96.235:9002';
+export const API_URL = 'http://139.199.96.235:9005/api/admin';
+
+// 上传文件获取token URL
+export const UPLOAD_URL = 'http://139.199.96.235:9002';
+
+// 用户管理系统API URL
+export const USERS_URL = 'http://139.199.96.235:9006';
 
 // 验证登录接口URL
 export const LOGIN_URL = `${URL}/server/authorize`;
@@ -21,7 +27,7 @@ export const REGISTER_URL = `${URL}/register`;
 export const LOGOUT_URL = `${URL}/logout`;
 
 // 静态web服务器地址,端口和地址必须要写，80端口可不写
-const myHost = `${window.location.protocol}//${window.location.host}`;
+const myHost = `${window.location.protocol}/${window.location.host}`;
 
 // 前端登录验证URL
 export const NEXT_URL = `${myHost}/#/test`;

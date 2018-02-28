@@ -4,21 +4,16 @@ const menuData = [{
   path: 'goods',
   children: [
     {
-      name: '供应商商品列表',
+      name: '商品列表',
       path: 'list',
     },
-  ],
-}, {
-  name: '产品管理',
-  icon: 'dashboard',
-  path: 'product',
-  children: [
     {
-      name: '产品列表',
-      path: 'list',
-    }, {
-      name: '产品类目管理',
-      path: 'menu',
+      name: '新增商品信息',
+      path: 'new',
+    },
+    {
+      name: '修改商品信息',
+      path: 'modify',
     },
   ],
 }, {

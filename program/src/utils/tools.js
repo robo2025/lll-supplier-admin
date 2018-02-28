@@ -1,5 +1,5 @@
-import { LOGIN_URL, NEXT_URL, HOME_PAGE, VERIFY_PAGE } from '../constant/config';
 import Cookies from 'js-cookie';
+import { LOGIN_URL, NEXT_URL, HOME_PAGE, VERIFY_PAGE } from '../constant/config';
 
 // 验证是否登录
 export function verifyLogin() {
@@ -57,11 +57,10 @@ export const queryString = {
 
 
 // 验证文件类型
-export const fileArr = ['pdf', 'doc', 'xls', 'ppt', 'docx', 'xlsx', 'pptx'];
-export function checkFile(filename, fileArr) {
+export function checkFile(filename, filelist) {
   const postfix = filename.split('.')[1];
-  for (let i = 0, fileLen = fileArr.length; i < fileLen; i++) {
-    if (postfix === fileArr[i]) {
+  for (let i = 0, fileLen = filelist.length; i < fileLen; i++) {
+    if (postfix === filelist[i]) {
       return true;
     }
   }
@@ -81,4 +80,50 @@ export function timeStampToDate(timeStamp) {
     S: date.getSeconds(),
   };
   return { ...time, timeStr: `${time.year}-${time.month}-${time.day} ${time.H}:${time.M}:${time.S}` };
+}
+
+
+// 获取文件的后缀名
+export function getFileSuffix(filename) {
+  return filename.split('.').slice(-1)[0];
+}
+
+// 获取目录字符串
+let categoryStr = '';
+export function getCategoryStr(category) {
+  if (typeof category !== 'object') {
+    throw new Error('参数必须是一个json对象');
+  }
+  categoryStr += '-' + category.category_name;
+  if (category.children) { getCategoryStr(category.children); }
+  return categoryStr;
+}
+
+
+/**
+ * 根据指定key替换数组中的的某一个对象
+ * 
+ * @param {obj} obj 用来替换的json对象
+ * @param {arr} arr 放置了很多个json对象的数据
+ * @param {string} key 用于替换查找的key
+ * 
+ * demo 
+ * var arr1 = [{name:'test1'},{name:'test2'},{name:'test3'}]
+ * 执行replaceObjFromArr({name:'test1',age:25},arr1,"name");
+ * 结果：[{name:'test1',age:23},{name:'test2'},{name:'test3'}]
+ */
+export function replaceObjFromArr(obj, arr, key) {
+  if (!Array.isArray(arr)) {
+    throw new Error('传参必须是数组');
+  }
+  let isExist = false;
+  const newArr = arr.map((val) => {
+    if (val[key] === obj[key]) {
+      isExist = true;
+      return obj;
+    } else {
+      return val;
+    }
+  });
+  return isExist ? newArr : [...newArr, obj];
 }

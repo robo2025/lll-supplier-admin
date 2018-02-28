@@ -1,12 +1,13 @@
 import '@babel/polyfill';
 import 'url-polyfill';
+import { hashHistory } from 'dva/router';
 import dva from 'dva';
 import 'moment/locale/zh-cn';
 import FastClick from 'fastclick';
+import createLoading from 'dva-loading';
 import './g2';
 import './rollbar';
 import onError from './error';
-import { hashHistory } from 'dva/router';
 import './index.less';
 // 1. Initialize
 const app = dva({
@@ -15,7 +16,7 @@ const app = dva({
 });
 
 // 2. Plugins
-// app.use({});
+app.use(createLoading());
 
 // 3. Register global model
 app.model(require('./models/global').default);
