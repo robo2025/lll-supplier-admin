@@ -47,7 +47,7 @@ export default {
       });
     },
     *modifyGoodStatus({ goodId, goodStatus, publishType, desc, callback }, { call, put }) {
-      console.log('models', publishType, desc);
+      console.log('下架models', publishType, desc);
       const res = yield call(modifyGoodStatus, { goodId, goodStatus, publishType, desc });
       if (res.rescode >> 0 === 10000) {
         if (callback) callback(res);

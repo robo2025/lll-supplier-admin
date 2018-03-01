@@ -1,21 +1,17 @@
 import React, { Component } from 'react';
-import { Table, Input, Popconfirm, Radio } from 'antd';
+import { Table, Input, Radio, Divider, message } from 'antd';
 
 const RadioGroup = Radio.Group;
 
-const data = [];
-for (let i = 0; i < 4; i++) {
-  data.push({
-    key: i.toString(),
-    min_quantity: 10,
-    max_quantity: 200,
-    price: '550.00',
-    lead_time: '1天',
+const data = [{
+    id: '0',
+    min_quantity: '',
+    max_quantity: '',
+    price: '',
+    lead_time: '',
     shipping_fee_type: 0,
     editable: true,
-  });
-}
-const mapFreightTypes = ['包邮', '到付'];
+}];
 
 const EditableCell = ({ editable, value, onChange }) => (
   <span style={{ display: 'inline-block' }}>
@@ -27,8 +23,8 @@ const EditableCell = ({ editable, value, onChange }) => (
 );
 const RadioGroupCell = ({ value, onChange }) => (
   <RadioGroup onChange={onChange} value={value}>
-          <Radio value={0}>包邮</Radio>
-          <Radio value={1}>到付</Radio>
+    <Radio value={0}>包邮</Radio>
+    <Radio value={1}>到付</Radio>
   </RadioGroup>
 );
 
@@ -53,7 +49,7 @@ export default class EditableTable extends Component {
     }, {
       title: '发货期(天)',
       dataIndex: 'lead_time',
-      width: 50,
+      width: 56,
       render: (text, record) => this.renderColumns(text, record, 'lead_time'),
     }, {
       title: '运费',
@@ -61,36 +57,49 @@ export default class EditableTable extends Component {
       width: 120,
       render: (text, record) => this.renderRadioColumns(text, record, 'shipping_fee_type'),
     }, {
-      title: 'operation',
-      dataIndex: 'operation',
-      width: 90,
-      render: (text, record) => {
-        const { editable } = record;
-        return (
-          <div className="editable-row-operations">
-            {
-              editable ?
-                (
-                  <span>
-                    <a onClick={() => this.save(record.key)}>Save</a>
-                    <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}>
-                      <a>Cancel</a>
-                    </Popconfirm>
-                  </span>
-                )
-                : <a onClick={() => this.edit(record.key)}>Edit</a>
-            }
-          </div>
-        );
+      title: '操作',
+      dataIndex: '操作',
+      width: 65,
+      render: (text, record, idx) => {
+        console.log(this.state);
+        return (idx + 1 === this.state.data.length ?
+          (
+            <span>
+              <a onClick={this.removeLastRow}>删除</a>
+              <Divider type="vertical" />                          
+              <a onClick={this.addLastRow}>增加</a>
+            </span>
+          )
+          : null);
       },
+      // render: (text, record) => {
+      //   const { editable } = record;
+      //   return (
+      //     <div className="editable-row-operations">
+      //       {
+      //         editable ?
+      //           (
+      //             <span>
+      //               <a onClick={() => this.save(record.key)}>Save</a>
+      //               <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}>
+      //                 <a>Cancel</a>
+      //               </Popconfirm>
+      //             </span>
+      //           )
+      //           : <a onClick={() => this.edit(record.key)}>Edit</a>
+      //       }
+      //     </div>
+      //   );
+      // },
     }];
     this.state = { data };
     this.cacheData = data.map(item => ({ ...item }));
   }
 
   handleChange(value, key, column) {
+    console.log('handleChange', value, key, column);
     const newData = [...this.state.data];
-    const target = newData.filter(item => key === item.key)[0];
+    const target = newData.filter(item => key === item.id)[0];
     if (target) {
       target[column] = value;
       this.setState({ data: newData });
@@ -99,7 +108,7 @@ export default class EditableTable extends Component {
 
   edit(key) {
     const newData = [...this.state.data];
-    const target = newData.filter(item => key === item.key)[0];
+    const target = newData.filter(item => key === item.id)[0];
     if (target) {
       target.editable = true;
       this.setState({ data: newData });
@@ -108,7 +117,7 @@ export default class EditableTable extends Component {
 
   save(key) {
     const newData = [...this.state.data];
-    const target = newData.filter(item => key === item.key)[0];
+    const target = newData.filter(item => key === item.id)[0];
     if (target) {
       delete target.editable;
       this.setState({ data: newData });
@@ -118,11 +127,37 @@ export default class EditableTable extends Component {
 
   cancel(key) {
     const newData = [...this.state.data];
-    const target = newData.filter(item => key === item.key)[0];
+    const target = newData.filter(item => key === item.id)[0];
     if (target) {
-      Object.assign(target, this.cacheData.filter(item => key === item.key)[0]);
+      Object.assign(target, this.cacheData.filter(item => key === item.id)[0]);
       delete target.editable;
       this.setState({ data: newData });
+    }
+  }
+
+  // 删除最后一条区间
+  removeLastRow = () => {
+    const newData = [...this.state.data];
+    newData.pop();
+    this.setState({ data: newData });
+  }
+
+  // 增加一条区间
+  addLastRow = () => {
+    const newData = [...this.state.data];
+    if (newData.length < 4) {
+      newData.push({ 
+        id: newData.length.toString(),
+        min_quantity: '',
+        max_quantity: '',
+        price: '',
+        lead_time: '',
+        shipping_fee_type: 0,
+        editable: true,
+        });
+      this.setState({ data: newData });      
+    } else {
+      message.info('最多只能增加四个区间');
     }
   }
 
@@ -140,13 +175,14 @@ export default class EditableTable extends Component {
     return (
       <RadioGroupCell
         value={text}
-        onChange={value => this.handleChange(value, record.key, column)}        
+        onChange={e => this.handleChange(e.target.value, record.key, column)}
       />
     );
   }
 
 
   render() {
+    console.log('editableTable state', this.state);
     return (
       <Table
         bordered

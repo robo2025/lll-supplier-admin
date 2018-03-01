@@ -41,7 +41,8 @@ export async function addGood({ data }) {
  * @param {string=} GoodStatus 商品状态 [0,下架，1,上架]
  * 
  */
-export async function modifyGoodStatus({ goodId, goodStatus, PublishType, desc }) {
+export async function modifyGoodStatus({ goodId, goodStatus, publishType, desc }) {
+  console.log('下架service', publishType, desc);
   const acess_token = Cookies.get('access_token');
   return lyRequest(`${API_URL}/goods/${goodId}/publish_status`, {
     method: 'put',
@@ -50,7 +51,7 @@ export async function modifyGoodStatus({ goodId, goodStatus, PublishType, desc }
     },
     data: {
       is_publish: goodStatus,
-      publish_type: PublishType,
+      publish_type: publishType,
       desc,
     },
   });
