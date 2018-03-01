@@ -172,21 +172,20 @@ export default class NewGoodForm extends Component {
     };
     const { getFieldDecorator } = this.props.form;
     const { data, loading } = this.props;
-    const { category } = data;
-    const slectedCatagory = category ? [
-      category.category_name,
-      category.children.category_name,
-      category.children.children.category_name,
-      category.children.children.children.category_name,
+    const { product } = data;
+    const slectedCatagory = product ? [
+      product.category.category_name,
+      product.category.children.category_name,
+      product.category.children.children.category_name,
+      product.category.children.children.children.category_name,
     ] : [];
     const { previewVisible, previewImage, a, b, c, d1, d2, d3, file } = this.state;
 
-    let uploaders = []; // 商品图片   
-    let uploaderCAD = []; // 商品cad文件 
-    
-    if (data.pics) {
+    let uploaders = []; // 商品图片
+    let uploaderCAD = []; // 商品cad图   
+    if (product) {
       // 商品图片集合
-      uploaders = data.pics.map(val => (
+      uploaders = product.pics.map(val => (
         <Col span={8} key={val.id}>
           <Upload
             action="//jsonplaceholder.typicode.com/posts/"
@@ -202,9 +201,9 @@ export default class NewGoodForm extends Component {
           <p className="upload-pic-desc">{val.img_type}</p>
         </Col>
       ));
-      // 商品cad集合
-      if (data.cad_url) {
-        uploaderCAD = data.cad_url.map((val, idx) => (
+      // 商品cad图
+      if (product.cad_url) {
+        uploaderCAD = product.cad_url.map((val, idx) => (
           <Col span={8} key={idx}>
             <Upload
               action="//jsonplaceholder.typicode.com/posts/"
@@ -223,8 +222,7 @@ export default class NewGoodForm extends Component {
       }
     }
 
-    console.log('新建分类', slectedCatagory.join('-'));
-
+    console.log('目录1', slectedCatagory.join('-'));
     return (
       <div className={styles['good-info-wrap']} >
         {/* 产品主要属性 */}
@@ -235,6 +233,16 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('pno', {
+                initialValue: data.product ? data.product.pno : '',
+              })(
+                <Input disabled />
+              )}
+            </FormItem>
+            <FormItem
+              label="商品ID"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('gno', {
               })(
                 <Input disabled />
               )}
@@ -244,12 +252,14 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               <Input value={slectedCatagory.join('-')} disabled />
+
             </FormItem>
             <FormItem
               label="商品名称"
               {...formItemLayout}
             >
-              {getFieldDecorator('product_name', {
+              {getFieldDecorator('good_name', {
+                initialValue: data.product ? data.product.product_name : '',
               })(
                 <Input disabled />
               )}
@@ -259,6 +269,7 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('partnumber', {
+                initialValue: data.product ? data.product.partnumber : '',
               })(
                 <Input disabled />
               )}
@@ -268,6 +279,7 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('brand_name', {
+                initialValue: data.product ? data.product.brand_name : '',
               })(
                 <Input disabled />
               )}
@@ -277,6 +289,8 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('english_name', {
+                initialValue: data.product ? data.product.english_name : '',
+
               })(
                 <Input disabled />
               )}
@@ -286,8 +300,9 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('prodution_place', {
+                initialValue: data.product ? data.product.prodution_place : '',
               })(
-                <Input disabled />
+                <Input />
               )}
             </FormItem>
             <FormItem
@@ -303,8 +318,8 @@ export default class NewGoodForm extends Component {
               label="质保期"
               {...formItemLayout}
             >
-              {getFieldDecorator('shiff_life', {
-                 rules: [{
+              {getFieldDecorator('shelf_life', {
+                rules: [{
                   required: true,
                   message: '请输入库质保期',
                 }],
@@ -316,7 +331,7 @@ export default class NewGoodForm extends Component {
               label="销售单位"
               {...formItemLayout}
             >
-              {getFieldDecorator('unit', {
+              {getFieldDecorator('sales_unit', {
                 rules: [{
                   required: true,
                   message: '请输入销售单位',
@@ -327,7 +342,7 @@ export default class NewGoodForm extends Component {
             </FormItem>
             <FormItem
               label="价格设置"
-              labelCol={{ span: 2 }} 
+              labelCol={{ span: 2 }}
               wrapperCol={{ span: 18 }}
             >
               {getFieldDecorator('prices', {
@@ -376,7 +391,7 @@ export default class NewGoodForm extends Component {
               <RichEditor
                 onChange={(html) => { this.handleChange('summary', html); }}
                 token="uploadToken"
-                defaultValue={data.summary}
+                defaultValue={data.product ? data.product.summary : ''}
                 disabled
               />
             </TabPane>
@@ -384,16 +399,16 @@ export default class NewGoodForm extends Component {
               <RichEditor
                 onChange={(html) => { this.handleChange('description', html); }}
                 token="uploadToken"
-                defaultValue={data.description}
-                disabled             
+                defaultValue={data.product ? data.product.description : ''}
+                disabled
               />
             </TabPane>
             <TabPane tab="常见问题FAQ" key="3" >
               <RichEditor
                 onChange={(html) => { this.handleChange('faq', html); }}
                 token="uploadToken"
-                defaultValue={data.faq}
-                disabled                
+                defaultValue={data.product ? data.product.faq : ''}
+                disabled
               />
             </TabPane>
           </Tabs>

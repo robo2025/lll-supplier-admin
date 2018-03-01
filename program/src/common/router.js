@@ -54,13 +54,13 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, ['good'], () => import('../routes/GoodsList')),
     },
     '/goods/new': {
-      component: dynamicWrapper(app, [], () => import('../routes/NewGood')),
+      component: dynamicWrapper(app, ['product', 'good'], () => import('../routes/NewGood')),
     },
     '/goods/modify': {
-      component: dynamicWrapper(app, [], () => import('../routes/ModifyGood')),
+      component: dynamicWrapper(app, ['product', 'good'], () => import('../routes/ModifyGood')),
     },
     '/:goods/detail': {
-      component: dynamicWrapper(app, [], () => import('../routes/GoodDetail')),
+      component: dynamicWrapper(app, ['product', 'good'], () => import('../routes/GoodDetail')),
     },
   };
   // Get name from ./menu.js or just set it in the router data.

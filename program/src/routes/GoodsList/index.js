@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import { Row, Col, Card, Form, Input, Checkbox, Select, Icon, Button, Menu, DatePicker, Modal, message } from 'antd';
 import GoodsTable from '../../components/StandardTable/GoodsTable';
-import GoodCheckboxGroup from '../../components/Checkbox/GoodCheckboxGroup';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import GoodCheckboxGroup from '../../components/Checkbox/GoodCheckboxGroup';
 import styles from './index.less';
 
 const FormItem = Form.Item;
@@ -34,7 +34,8 @@ export default class GoodsList extends Component {
       formValues: {},
       isShowExportModal: false,
       exportFields: [], // 导出产品字段 
-      isCheckAll: false, // 是否全选导出数据     
+      isCheckAll: false, // 是否全选导出数据  
+      isShowUnpublishModal: true,   
     };
   }
 
@@ -98,6 +99,10 @@ export default class GoodsList extends Component {
   handlePublishGood(goodId, status) {
     const { dispatch } = this.props;
     console.log(goodId, status);
+    if (status === 0) { // 如果是下架商品，需要填写下架原因
+      this.setState({ isShowUnpublishModal: true });
+      return;
+    }
     dispatch({
       type: 'good/modifyGoodStatus',
       goodId,
@@ -443,6 +448,24 @@ export default class GoodsList extends Component {
                 isCheckAll={this.state.isCheckAll}
                 checkedList={this.state.exportFields}
               />
+            </Modal>
+            {/* 填写下架原因Modal */}
+            <Modal
+              visible={this.state.isShowUnpublishModal}
+              title="申请下架"
+            >
+             <Row gutter={24}>
+               <Col span={5}>
+                  下架类型：
+               </Col>
+               <Col span={12}>
+                <Select defaultValue="1">
+                  <Option value="1">暂停生产该产品</Option>
+                  <Option value="2">暂不供货</Option>
+                  <Option value="3">产品升级</Option>
+                </Select>
+               </Col>
+             </Row>
             </Modal>
             <GoodsTable
               selectedRows={selectedRows}
