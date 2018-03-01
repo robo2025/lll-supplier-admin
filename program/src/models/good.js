@@ -46,8 +46,9 @@ export default {
         payload: response.data,
       });
     },
-    *modifyGoodStatus({ goodId, goodStatus, callback }, { call, put }) {
-      const res = yield call(modifyGoodStatus, { goodId, goodStatus });
+    *modifyGoodStatus({ goodId, goodStatus, publishType, desc, callback }, { call, put }) {
+      console.log('models', publishType, desc);
+      const res = yield call(modifyGoodStatus, { goodId, goodStatus, publishType, desc });
       if (res.rescode >> 0 === 10000) {
         if (callback) callback(res);
       }

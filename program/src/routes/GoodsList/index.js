@@ -12,6 +12,7 @@ const getValue = obj => Object.keys(obj).map(key => obj[key]).join(',');
 const InputGroup = Input.Group;
 const { RangePicker } = DatePicker;
 const plainOptions = ['gno', 'product_name', 'brand_name', 'english_name', 'partnumber', 'prodution_place', 'category', 'stock', 'price', 'supplier_name', 'min_buy', 'audit_status', 'publish_status', 'created_time'];// 所有选项
+const { TextArea } = Input;
 
 // 商品列表
 @connect(({ rule, loading, good }) => ({
@@ -35,7 +36,10 @@ export default class GoodsList extends Component {
       isShowExportModal: false,
       exportFields: [], // 导出产品字段 
       isCheckAll: false, // 是否全选导出数据  
-      isShowUnpublishModal: true,   
+      isShowUnpublishModal: false,
+      unpublishReason: {
+        publish_type: 1,
+      }, // 下架原因
     };
   }
 
@@ -71,6 +75,29 @@ export default class GoodsList extends Component {
     });
   }
 
+  // 取消下架原因弹窗
+  onCancelUnpublishModal = () => {
+    this.setState({ isShowUnpublishModal: false });
+  }
+
+  // 确定下架原因弹窗  
+  onOkUnpublishModal = () => {
+    const { dispatch } = this.props;    
+    const { unpublishReason, goodId } = this.state;
+    console.log('确定下架', unpublishReason.publish_type);        
+    this.setState({ isShowUnpublishModal: false });
+    if (unpublishReason.publish_type) {
+      dispatch({
+        type: 'good/modifyGoodStatus',
+        goodId,
+        goodStatus: 0,
+        publishType: unpublishReason.publish_type,
+        desc: unpublishReason.desc,
+        callback: () => { alert('下架成功。'); },
+      });
+    }
+  }
+
   // 显示导出数据Modal
   showExportModal() {
     this.setState({ isShowExportModal: true });
@@ -100,14 +127,31 @@ export default class GoodsList extends Component {
     const { dispatch } = this.props;
     console.log(goodId, status);
     if (status === 0) { // 如果是下架商品，需要填写下架原因
-      this.setState({ isShowUnpublishModal: true });
+      this.setState({ isShowUnpublishModal: true, goodId });
       return;
     }
     dispatch({
       type: 'good/modifyGoodStatus',
       goodId,
       goodStatus: status,
-      callback: () => { alert('下架成功'); },
+      callback: () => { alert('上架成功'); },
+    });
+  }
+
+  // 选择下架原因类型
+  handlePublishType = (type) => {
+    console.log('type', type);    
+    const { unpublishReason } = this.state;
+    this.setState({
+      unpublishReason: { ...unpublishReason, publish_type: type },
+    });
+  }
+  // 下架原因描述
+  handlePublishDesc= (desc) => {
+    console.log('desc', desc);
+    const { unpublishReason } = this.state;
+    this.setState({
+      unpublishReason: { ...unpublishReason, desc },
     });
   }
 
@@ -419,7 +463,7 @@ export default class GoodsList extends Component {
       </Menu>
     );
 
-    console.log('商品列表', good);
+    console.log('商品列表页', this.state);
 
     const parentMethods = {
       handleAdd: this.handleAdd,
@@ -453,17 +497,28 @@ export default class GoodsList extends Component {
             <Modal
               visible={this.state.isShowUnpublishModal}
               title="申请下架"
+              onOk={this.onOkUnpublishModal}
+              onCancel={this.onCancelUnpublishModal}
             >
              <Row gutter={24}>
                <Col span={5}>
                   下架类型：
                </Col>
                <Col span={12}>
-                <Select defaultValue="1">
+                <Select defaultValue="1" onChange={this.handlePublishType}>
                   <Option value="1">暂停生产该产品</Option>
                   <Option value="2">暂不供货</Option>
                   <Option value="3">产品升级</Option>
+                  <Option value="0">其他</Option>
                 </Select>
+               </Col>
+             </Row>
+             <Row gutter={24}>
+               <Col span={5}>
+                  其他说明：
+               </Col>
+               <Col span={12}>
+                <TextArea onChange={(e) => { this.handlePublishDesc(e.target.value); }} />
                </Col>
              </Row>
             </Modal>
