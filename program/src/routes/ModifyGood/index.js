@@ -55,12 +55,8 @@ export default class ModifyGood extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isShowModal: false,
-      isShowAttrMOdal: false,
       args: queryString.parse(this.props.location.search),
       fields: {},
-      newFiled: {}, // 用户自定义的其他属性
-      otherAttrs: [],
       operationkey: 'tab1',
     };
   }
@@ -87,53 +83,12 @@ export default class ModifyGood extends Component {
     this.setState({ operationkey: key });
   }
 
-  onCancel = () => {
-    this.setState({ isShowModal: false });
-    this.setState({ isShowAttrMOdal: false });
-  }
-
-  onOk = () => {
-    this.setState({ isShowModal: false });
-    const { newFiled, otherAttrsFiled, otherAttrs } = this.state;
-    if (newFiled.attr_name && newFiled.attr_value) {
-      this.setState({ isShowAttrMOdal: false }); // 隐藏添加属性弹窗
-      this.setState({
-        otherAttrsFiled: [
-          ...otherAttrsFiled,
-          { attr_name: newFiled.attr_name.value, attr_value: newFiled.attr_value.value },
-        ],
-        otherAttrs: [
-          ...otherAttrs,
-          {
-            id: otherAttrsFiled.length - 100,
-            attr_name: newFiled.attr_name.value,
-            attr_value: newFiled.attr_value.value,
-          },
-        ],
-      });
-      console.log('提交新属性', newFiled);
-    }
-  }
-
-  // 显示关联产品modal
-  showModal = () => {
-    this.setState({ isShowModal: true });
-  }
+  
   // 显示添加其他属性modal  
   ShowAttrModal = () => {
     this.setState({ isShowAttrMOdal: true });
   }
 
-  /**
-  * 点击关联后事件
-  * @param {string=} prdId 产品ID
-  *
-  * */
-  handleAssociate = (prdId) => {
-    const { history } = this.props;
-    history.push(`/goods/new?origin_prdId=${prdId}`);
-    this.setState({ isShowModal: false });
-  }
 
   // 当表单输入框被修改事件
   handleFormChange = (changedFields) => {
@@ -225,19 +180,6 @@ export default class ModifyGood extends Component {
     return (
       <PageHeaderLayout title="新增商品信息" >
         <Card bordered={false} className={styles['new-good-wrap']}>
-          {/* 添加其它属性Modal */}
-          <Modal
-            width="650px"
-            visible={isShowAttrMOdal}
-            title="添加属性项"
-            onCancel={this.onCancel}
-            onOk={this.onOk}
-          >
-            {/*  <AddAttrForm
-              onFieldsChange={this.handleAddOtherAttrFiled}
-            /> */}
-            添加其他属性
-          </Modal>
           <ModifyGoodForm
             loading={loading.models.good}
             data={fields}

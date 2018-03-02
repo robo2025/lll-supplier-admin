@@ -28,8 +28,6 @@ export default class GoodDetail extends Component {
       },
       newFiled: {}, // 用户自定义的其他属性
       otherAttrs: [],
-      file: { uid: '', name: '' },
-      isPicture: true,
     };
   }
 

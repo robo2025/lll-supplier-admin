@@ -297,27 +297,6 @@ export default class GoodsList extends Component {
     });
   }
 
-  handleModalVisible = (flag) => {
-    this.setState({
-      modalVisible: !!flag,
-    });
-  }
-
-  handleAdd = (fields) => {
-    console.log(111);
-    this.props.dispatch({
-      type: 'rule/add',
-      payload: {
-        description: fields.desc,
-      },
-    });
-
-    message.success('添加成功');
-    this.setState({
-      modalVisible: false,
-    });
-  }
-
   renderSimpleForm() {
     const { getFieldDecorator } = this.props.form;
     return (
@@ -507,11 +486,6 @@ export default class GoodsList extends Component {
     );
 
     console.log('商品列表页', this.state);
-
-    const parentMethods = {
-      handleAdd: this.handleAdd,
-      handleModalVisible: this.handleModalVisible,
-    };
 
     return (
       <PageHeaderLayout title="查询表格">
