@@ -127,3 +127,14 @@ export function replaceObjFromArr(obj, arr, key) {
   });
   return isExist ? newArr : [...newArr, obj];
 }
+
+
+/**
+ * 给一个json数组中的每一个元素增加key-value
+ * 
+ */
+export function addKeyValToArr(arr, obj) {
+  return arr.map((val) => {
+    return { ...val, ...obj };
+  });
+}

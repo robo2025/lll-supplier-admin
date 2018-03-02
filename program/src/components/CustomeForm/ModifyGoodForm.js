@@ -222,7 +222,6 @@ export default class NewGoodForm extends Component {
       }
     }
 
-    console.log('目录1', slectedCatagory.join('-'));
     return (
       <div className={styles['good-info-wrap']} >
         {/* 产品主要属性 */}
@@ -344,15 +343,12 @@ export default class NewGoodForm extends Component {
               label="价格设置"
               labelCol={{ span: 2 }}
               wrapperCol={{ span: 18 }}
+              required
             >
-              {getFieldDecorator('prices', {
-                rules: [{
-                  required: true,
-                  message: '请完善价格区间',
-                }],
-              })(
-                <EditableTable />
-              )}
+                <EditableTable
+                  data={data.prices}
+                  onChange={this.props.onAttrChange}
+                />
             </FormItem>
             <FormItem
               label="库存数量"

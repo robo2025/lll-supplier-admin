@@ -1,4 +1,4 @@
-import { queryGoods, queryGoodDetail, modifyGoodStatus, modifyGoodInfo, addGood, queryOperationLog, exportGood } from '../services/good';
+import { queryGoods, queryGoodDetail, modifyGoodStatus, modifyGoodInfo, modifyGoodPrice, addGood, queryOperationLog, exportGood } from '../services/good';
 
 export default {
   namespace: 'good',
@@ -47,7 +47,6 @@ export default {
       });
     },
     *modifyGoodStatus({ goodId, goodStatus, publishType, desc, callback }, { call, put }) {
-      console.log('下架models', publishType, desc);
       const res = yield call(modifyGoodStatus, { goodId, goodStatus, publishType, desc });
       if (res.rescode >> 0 === 10000) {
         if (callback) callback(res);
@@ -58,8 +57,20 @@ export default {
         payload: response.data,
       });
     },
-    *queryLogs({ module }, { call, put }) {
-      const res = yield call(queryOperationLog, { module });
+    *modifyPrice({ goodId, data, callback }, { call, put }) {
+        alert('21312312');
+        const res = yield call(modifyGoodPrice, { goodId, data });
+        if (res.rescode >> 0 === 10000) {
+          if (callback) callback(res);
+        }
+        const response = yield call(queryGoods);
+        yield put({
+          type: 'modify',
+          payload: response.data,
+        });
+    },
+    *queryLogs({ module, goodId }, { call, put }) {
+      const res = yield call(queryOperationLog, { module, goodId });
       console.log('操作日志', res);
       yield put({
         type: 'logs',

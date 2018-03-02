@@ -73,11 +73,6 @@ export default class NewGoodForm extends Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    console.log('will reiceve', nextProps);
-  }
-
-
   handleCancel = () => this.setState({ previewVisible: false })
   handlePreview = (file) => {
     this.setState({
@@ -223,7 +218,7 @@ export default class NewGoodForm extends Component {
       }
     }
 
-    console.log('新建分类', slectedCatagory.join('-'));
+    // console.log('新建页面表单', this.props.data);
 
     return (
       <div className={styles['good-info-wrap']} >
@@ -303,7 +298,7 @@ export default class NewGoodForm extends Component {
               label="质保期"
               {...formItemLayout}
             >
-              {getFieldDecorator('shiff_life', {
+              {getFieldDecorator('shelf_life', {
                  rules: [{
                   required: true,
                   message: '请输入库质保期',
@@ -316,7 +311,7 @@ export default class NewGoodForm extends Component {
               label="销售单位"
               {...formItemLayout}
             >
-              {getFieldDecorator('unit', {
+              {getFieldDecorator('sales_unit', {
                 rules: [{
                   required: true,
                   message: '请输入销售单位',
@@ -329,15 +324,12 @@ export default class NewGoodForm extends Component {
               label="价格设置"
               labelCol={{ span: 2 }} 
               wrapperCol={{ span: 18 }}
+              required
             >
-              {getFieldDecorator('prices', {
-                rules: [{
-                  required: true,
-                  message: '请完善价格区间',
-                }],
-              })(
-                <EditableTable />
-              )}
+                <EditableTable
+                  data={data.prices}
+                  onChange={this.props.onAttrChange}
+                />
             </FormItem>
             <FormItem
               label="库存数量"

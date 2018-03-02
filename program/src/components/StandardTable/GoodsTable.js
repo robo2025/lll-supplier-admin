@@ -2,7 +2,7 @@
  * @Author: lll
  * @Date: 2018-01-26 14:08:45
  * @Last Modified by: lll
- * @Last Modified time: 2018-03-01 16:38:53
+ * @Last Modified time: 2018-03-02 11:51:55
  */
 import React, { PureComponent, Fragment } from 'react';
 import moment from 'moment';
@@ -51,7 +51,7 @@ class GoodsTable extends PureComponent {
 
   render() {
     const { selectedRowKeys, totalCallNo } = this.state;
-    const { data, loading, onPublish } = this.props;
+    const { data, loading, onPublish, onPriceSetting } = this.props;
 
     const columns = [
       {
@@ -170,7 +170,7 @@ class GoodsTable extends PureComponent {
               {record.is_publish === 1 ? '申请下架' : '申请上架'}
             </a>
             <Divider type="vertical" />
-            <a>价格设置</a>
+            <a onClick={() => { onPriceSetting(record.id); }}>价格设置</a>
           </Fragment>
         ),
         width: 260,

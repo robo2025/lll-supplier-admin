@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Input, Radio, Divider, message } from 'antd';
+import { addKeyValToArr } from '../../utils/tools';
 
 const RadioGroup = Radio.Group;
 
@@ -61,7 +62,7 @@ export default class EditableTable extends Component {
       dataIndex: '操作',
       width: 65,
       render: (text, record, idx) => {
-        console.log(this.state);
+        // console.log(this.state);
         return (idx + 1 === this.state.data.length ?
           (
             <span>
@@ -92,17 +93,33 @@ export default class EditableTable extends Component {
       //   );
       // },
     }];
-    this.state = { data };
+    const propsData = this.props.data;
+    console.log('价格设置构造函数', propsData);    
+    this.state = {
+      data: propsData ? addKeyValToArr(propsData, { shipping_fee_type: 0, editable: true }) : data,
+    };
     this.cacheData = data.map(item => ({ ...item }));
   }
 
+  componentWillReceiveProps(nextProps) {
+    const nextPropsData = nextProps.data;
+    if (Array.isArray(nextPropsData)) {
+      this.setState({ 
+        data: addKeyValToArr(nextPropsData, { shipping_fee_type: 0, editable: true }), 
+      }); 
+    }
+  }
+
   handleChange(value, key, column) {
-    console.log('handleChange', value, key, column);
+    // console.log('handleChange', this.props, value, key, column);
+    const { onChange } = this.props;
     const newData = [...this.state.data];
     const target = newData.filter(item => key === item.id)[0];
     if (target) {
       target[column] = value;
       this.setState({ data: newData });
+      // 把改变数据传给母组件
+      onChange({ prices: newData });
     }
   }
 
@@ -147,7 +164,7 @@ export default class EditableTable extends Component {
     const newData = [...this.state.data];
     if (newData.length < 4) {
       newData.push({ 
-        id: newData.length.toString(),
+        id: (newData.length - 100).toString(),
         min_quantity: '',
         max_quantity: '',
         price: '',
@@ -166,7 +183,7 @@ export default class EditableTable extends Component {
       <EditableCell
         editable={record.editable}
         value={text}
-        onChange={value => this.handleChange(value, record.key, column)}
+        onChange={value => this.handleChange(value, record.id, column)}
       />
     );
   }
@@ -175,14 +192,14 @@ export default class EditableTable extends Component {
     return (
       <RadioGroupCell
         value={text}
-        onChange={e => this.handleChange(e.target.value, record.key, column)}
+        onChange={e => this.handleChange(e.target.value, record.id, column)}
       />
     );
   }
 
 
   render() {
-    console.log('editableTable state', this.state);
+    console.log('可修改table', this.props.data);
     return (
       <Table
         bordered

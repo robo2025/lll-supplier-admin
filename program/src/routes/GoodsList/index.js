@@ -4,6 +4,7 @@ import { Row, Col, Card, Form, Input, Checkbox, Select, Icon, Button, Menu, Date
 import GoodsTable from '../../components/StandardTable/GoodsTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import GoodCheckboxGroup from '../../components/Checkbox/GoodCheckboxGroup';
+import EditableTable from '../../components/CustomTable/EditTable';
 import styles from './index.less';
 
 const FormItem = Form.Item;
@@ -29,17 +30,18 @@ export default class GoodsList extends Component {
     this.handleOk = this.handleOk.bind(this);
     this.handlePublishGood = this.handlePublishGood.bind(this);
     this.state = {
-      modalVisible: false,
       expandForm: false,
       selectedRows: [],
       formValues: {},
       isShowExportModal: false,
       exportFields: [], // 导出产品字段 
       isCheckAll: false, // 是否全选导出数据  
-      isShowUnpublishModal: false,
+      isShowUnpublishModal: false, // 是否显示下架原因Modal
+      isShowPriceSettingModal: false,
       unpublishReason: {
         publish_type: 1,
       }, // 下架原因
+      prices: [], // 商品价格区间数组
     };
   }
 
@@ -61,10 +63,10 @@ export default class GoodsList extends Component {
   // 导出数据复选框改变
   onExportFieldsChange = (fields) => {
     console.log('exportFiles', fields);
-    this.setState({ 
+    this.setState({
       exportFields: fields,
       isCheckAll: fields.length === plainOptions.length,
-     });
+    });
   }
 
   // 全选按钮改变
@@ -82,9 +84,9 @@ export default class GoodsList extends Component {
 
   // 确定下架原因弹窗  
   onOkUnpublishModal = () => {
-    const { dispatch } = this.props;    
+    const { dispatch } = this.props;
     const { unpublishReason, goodId } = this.state;
-    console.log('确定下架', unpublishReason.publish_type);        
+    console.log('确定下架', unpublishReason.publish_type);
     this.setState({ isShowUnpublishModal: false });
     if (unpublishReason.publish_type) {
       dispatch({
@@ -140,18 +142,59 @@ export default class GoodsList extends Component {
 
   // 选择下架原因类型
   handlePublishType = (type) => {
-    console.log('type', type);    
+    console.log('type', type);
     const { unpublishReason } = this.state;
     this.setState({
       unpublishReason: { ...unpublishReason, publish_type: type },
     });
   }
   // 下架原因描述
-  handlePublishDesc= (desc) => {
+  handlePublishDesc = (desc) => {
     console.log('desc', desc);
     const { unpublishReason } = this.state;
     this.setState({
       unpublishReason: { ...unpublishReason, desc },
+    });
+  }
+
+  // 点击价格设置按钮
+  handleClickPriceSettingBtn = (goodId) => {
+    console.log('需要设置价格商品ID', goodId);
+    const GoodsList1 = this.props.good.list;
+    const selectedGood = GoodsList1.filter(val => (
+      val.id === goodId
+    ));
+    this.setState({ 
+      prices: selectedGood[0].prices, 
+      isShowPriceSettingModal: true,
+      goodId,
+    });
+  }
+  // 确定：价格设置Modal
+  okPriceSettingModal = () => {
+    const { dispatch } = this.props;
+    const { prices, goodId } = this.state;
+    this.setState({ isShowPriceSettingModal: false });
+    dispatch({
+      type: 'good/modifyPrice',
+      goodId,
+      data: {
+        prices,
+      },
+    });
+  }
+  // 取消：价格设置Modal 
+  cancelPriceSettingModal = () => {
+    this.setState({ isShowPriceSettingModal: false });
+  }
+  /**
+  * 价格改变时处理
+  * @param {object} obj json对象，产品属性key=>value
+  */
+  handleGoodPrice = (obj) => {
+    console.log('商品列表·组件收到：', obj);
+    this.setState({
+      prices: obj.prices,
     });
   }
 
@@ -454,7 +497,7 @@ export default class GoodsList extends Component {
 
   render() {
     const { loading, good } = this.props;
-    const { selectedRows, modalVisible, isShowExportModal } = this.state;
+    const { selectedRows, isShowPriceSettingModal, isShowExportModal, prices } = this.state;
     const data = good.list;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
@@ -480,6 +523,7 @@ export default class GoodsList extends Component {
             <div className={styles.tableListOperator}>
               <Button onClick={this.showExportModal}>导出数据</Button>
             </div>
+            {/* 导出数据Modal */}
             <Modal
               visible={isShowExportModal}
               width="600px"
@@ -500,27 +544,39 @@ export default class GoodsList extends Component {
               onOk={this.onOkUnpublishModal}
               onCancel={this.onCancelUnpublishModal}
             >
-             <Row gutter={24}>
-               <Col span={5}>
+              <Row gutter={24}>
+                <Col span={5}>
                   下架类型：
-               </Col>
-               <Col span={12}>
-                <Select defaultValue="1" onChange={this.handlePublishType}>
-                  <Option value="1">暂停生产该产品</Option>
-                  <Option value="2">暂不供货</Option>
-                  <Option value="3">产品升级</Option>
-                  <Option value="0">其他</Option>
-                </Select>
-               </Col>
-             </Row>
-             <Row gutter={24}>
-               <Col span={5}>
+                </Col>
+                <Col span={12}>
+                  <Select defaultValue="1" onChange={this.handlePublishType}>
+                    <Option value="1">暂停生产该产品</Option>
+                    <Option value="2">暂不供货</Option>
+                    <Option value="3">产品升级</Option>
+                    <Option value="0">其他</Option>
+                  </Select>
+                </Col>
+              </Row>
+              <Row gutter={24}>
+                <Col span={5}>
                   其他说明：
-               </Col>
-               <Col span={12}>
-                <TextArea onChange={(e) => { this.handlePublishDesc(e.target.value); }} />
-               </Col>
-             </Row>
+                </Col>
+                <Col span={12}>
+                  <TextArea onChange={(e) => { this.handlePublishDesc(e.target.value); }} />
+                </Col>
+              </Row>
+            </Modal>
+            <Modal
+              width={805}
+              title="价格设置"
+              visible={isShowPriceSettingModal}
+              onCancel={this.cancelPriceSettingModal}
+              onOk={this.okPriceSettingModal}
+            >
+              <EditableTable
+                data={prices}
+                onChange={this.handleGoodPrice}
+              />
             </Modal>
             <GoodsTable
               selectedRows={selectedRows}
@@ -529,6 +585,7 @@ export default class GoodsList extends Component {
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
               onPublish={this.handlePublishGood}
+              onPriceSetting={this.handleClickPriceSettingBtn}
             />
           </div>
         </Card>

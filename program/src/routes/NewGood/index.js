@@ -24,8 +24,19 @@ export default class NewGood extends Component {
       isShowAttrMOdal: false,
       args: queryString.parse(this.props.location.search),
       fields: {
-        pics: [],
-        other_attrs: [],
+        shelf_life: '1年', // 质保期
+        sales_unit: '个', // 销售单位
+        stock: '20', // 库存
+        min_buy: '10', // 最小采购量 (可选)
+        prices: [ // 价格
+          {
+            id: -100,
+            min_quantity: 2, // 最小数量
+            max_quantity: 100, // 最大数量
+            price: '1000', // 价格
+            lead_time: '1天', // 货期
+          },
+        ],
       },
       newFiled: {}, // 用户自定义的其他属性
       otherAttrsFiled: [{
@@ -36,8 +47,6 @@ export default class NewGood extends Component {
         attr_name: '检测物体',
       }],
       otherAttrs: [],
-      file: { uid: '', name: '' },
-      isPicture: true,
     };
   }
 
@@ -114,8 +123,9 @@ export default class NewGood extends Component {
   * */
   handleAssociate = (prdId) => {
     const { history } = this.props;
+    const { fields } = this.state;
     history.push(`/goods/new?origin_prdId=${prdId}`);
-    this.setState({ isShowModal: false });
+    this.setState({ isShowModal: false, fields: { ...fields, product_id: prdId } });
   }
 
   // 当表单输入框被修改事件
@@ -125,8 +135,37 @@ export default class NewGood extends Component {
     });
   }
 
+  /**
+  * 当商品其他属性被修改事件[产品概述、详情、FAQ,其他属性，图片]
+  * 
+  * @param {object} obj json对象，产品属性key=>value
+  * 
+  */
+  handleGoodAttr = (obj) => {
+    this.setState({
+      fields: { ...this.state.fields, ...obj },
+    });
+    console.log('商品信息', { ...this.state.fields, ...obj });
+  }
+
+  /**
+  * 提交商品信息
+  * 
+  */
+  handleSubmitProduct = () => {
+    const { fields, args } = this.state;
+    console.log('url参数', args);
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'good/add',
+      data: {
+        ...fields,
+      },
+    });
+  }
+
   render() {
-    const { isShowModal, isShowAttrMOdal, otherAttrsFiled } = this.state;
+    const { isShowModal, isShowAttrMOdal, otherAttrsFiled, fields } = this.state;
     const { product, good, loading } = this.props;
     const formItemLayout = {
       labelCol: {
@@ -139,7 +178,7 @@ export default class NewGood extends Component {
       },
     };
 
-    console.log('新建props', this.props.product);
+    console.log('新建props和state', this.props.product, this.state);
 
     return (
       <PageHeaderLayout title="新增商品信息" >
@@ -159,19 +198,6 @@ export default class NewGood extends Component {
               onAssociate={this.handleAssociate}
             />
           </Modal>
-          {/* 添加其它属性Modal */}
-          <Modal
-            width="650px"
-            visible={isShowAttrMOdal}
-            title="添加属性项"
-            onCancel={this.onCancel}
-            onOk={this.onOk}
-          >
-            {/*  <AddAttrForm
-              onFieldsChange={this.handleAddOtherAttrFiled}
-            /> */}
-            添加其他属性
-          </Modal>
           <Form layout="horizontal" style={{ with: 1050 }}>
             <FormItem
               label="选择产品"
@@ -184,16 +210,17 @@ export default class NewGood extends Component {
           </Form>
           <NewGoodForm
             loading={loading.models.good}
-            data={product.detail}
+            data={{ ...product.detail, ...fields }}
             onChange={this.handleFormChange}
+            onAttrChange={this.handleGoodAttr}
           />
           <SectionHeader
             title="产品其他属性"
-            extra={<Button style={{ marginLeft: 20 }} icon="plus" onClick={this.ShowAttrModal}>添加其他属性项</Button>}
           />
           <Form style={{ width: 700, maxWidth: '70%' }} >
             {
-              otherAttrsFiled.map((val, idx) => (
+              (product.detail.other_attrs && product.detail.other_attrs.length > 0) ? 
+              (product.detail.other_attrs.map((val, idx) => (
                 <FormItem
                   label={val.attr_name}
                   key={'otherAttr' + idx}
@@ -228,7 +255,7 @@ export default class NewGood extends Component {
                     </Col>
                   </Row>
                 </FormItem>
-              ))
+              ))) : <span>无</span>
             }
           </Form>
           <div className={styles['submit-btn-wrap']}>

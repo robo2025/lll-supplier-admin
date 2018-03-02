@@ -59,7 +59,7 @@ export async function modifyGoodStatus({ goodId, goodStatus, publishType, desc }
 
 
 /**
- * 修改商品信息[审核]
+ * 修改商品信息
  *
  * @param {string} goodId 商品唯一ID
  * @param {object} data 商品数据
@@ -68,6 +68,26 @@ export async function modifyGoodStatus({ goodId, goodStatus, publishType, desc }
 export async function modifyGoodInfo({ goodId, data }) {
   const acess_token = Cookies.get('access_token');
   return lyRequest(`${API_URL}/goods/${goodId}`, {
+    method: 'put',
+    headers: {
+      Authorization: acess_token,
+    },
+    data: {
+      ...data,
+    },
+  });
+}
+
+/**
+ * 修改商品价格
+ *
+ * @param {string} goodId 商品唯一ID
+ * @param {object} data 商品价格区间
+ *
+*/
+export async function modifyGoodPrice({ goodId, data }) {
+  const acess_token = Cookies.get('access_token');
+  return lyRequest(`${API_URL}/goods/${goodId}/price`, {
     method: 'put',
     headers: {
       Authorization: acess_token,
@@ -119,7 +139,7 @@ export async function removeProducts({ ids }) {
 */
 export async function queryOperationLog({ module, goodId }) {
   const acess_token = Cookies.get('access_token');
-  return lyRequest(`${API_URL}/adminlogs?module=${module}`, {
+  return lyRequest(`${API_URL}/operationlogs?module=${module}&object_id=${goodId}`, {
     method: 'get',
     headers: {
       Authorization: acess_token,
