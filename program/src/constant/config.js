@@ -27,7 +27,7 @@ export const REGISTER_URL = `${URL}/register`;
 export const LOGOUT_URL = `${URL}/logout`;
 
 // 静态web服务器地址,端口和地址必须要写，80端口可不写
-const myHost = `${window.location.protocol}/${window.location.host}`;
+const myHost = `${window.location.protocol}//${window.location.host}`;
 
 // 前端登录验证URL
 export const NEXT_URL = `${myHost}/#/test`;
