@@ -12,11 +12,6 @@ const menuData = [{
       path: 'new',
     },
   ],
-}, {
-  name: '使用文档',
-  icon: 'book',
-  path: 'http://blog.liaolunling.top',
-  target: '_blank',
 }];
 
 function formatter(data, parentPath = '') {
