@@ -190,7 +190,7 @@ class BasicLayout extends React.PureComponent {
               // }]}
               copyright={
                 <div>
-                  Copyright <Icon type="copyright" /> 2018 孚中数据科技有限公司
+                  Copyright <Icon type="copyright" /> 2018 工业魔方
                 </div>
               }
             />

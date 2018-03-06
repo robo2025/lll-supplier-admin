@@ -83,7 +83,7 @@ export default class ModifyGood extends Component {
     this.setState({ operationkey: key });
   }
 
-  
+
   // 显示添加其他属性modal  
   ShowAttrModal = () => {
     this.setState({ isShowAttrMOdal: true });
@@ -174,12 +174,28 @@ export default class ModifyGood extends Component {
         columns={columns}
       />,
     };
+    // 其他属性列
+    const attrClomns = [{
+      title: '属性名',
+      dataIndex: 'attr_name',
+      key: 'attr_name',
+    }, {
+      title: '属性值',
+      dataIndex: 'attr_value',
+      key: 'attr_value',
+      render: (text, record) => (
+        <Input
+          defaultValue={text}
+          onChange={(e) => { this.handleAddProductOtherAttr(record.id, { attr_name: record.attr_name, attr_value: e.target.value }); }}
+        />
+      ),
+    }];
 
     console.log('商品详情页index:', good, loading.models.good);
 
     return (
       <PageHeaderLayout title="新增商品信息" >
-        <Card bordered={false} className={styles['new-good-wrap']}>
+        <Card bordered={false} className={styles['modify-good-wrap']}>
           <ModifyGoodForm
             loading={loading.models.good}
             data={fields}
@@ -189,46 +205,15 @@ export default class ModifyGood extends Component {
           <SectionHeader
             title="产品其他属性"
           />
-          <Form style={{ width: 700, maxWidth: '70%' }} >
-            {
-              good.product ? (good.product.detail.map((val, idx) => (
-                <FormItem
-                  label={val.attr_name}
-                  key={'otherAttr' + idx}
-                  {...formItemLayout}
-                >
-                  <Row gutter={12}>
-                    <Col span={6}>
-                      <Input
-                        defaultValue={val.attr_value}
-                        onChange={(e) => {
-                          this.handleAddProductOtherAttr(idx - 100, {
-                            attr_name: val.attr_name,
-                            attr_value: e.target.value,
-                          });
-                        }
-                        }
-                      />
-                    </Col>
-                    <Col span={4}>
-                      <Upload>
-                        <Button icon="upload">上传图片</Button>
-                      </Upload>
-                    </Col>
-                    <Col span={4}>
-                      <span>{val.img_url}</span>
-                    </Col>
-                    <Col span={5}>
-                      <span>
-                        <a>删除</a>|
-                        <a>查看</a>
-                      </span>
-                    </Col>
-                  </Row>
-                </FormItem>
-              ))) : <span>无</span>
-            }
-          </Form>
+          <div style={{ width: '50%', maxWidth: 500 }}>
+            <Table
+              className="attr-table"
+              bordered
+              pagination={false}
+              columns={attrClomns}
+              dataSource={good.product ? good.product.detail : []}
+            />
+          </div>
           <div className={styles['section-header']}>
             <h2>操作日志</h2>
           </div>

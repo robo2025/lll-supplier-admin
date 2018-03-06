@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Form, Spin, Cascader, Input, Row, Col, Upload, Icon, Modal, Button, Tabs, message } from 'antd';
-import RichEditor from '../../components/RichEditor/RichEditor';
+import { Form, Input, Row, Col, Upload, Modal, Tabs, message } from 'antd';
+import RichEditorShow from '../../components/RichEditor/RichEidtorShow';
 import EditableTable from '../../components/CustomTable/EditTable';
-import { checkFile, getFileSuffix, replaceObjFromArr } from '../../utils/tools';
+import { checkFile, replaceObjFromArr } from '../../utils/tools';
 import styles from './good-form.less';
 
 
@@ -167,8 +167,8 @@ export default class NewGoodForm extends Component {
 
   render() {
     const formItemLayout = {
-      labelCol: { span: 2 },
-      wrapperCol: { span: 10 },
+      labelCol: { md: { span: 4 }, xxl: { span: 3 } },
+      wrapperCol: { span: 18 },
     };
     const { getFieldDecorator } = this.props.form;
     const { data, loading } = this.props;
@@ -225,8 +225,8 @@ export default class NewGoodForm extends Component {
     return (
       <div className={styles['good-info-wrap']} >
         {/* 产品主要属性 */}
-        <div style={{ float: 'left', minWidth: 500, maxWidth: '50%' }}>
-          <Form layout="horizontal">
+        <div style={{ float: 'left', width: '50%' }}>
+          <Form layout="horizontal" style={{ width: '100%' }}>
             <FormItem
               label="产品ID"
               {...formItemLayout}
@@ -340,17 +340,6 @@ export default class NewGoodForm extends Component {
               )}
             </FormItem>
             <FormItem
-              label="价格设置"
-              labelCol={{ span: 2 }}
-              wrapperCol={{ span: 18 }}
-              required
-            >
-                <EditableTable
-                  data={data.prices}
-                  onChange={this.props.onAttrChange}
-                />
-            </FormItem>
-            <FormItem
               label="库存数量"
               {...formItemLayout}
             >
@@ -369,7 +358,7 @@ export default class NewGoodForm extends Component {
         <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel} >
           <img alt="example" style={{ width: '100%' }} src={previewImage} />
         </Modal >
-        <div style={{ float: 'left', width: 360 }}>
+        <div style={{ float: 'left', width: '50%', maxWidth: 360 }}>
           <h3>产品图片</h3>
           <Row gutter={24}>
             {uploaders}
@@ -379,33 +368,34 @@ export default class NewGoodForm extends Component {
             {uploaderCAD}
           </Row>
         </div>
+        <div style={{ clear: 'both' }} />
+        <div style={{ width: '95%', maxWidth: 1000 }}>
+          <Form layout="horizontal" style={{ width: '100%' }}>
+            <FormItem
+              label="价格设置"
+              labelCol={{ md: { span: 2 }, xxl: { span: 2 } }}
+              wrapperCol={{ md: { span: 20 }, xxl: { span: 21 } }}
+              required
+            >
+              <EditableTable
+                data={data.prices}
+                onChange={this.props.onAttrChange}
+              />
+            </FormItem>
+          </Form>
+        </div>
         {/* 商品描述、详情 */}
         <div style={{ clear: 'both' }} />
         <div className="good-desc">
           <Tabs defaultActiveKey="1" onChange={(key) => { console.log(key); }}>
             <TabPane tab="商品概述" key="1">
-              <RichEditor
-                onChange={(html) => { this.handleChange('summary', html); }}
-                token="uploadToken"
-                defaultValue={data.product ? data.product.summary : ''}
-                disabled
-              />
+              <RichEditorShow content={data.product ? data.product.summary : ''} />
             </TabPane>
             <TabPane tab="商品详情" key="2">
-              <RichEditor
-                onChange={(html) => { this.handleChange('description', html); }}
-                token="uploadToken"
-                defaultValue={data.product ? data.product.description : ''}
-                disabled
-              />
+              <RichEditorShow content={data.product ? data.product.description : ''} />
             </TabPane>
             <TabPane tab="常见问题FAQ" key="3" >
-              <RichEditor
-                onChange={(html) => { this.handleChange('faq', html); }}
-                token="uploadToken"
-                defaultValue={data.product ? data.product.faq : ''}
-                disabled
-              />
+              <RichEditorShow content={data.product ? data.product.faq : ''} />            
             </TabPane>
           </Tabs>
         </div>

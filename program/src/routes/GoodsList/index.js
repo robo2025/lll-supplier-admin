@@ -302,14 +302,14 @@ export default class GoodsList extends Component {
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={4} sm={24}>
+          <Col xll={4} md={6} sm={24}>
             <FormItem label="商品ID编号">
               {getFieldDecorator('no')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
-          <Col md={4} sm={24}>
+          <Col xll={4} md={6} sm={24}>
             <FormItem label="审核状态">
               {getFieldDecorator('status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
@@ -320,7 +320,7 @@ export default class GoodsList extends Component {
               )}
             </FormItem>
           </Col>
-          <Col md={4} sm={24}>
+          <Col xll={4} md={6} sm={24}>
             <FormItem label="上限架状态">
               {getFieldDecorator('status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
@@ -331,7 +331,14 @@ export default class GoodsList extends Component {
               )}
             </FormItem>
           </Col>
-          <Col md={5} sm={24}>
+          <Col xll={4} md={6} sm={24}>
+            <FormItem label="佣金比率">
+              {getFieldDecorator('no')(
+                <Input placeholder="请输入" />
+              )}
+            </FormItem>
+          </Col>
+          <Col xll={4} md={8} sm={24}>
             <FormItem label="价格">
               {getFieldDecorator('no')(
                 <InputGroup>
@@ -342,19 +349,13 @@ export default class GoodsList extends Component {
               )}
             </FormItem>
           </Col>
-          <Col md={4} sm={24}>
-            <FormItem label="佣金比率">
-              {getFieldDecorator('no')(
-                <Input placeholder="请输入" />
-              )}
-            </FormItem>
-          </Col>
+          
         </Row>
         <div style={{ overflow: 'hidden' }}>
           <span style={{ float: 'right', marginBottom: 24 }}>
             <Button type="primary" htmlType="submit">查询</Button>
             <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>重置</Button>
-            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
+            <a style={{ marginLeft: 8 }} onClick={this.toggleForm} className="unfold">
               展开 <Icon type="down" />
             </a>
           </span>
@@ -368,14 +369,14 @@ export default class GoodsList extends Component {
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={4} sm={24}>
+          <Col xll={4} md={6} sm={24}>
             <FormItem label="商品ID编号">
               {getFieldDecorator('no')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
-          <Col md={4} sm={24}>
+          <Col xll={4} md={6} sm={24}>
             <FormItem label="审核状态">
               {getFieldDecorator('status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
@@ -386,7 +387,7 @@ export default class GoodsList extends Component {
               )}
             </FormItem>
           </Col>
-          <Col md={4} sm={24}>
+          <Col xll={4} md={6} sm={24}>
             <FormItem label="上限架状态">
               {getFieldDecorator('status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
@@ -397,7 +398,14 @@ export default class GoodsList extends Component {
               )}
             </FormItem>
           </Col>
-          <Col md={5} sm={24}>
+          <Col xll={4} md={6} sm={24}>
+            <FormItem label="佣金比率">
+              {getFieldDecorator('no')(
+                <Input placeholder="请输入" />
+              )}
+            </FormItem>
+          </Col>
+          <Col xll={4} md={8} sm={24}>
             <FormItem label="价格">
               {getFieldDecorator('no')(
                 <InputGroup>
@@ -408,37 +416,30 @@ export default class GoodsList extends Component {
               )}
             </FormItem>
           </Col>
-          <Col md={4} sm={24}>
-            <FormItem label="佣金比率">
-              {getFieldDecorator('no')(
-                <Input placeholder="请输入" />
-              )}
-            </FormItem>
-          </Col>
         </Row>
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={4} sm={24}>
+          <Col xll={4} md={6} sm={24}>
             <FormItem label="商品名称">
               {getFieldDecorator('no')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
-          <Col md={4} sm={24}>
+          <Col xll={4} md={6} sm={24}>
             <FormItem label="型号">
               {getFieldDecorator('no')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
-          <Col md={4} sm={24}>
+          <Col xll={4} md={6} sm={24}>
             <FormItem label="品牌">
               {getFieldDecorator('no')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
-          <Col md={4} sm={24}>
+          <Col xll={4} md={6} sm={24}>
             <FormItem label="所属类目">
               {getFieldDecorator('status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
@@ -449,7 +450,7 @@ export default class GoodsList extends Component {
               )}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
+          <Col xll={4} md={10} sm={24}>
             <FormItem label="产品提交日期">
               {getFieldDecorator('no')(
                 <RangePicker onChange={this.onDatepickerChange} />
@@ -461,7 +462,7 @@ export default class GoodsList extends Component {
           <span style={{ float: 'right', marginBottom: 24 }}>
             <Button type="primary" htmlType="submit">查询</Button>
             <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>重置</Button>
-            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
+            <a style={{ marginLeft: 8 }} onClick={this.toggleForm} className="unfold">
               收起 <Icon type="up" />
             </a>
           </span>
@@ -488,12 +489,14 @@ export default class GoodsList extends Component {
     console.log('商品列表页', this.state);
 
     return (
-      <PageHeaderLayout title="查询表格">
-        <Card bordered={false}>
-          <div className={styles.tableList}>
+      <PageHeaderLayout title="商品列表">
+        <Card bordered={false} className={styles['search-wrap']} title="搜索条件">
             <div className={styles.tableListForm}>
               {this.renderForm()}
             </div>
+        </Card>
+        <Card bordered={false}>
+          <div className={styles.tableList}>
             <div className={styles.tableListOperator}>
               <Button onClick={this.showExportModal}>导出数据</Button>
             </div>

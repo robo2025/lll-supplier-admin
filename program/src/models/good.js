@@ -28,14 +28,16 @@ export default {
         payload: response.data,
       });
     },
-    *add({ data, callback }, { call, put }) {
-      yield call(addGood, { data });
+    *add({ data, success, error }, { call, put }) {
+      const res = yield call(addGood, { data });
+      if (res.rescode >> 0 === 10000) {
+        if (success) { success(res); }
+      } else if (error) { error(res); }
       const response = yield call(queryGoods);
       yield put({
         type: 'saveOne',
         payload: response.data,
       });
-      if (callback) callback();
     },
     *modifyInfo({ goodId, data, callback }, { call, put }) {
       const res = yield call(modifyGoodInfo, { goodId, data });

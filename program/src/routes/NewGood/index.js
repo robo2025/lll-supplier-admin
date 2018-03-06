@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Modal, Button, Row, Col, Form, Input, Upload } from 'antd';
+import { Card, Modal, Button, Row, Col, Form, Input, Table, message } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import SectionHeader from '../../components/PageHeader/SectionHeader';
 import ProductList from '../../components/CustomTable/ProductList';
@@ -99,6 +99,7 @@ export default class NewGood extends Component {
   hashChangeFire = () => {
     const { dispatch } = this.props;
     const args = queryString.parse(this.props.location.search);
+    this.setState({ args });
     if (args.origin_prdId) {
       dispatch({
         type: 'product/fetchDetail',
@@ -160,7 +161,10 @@ export default class NewGood extends Component {
       type: 'good/add',
       data: {
         ...fields,
+        product_id: args.origin_prdId,
       },
+      success: (res) => { this.props.history.push('/goods/list'); },
+      error: (res) => { message.error(res.msg, 2.5); },
     });
   }
 
@@ -177,6 +181,22 @@ export default class NewGood extends Component {
         sm: { span: 21 },
       },
     };
+     // 其他属性列
+     const attrClomns = [{
+      title: '属性名',
+      dataIndex: 'attr_name',
+      key: 'attr_name',
+    }, {
+      title: '属性值',
+      dataIndex: 'attr_value',
+      key: 'attr_value',
+      render: (text, record) => (
+      <Input 
+        defaultValue={text}      
+        onChange={(e) => { this.handleAddProductOtherAttr(record.id, { attr_name: record.attr_name, attr_value: e.target.value }); }}
+      />
+      ),
+    }];
 
     console.log('新建props和state', this.props.product, this.state);
 
@@ -198,17 +218,8 @@ export default class NewGood extends Component {
               onAssociate={this.handleAssociate}
             />
           </Modal>
-          <Form layout="horizontal" style={{ with: 1050 }}>
-            <FormItem
-              label="选择产品"
-              required
-              labelCol={{ span: 2 }}
-              wrapperCol={{ span: 6 }}
-            >
-              <Button type="primary" onClick={this.showModal}>选择产品</Button>
-            </FormItem>
-          </Form>
           <NewGoodForm
+            showModal={this.showModal}
             loading={loading.models.good}
             data={{ ...product.detail, ...fields }}
             onChange={this.handleFormChange}
@@ -217,47 +228,15 @@ export default class NewGood extends Component {
           <SectionHeader
             title="产品其他属性"
           />
-          <Form style={{ width: 700, maxWidth: '70%' }} >
-            {
-              (product.detail.other_attrs && product.detail.other_attrs.length > 0) ? 
-              (product.detail.other_attrs.map((val, idx) => (
-                <FormItem
-                  label={val.attr_name}
-                  key={'otherAttr' + idx}
-                  {...formItemLayout}
-                >
-                  <Row gutter={12}>
-                    <Col span={6}>
-                      <Input
-                        defaultValue={val.attr_value}
-                        onChange={(e) => {
-                          this.handleAddProductOtherAttr(idx - 100, {
-                            attr_name: val.attr_name,
-                            attr_value: e.target.value,
-                          });
-                        }
-                        }
-                      />
-                    </Col>
-                    <Col span={4}>
-                      <Upload>
-                        <Button icon="upload">上传图片</Button>
-                      </Upload>
-                    </Col>
-                    <Col span={4}>
-                      <span>{val.img_url}</span>
-                    </Col>
-                    <Col span={5}>
-                      <span>
-                        <a>删除</a>|
-                        <a>查看</a>
-                      </span>
-                    </Col>
-                  </Row>
-                </FormItem>
-              ))) : <span>无</span>
-            }
-          </Form>
+          <div style={{ width: '50%', maxWidth: 500 }}>
+            <Table
+              className="attr-table"
+              bordered
+              pagination={false}
+              columns={attrClomns}
+              dataSource={product.detail.other_attrs}
+            />
+          </div>
           <div className={styles['submit-btn-wrap']}>
             <Button type="primary" onClick={this.handleSubmitProduct}>提交审核</Button>
             <Button onClick={() => { this.props.history.push('/goods/list'); }}>取消</Button>

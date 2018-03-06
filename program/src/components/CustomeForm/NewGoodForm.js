@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Form, Spin, Cascader, Input, Row, Col, Upload, Icon, Modal, Button, Tabs, message } from 'antd';
-import RichEditor from '../../components/RichEditor/RichEditor';
 import EditableTable from '../../components/CustomTable/EditTable';
 import { checkFile, getFileSuffix, replaceObjFromArr } from '../../utils/tools';
+import RichEditorShow from '../../components/RichEditor/RichEidtorShow';
 import styles from './good-form.less';
 
 
@@ -31,6 +31,7 @@ function getPic(key, pics) {
     return [];
   }
 }
+const imagesType = ['正面', '反面', '侧面', '包装图1', '包装图2', '包装图3'];
 
 @Form.create({
   mapPropsToFields(props) {
@@ -162,8 +163,8 @@ export default class NewGoodForm extends Component {
 
   render() {
     const formItemLayout = {
-      labelCol: { span: 2 },
-      wrapperCol: { span: 10 },
+      labelCol: { md: { span: 4 }, xxl: { span: 3 } },
+      wrapperCol: { span: 18 },
     };
     const { getFieldDecorator } = this.props.form;
     const { data, loading } = this.props;
@@ -178,7 +179,7 @@ export default class NewGoodForm extends Component {
 
     let uploaders = []; // 商品图片   
     let uploaderCAD = []; // 商品cad文件 
-    
+
     if (data.pics) {
       // 商品图片集合
       uploaders = data.pics.map(val => (
@@ -194,7 +195,7 @@ export default class NewGoodForm extends Component {
             onPreview={this.handlePreview}
             onChange={({ fileList }) => { this.handleUploaderChange('b', fileList); }}
           />
-          <p className="upload-pic-desc">{val.img_type}</p>
+          <p className="upload-pic-desc">{imagesType[val.img_type - 1]}</p>
         </Col>
       ));
       // 商品cad集合
@@ -223,8 +224,14 @@ export default class NewGoodForm extends Component {
     return (
       <div className={styles['good-info-wrap']} >
         {/* 产品主要属性 */}
-        <div style={{ float: 'left', minWidth: 500, maxWidth: '50%' }}>
-          <Form layout="horizontal">
+        <div style={{ float: 'left', width: '50%' }}>
+          <Form layout="horizontal" style={{ width: '100%' }}>
+            <FormItem
+              label="选择产品"
+              {...formItemLayout}
+            >
+              <Button type="primary" onClick={this.props.showModal}>选择产品</Button>
+            </FormItem>
             <FormItem
               label="产品ID"
               {...formItemLayout}
@@ -299,7 +306,7 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('shelf_life', {
-                 rules: [{
+                rules: [{
                   required: true,
                   message: '请输入库质保期',
                 }],
@@ -321,17 +328,6 @@ export default class NewGoodForm extends Component {
               )}
             </FormItem>
             <FormItem
-              label="价格设置"
-              labelCol={{ span: 2 }} 
-              wrapperCol={{ span: 18 }}
-              required
-            >
-                <EditableTable
-                  data={data.prices}
-                  onChange={this.props.onAttrChange}
-                />
-            </FormItem>
-            <FormItem
               label="库存数量"
               {...formItemLayout}
             >
@@ -350,8 +346,8 @@ export default class NewGoodForm extends Component {
         <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel} >
           <img alt="example" style={{ width: '100%' }} src={previewImage} />
         </Modal >
-        <div style={{ float: 'left', width: 360 }}>
-          <h3>产品图片</h3>
+        <div style={{ float: 'left', width: '50%', maxWidth: 360 }}>
+          <h3 style={{ paddingTop: 12, paddingBottom: 15 }}>产品图片</h3>
           <Row gutter={24}>
             {uploaders}
           </Row>
@@ -360,32 +356,39 @@ export default class NewGoodForm extends Component {
             {uploaderCAD}
           </Row>
         </div>
+        <div style={{ clear: 'both' }} />
+        <div style={{ width: '95%', maxWidth: 1000 }}>
+          <Form layout="horizontal" style={{ width: '100%' }}>
+            <FormItem
+              label="价格设置"
+              labelCol={{ md: { span: 2 }, xxl: { span: 2 } }}
+              wrapperCol={{ md: { span: 20 }, xxl: { span: 21 } }}
+              required
+            >
+              <EditableTable
+                data={data.prices}
+                onChange={this.props.onAttrChange}
+              />
+            </FormItem>
+          </Form>
+        </div>
         {/* 商品描述、详情 */}
         <div style={{ clear: 'both' }} />
         <div className="good-desc">
           <Tabs defaultActiveKey="1" onChange={(key) => { console.log(key); }}>
             <TabPane tab="商品概述" key="1">
-              <RichEditor
-                onChange={(html) => { this.handleChange('summary', html); }}
-                token="uploadToken"
-                defaultValue={data.summary}
-                disabled
+              <RichEditorShow
+                content={data.summary}
               />
             </TabPane>
             <TabPane tab="商品详情" key="2">
-              <RichEditor
-                onChange={(html) => { this.handleChange('description', html); }}
-                token="uploadToken"
-                defaultValue={data.description}
-                disabled             
+              <RichEditorShow
+                content={data.description}
               />
             </TabPane>
             <TabPane tab="常见问题FAQ" key="3" >
-              <RichEditor
-                onChange={(html) => { this.handleChange('faq', html); }}
-                token="uploadToken"
-                defaultValue={data.faq}
-                disabled                
+              <RichEditorShow
+                content={data.faq}
               />
             </TabPane>
           </Tabs>

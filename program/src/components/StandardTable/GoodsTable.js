@@ -2,7 +2,7 @@
  * @Author: lll
  * @Date: 2018-01-26 14:08:45
  * @Last Modified by: lll
- * @Last Modified time: 2018-03-02 11:51:55
+ * @Last Modified time: 2018-03-06 14:10:16
  */
 import React, { PureComponent, Fragment } from 'react';
 import moment from 'moment';
@@ -91,19 +91,19 @@ class GoodsTable extends PureComponent {
       {
         title: '一级类目',
         dataIndex: 'product',
-        render: val => (<span >{val.category.category_name}</span>),
+        render: val => (<span >{val.category ? val.category.category_name : ''}</span>),
         key: 'category_name_1',
       },
       {
         title: '二级类目',
         dataIndex: 'product',
-        render: val => (<span >{val.category.children.category_name}</span>),
+        render: val => (<span >{val.category ? val.category.children.category_name : ''}</span>),
         key: 'category_name_2',
       },
       {
         title: '三级类目',
         dataIndex: 'product',
-        render: val => (<span >{val.category.children.children.category_name}</span>),
+        render: val => (<span >{val.category ? val.category.children.children.category_name:''}</span>),
         key: 'category_name_3',
       },
       
