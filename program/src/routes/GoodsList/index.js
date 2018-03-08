@@ -5,6 +5,7 @@ import GoodsTable from '../../components/StandardTable/GoodsTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import GoodCheckboxGroup from '../../components/Checkbox/GoodCheckboxGroup';
 import EditableTable from '../../components/CustomTable/EditTable';
+import { handleServerMsg } from '../../utils/tools';
 import styles from './index.less';
 
 const FormItem = Form.Item;
@@ -95,7 +96,7 @@ export default class GoodsList extends Component {
         goodStatus: 0,
         publishType: unpublishReason.publish_type,
         desc: unpublishReason.desc,
-        callback: () => { alert('下架成功。'); },
+        success: (res) => { message.success('下架成功。'); },
       });
     }
   }
@@ -117,7 +118,7 @@ export default class GoodsList extends Component {
     dispatch({
       type: 'good/queryExport',
       fields: this.state.exportFields,
-      callback: (res) => {
+      success: (res) => {
         console.log('http://139.199.96.235:9005/api/goods_reports?filename=' + res.filename);
         window.open('http://139.199.96.235:9005/api/goods_reports?filename=' + res.filename);
       },
@@ -136,7 +137,9 @@ export default class GoodsList extends Component {
       type: 'good/modifyGoodStatus',
       goodId,
       goodStatus: status,
-      callback: () => { alert('上架成功'); },
+      // success: (res) => { message.success('修改成功'); },
+      error: (res) => { message.error(handleServerMsg(res.msg)); },
+      
     });
   }
 
@@ -181,6 +184,7 @@ export default class GoodsList extends Component {
       data: {
         prices,
       },
+      error: (res) => { message.error(handleServerMsg(res.msg)); },      
     });
   }
   // 取消：价格设置Modal 

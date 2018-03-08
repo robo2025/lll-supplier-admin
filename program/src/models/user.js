@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import { query as queryUsers, queryCurrent, getUserInfo } from '../services/user';
+import { queryCurrent, getUserInfo } from '../services/user';
 
 export default {
   namespace: 'user',
@@ -17,8 +17,10 @@ export default {
         type: 'changeLoading',
         payload: true,
       });
+      alert(1)
       const response = yield call(getUserInfo);
-      console.log('当前用户数据：', response);
+      alert(2)
+      alert('当前用户数据：', response);
       window.sessionStorage.setItem('userinfo', JSON.stringify(response.data));
       Cookies.set('userinfo', JSON.stringify(response.data), { expires: 7 });
       yield put({

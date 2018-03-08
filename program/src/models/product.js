@@ -1,4 +1,5 @@
 import { queryProducts, queryProductDetail } from '../services/product';
+import { SUCCESS_STATUS } from '../constant/config.js';
 
 export default {
   namespace: 'product',
@@ -9,21 +10,26 @@ export default {
   },
 
   effects: {
-    *fetch(_, { call, put }) {
-      const response = yield call(queryProducts);
+    *fetch({ success, error }, { call, put }) {
+      const res = yield call(queryProducts);
+      if (res.rescode >> 0 === SUCCESS_STATUS) {
+        if (typeof success === 'function') { success(res); }
+      } else if (typeof error === 'function') { error(res); return; }
+
       yield put({
         type: 'save',
-        payload: response.data,
+        payload: res.data,
       });
     },
-    *fetchDetail({ productId, callback }, { call, put }) {
-      const response = yield call(queryProductDetail, { productId });
-      if (response.rescode >> 0 === 10000) {
-        if (callback) callback(response.data);
-      }
+    *fetchDetail({ productId, success, error }, { call, put }) {
+      const res = yield call(queryProductDetail, { productId });
+      if (res.rescode >> 0 === SUCCESS_STATUS) {
+        if (typeof success === 'function') { success(res); }
+      } else if (typeof error === 'function') { error(res); return; }
+
       yield put({
         type: 'saveDetail',
-        payload: response.data,
+        payload: res.data,
       });
     },
   },

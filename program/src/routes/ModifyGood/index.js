@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import moment from 'moment';
 import { connect } from 'dva';
-import { Card, Modal, Button, Row, Col, Form, Input, Upload, Table } from 'antd';
+import { Card, Button, Input, message, Table } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import SectionHeader from '../../components/PageHeader/SectionHeader';
 import ModifyGoodForm from '../../components/CustomeForm/ModifyGoodForm';
-import { queryString } from '../../utils/tools';
+import { queryString, handleServerMsg } from '../../utils/tools';
 
 import styles from './index.less';
 
-const FormItem = Form.Item;
 const actionFlag = ['新增', '修改', '删除']; // 操作类型 (1:新增 2:修改 3:删除)
 const operationTabList = [{
   key: 'tab1',
@@ -68,7 +67,7 @@ export default class ModifyGood extends Component {
     dispatch({
       type: 'good/fetchDetail',
       goodId: args.goodId,
-      callback: (res) => { this.setState({ fields: res }); },
+      success: (res) => { this.setState({ fields: res }); },
     });
     // 获取商品日志
     dispatch({
@@ -128,6 +127,7 @@ export default class ModifyGood extends Component {
       data: {
         shelf_life, sales_unit, stock, min_buy, prices,
       },
+      error: (res) => { message.error(handleServerMsg(res.msg)); },      
     });
   }
 

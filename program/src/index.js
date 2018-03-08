@@ -20,6 +20,7 @@ app.use(createLoading());
 
 // 3. Register global model
 app.model(require('./models/global').default);
+app.model(require('./models/user').default);
 
 // 4. Router
 app.router(require('./router').default);

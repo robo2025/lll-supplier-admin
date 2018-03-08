@@ -1,6 +1,6 @@
+import { Modal, notification } from 'antd';
 import axios from 'axios';
 import { login, jumpToLogin } from '../services/user';
-import { Modal, notification } from 'antd';
 
 
 const codeMessage = {
@@ -50,15 +50,15 @@ axios.interceptors.response.use((response) => {
   const response = error.response;
   /*
    * 如果响应头是以200开头，则是登录验证出了问题，跳转到登录页面
-   *   20001	token不存在
-   *   20002	token过期
-   *   20003	token非法
-   *   20004	登录超时
-   *   30001	无管理员权限
+   *   20001  token不存在
+   *   20002  token过期
+   *   20003  token非法
+   *   20004  登录超时
+   *   30001  无管理员权限
    * */
   if ((response.data.rescode >> 0) === 30001) {
     // 没有权限
-    alert('非管理员账号，没有此系统权限');
+    alert('当前账号没有此系统权限，请重新登录。');
     jumpToLogin();
     return;
   }
@@ -80,7 +80,5 @@ axios.interceptors.response.use((response) => {
     description: codeMessage[response.status],
   });
   console.log('服务器错误:', error.response);
-  return;
-
   return Promise.reject(error);
 });

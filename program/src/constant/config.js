@@ -43,3 +43,14 @@ export const FILE_SERVER = '//imgcdn.robo2025.com/';
 
 // 分页：每页显示多少记录
 export const PAGE_SIZE = 10;
+
+
+// 接口请求状态码
+export const SUCCESS_STATUS = 10000; // 操作成功
+export const FAIL_STATUS = 10001; // 操作失败
+export const NO_TOKEN = 20001; // token不存在
+export const EXPIRED_TOKEN = 20002; // token过期
+export const ILLEGAL_TOKEN = 20003; // 非法token
+export const LOGIN_TIMEOUT = 20004; // 登录超时
+export const NO_AUTH = 30001; // 无权限
+

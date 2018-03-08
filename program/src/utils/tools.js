@@ -138,3 +138,14 @@ export function addKeyValToArr(arr, obj) {
     return { ...val, ...obj };
   });
 }
+
+
+// 处理服务器错误信息
+export function handleServerMsg(str) {
+  const strArr = str.split(':');
+  if (strArr.length === 2) {
+    return strArr[1];
+  } else {
+    return strArr[0];
+  }
+}
