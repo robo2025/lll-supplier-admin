@@ -12,7 +12,7 @@ export const URL = 'https://login.robo2025.com';
 export const API_URL = 'http://139.199.96.235:9005/api';
 
 // 上传文件获取token URL
-export const UPLOAD_URL = 'http://139.199.96.235:9002';
+export const UPLOAD_URL = 'http://123.206.92.160:9020';
 
 // 用户管理系统API URL
 export const USERS_URL = 'http://139.199.96.235:9006';
