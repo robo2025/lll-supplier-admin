@@ -17,10 +17,7 @@ export default {
         type: 'changeLoading',
         payload: true,
       });
-      alert(1)
       const response = yield call(getUserInfo);
-      alert(2)
-      alert('当前用户数据：', response);
       window.sessionStorage.setItem('userinfo', JSON.stringify(response.data));
       Cookies.set('userinfo', JSON.stringify(response.data), { expires: 7 });
       yield put({

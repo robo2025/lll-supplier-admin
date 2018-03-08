@@ -12,7 +12,6 @@ class Test extends React.Component {
     dispatch({
       type: 'user/fetch',
     });
-    alert(0);
   }
 
   render() {

@@ -205,7 +205,7 @@ export default class NewGood extends Component {
         <Card bordered={false} className={styles['new-good-wrap']}>
           {/* 参照数据Modal */}
           <Modal
-            width="65%"
+            width="80%"
             visible={isShowModal}
             title="关联参照数据"
             okText=""
