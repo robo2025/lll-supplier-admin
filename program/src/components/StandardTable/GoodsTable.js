@@ -2,7 +2,7 @@
  * @Author: lll
  * @Date: 2018-01-26 14:08:45
  * @Last Modified by: lll
- * @Last Modified time: 2018-03-08 13:44:11
+ * @Last Modified time: 2018-03-12 16:59:08
  */
 import React, { PureComponent, Fragment } from 'react';
 import moment from 'moment';
@@ -164,10 +164,10 @@ class GoodsTable extends PureComponent {
             <a href={'#/goods/modify?goodId=' + record.id}>修改</a>
             <Divider type="vertical" />            
             <a
-              onClick={() => onPublish(record.id, (record.is_publish === 1) && (record.is_trade === 1) ? 0 : 1)}
+              onClick={() => onPublish(record.id, (record.is_publish === 1) ? 0 : 1)}
               disabled={record.audit_status !== 1}
             >
-              {(record.is_publish === 1) && (record.is_trade === 1) ? '申请下架' : '申请上架'}
+              {(record.is_publish === 1) ? '申请下架' : '申请上架'}
             </a>
             <Divider type="vertical" />
             <a onClick={() => { onPriceSetting(record.id); }}>价格设置</a>
