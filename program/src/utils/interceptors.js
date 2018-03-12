@@ -1,6 +1,6 @@
 import { Modal, notification } from 'antd';
 import axios from 'axios';
-import { login, jumpToLogin } from '../services/user';
+import { login, logout, jumpToLogin } from '../services/user';
 
 
 const codeMessage = {
@@ -58,8 +58,8 @@ axios.interceptors.response.use((response) => {
    * */
   if ((response.data.rescode >> 0) === 30001) {
     // 没有权限
-    alert('当前账号没有此系统权限，请重新登录。');
-    jumpToLogin();
+    alert(response.data.msg);
+    logout();
     return;
   }
   if ((response.data.rescode >> 0) > 20000) {
