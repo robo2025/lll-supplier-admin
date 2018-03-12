@@ -67,7 +67,7 @@ export default class ModifyGood extends Component {
     dispatch({
       type: 'good/fetchDetail',
       goodId: args.goodId,
-      success: (res) => { this.setState({ fields: res }); },
+      success: (res) => { this.setState({ fields: res.data }); },
     });
     // 获取商品日志
     dispatch({
@@ -191,7 +191,7 @@ export default class ModifyGood extends Component {
       ),
     }];
 
-    console.log('商品详情页index:', good, loading.models.good);
+    console.log('商品修改详情页:', good, loading.models.good);
 
     return (
       <PageHeaderLayout title="新增商品信息" >

@@ -1,6 +1,6 @@
 const menuData = [{
   name: '商品管理',
-  icon: 'dashboard',
+  icon: 'shop',
   path: 'goods',
   children: [
     {
@@ -10,6 +10,26 @@ const menuData = [{
     {
       name: '新增商品信息',
       path: 'new',
+    },
+  ],
+}, {
+  name: '交易管理',
+  icon: 'credit-card',
+  path: 'deal',
+  children: [
+    {
+      name: '客户订单列表',
+      path: 'orders',
+    },
+  ],
+}, {
+  name: '退货管理',
+  icon: 'check-square-o',
+  path: 'returns',
+  children: [
+    {
+      name: '退货单列表',
+      path: 'list',
     },
   ],
 }];
