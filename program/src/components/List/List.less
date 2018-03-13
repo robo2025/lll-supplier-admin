@@ -1,60 +1,70 @@
 .list{
   border: 1px solid #eee;
+  margin-bottom:15px;
   :global{
     .list-item{
       width: 100%;
       height: 110px;
-      justify-content: space-around;
-      align-items: center;
       border-top: 1px solid #eee;
-      .td{
-        width: 8%;
-        float: left;        
+      display: flex;
+      align-items: center;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      .item:first-child{
+        text-align: left;
+        text-indent: 15px;
+      }
+      .item{
         height: 110px;
         line-height: 110px;
         text-align: center;
-      }
-      .title{
-        text-overflow: ellipsis;
         overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
       }
-      .type,.title,.brand,.price{
-        width: 15%;;
-      }
-      .unit{
-        width: 6%;
-      }
       .amount{
-        width: 15%;
+        display: flex;
+        flex-direction: column;
+        line-height: normal;
+        justify-content: center;
+        align-items: center;
+        .money{
+          color: #CA0000;
+        }
+        .delivery{
+          color: #999;
+        }
       }
       .extra{
-        line-height: normal !important;
-        width: 10%;
-        float: right;
-        *{
-          display: block;
-          margin: 6px auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        line-height: normal;
+        >*{
+          margin: 3px 0;
+        }
+        .btn{
+          border: 1px solid #1890FF;
+          color: #1890ff;
+          width: 65px;
+          height: 25px;
+          line-height: 23px;
+          border-radius: 3px;
+          box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.05);
+          cursor: pointer;
+          transition: all 0.3s;
+          text-align: center;
+        }
+        .btn:hover{
+          box-shadow: 1px 1px 8px 1px rgba(2,117,216,0.3);
+          transition: border 2s;
         }
       }
     }
     .vertical{
       border-left: 1px solid #eee;
     }
-    .btn{
-      border: 1px solid #1890FF;
-      color: #1890ff;
-      width: 80px;
-      height: 30px;
-      line-height: 30px;
-      border-radius: 3px;
-      box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.05);
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .btn:hover{
-      box-shadow: 1px 1px 8px 1px rgba(2,117,216,0.3);
-      transition: border 2s;
-    }
+    
   }
 }

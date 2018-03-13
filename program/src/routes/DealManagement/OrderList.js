@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, Form, Input, Checkbox, Select, Icon, Button, Menu, DatePicker, Modal, message } from 'antd';
+import { Row, Col, Card, Form, Input, Select, Icon, Button, DatePicker } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import List from '../../components/List/List';
 
@@ -7,7 +7,6 @@ import styles from './OrderList.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
-const InputGroup = Input.Group;
 const { RangePicker } = DatePicker;
 
 // 订单列表假数据
@@ -219,8 +218,10 @@ export default class OrderList extends Component {
 
   render() {
     const orderListItemHeader = (
-      <div>
-        <b>客户订单编号</b><a href="#">XH1611060005</a><span>(2017-12-07 17:12)</span>
+      <div className={styles['order-list-header']}>
+        <b>客户订单编号：</b>
+        <a href="#" className="order-sn">XH1611060005</a>
+        <span className="order-time">(2017-12-07 17:12)</span>
       </div>
     );
 
@@ -231,14 +232,21 @@ export default class OrderList extends Component {
             {this.renderForm()}
           </div>
         </Card>
-        <Card border={false}>
+        <Card bordered={false}>
             <div className={styles.tableList}>
               <List
                 header={orderListItemHeader}
                 data={orderListData}
               />
+              <List
+                header={orderListItemHeader}
+                data={orderListData}
+              />
+               <List
+                header={orderListItemHeader}
+                data={orderListData}
+               />
             </div>
-
         </Card>
       </PageHeaderLayout>
     );

@@ -21,6 +21,10 @@ const menuData = [{
       name: '客户订单列表',
       path: 'orders',
     },
+    {
+      name: '订单详情页',
+      path: 'orders/detail',
+    },
   ],
 }, {
   name: '退货管理',

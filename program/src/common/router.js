@@ -65,6 +65,10 @@ export const getRouterData = (app) => {
     '/deal/orders': {
       component: dynamicWrapper(app, ['product', 'good'], () => import('../routes/DealManagement/OrderList')),
     },
+    '/deal/:orders/detail': {
+      component: dynamicWrapper(app, ['product', 'good'], () => import('../routes/DealManagement/OrderDetail')),
+      name: '订单详情',
+    },
     '/returns/list': {
       component: dynamicWrapper(app, ['product', 'good'], () => import('../routes/ReturnsManagement/ReturnsList')),
     },
