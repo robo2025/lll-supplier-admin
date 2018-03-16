@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, Form, Input, Checkbox, Select, Icon, Button, Menu, DatePicker, Modal, message } from 'antd';
+import { connect } from 'dva';
+import { Row, Col, Card, Form, Input, Select, Icon, Button, DatePicker } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import List from '../../components/List/ReturnsList';
 
@@ -10,6 +11,10 @@ const { Option } = Select;
 const InputGroup = Input.Group;
 const { RangePicker } = DatePicker;
 
+@connect(({ orders, loading }) => ({
+  orders,
+  loading: loading.models.orders,
+}))
 @Form.create()
 export default class ReturnsList extends Component {
   constructor(props) {
@@ -17,6 +22,13 @@ export default class ReturnsList extends Component {
     this.state = {
       expandForm: false,
     };
+  }
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'orders/fetchReturns',
+    });
   }
 
   toggleForm = () => {

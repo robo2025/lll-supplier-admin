@@ -44,6 +44,5 @@ export function login() {
 
 // 纯跳转到首页，不带next参数
 export function jumpToLogin() {
-  alert(123);
   window.location.href = `${LOGIN_URL}?next=${encodeURIComponent(HOME_PAGE)}&disable_redirect=1`;
 }

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Cookies from 'js-cookie';
 import { Card, Icon, Table, Badge } from 'antd';
 import { connect } from 'dva';
 import moment from 'moment';
@@ -127,15 +128,17 @@ const receiptColumns = [{
   title: '更新日期',
   dataIndex: 'add_time',
   key: 'add_time',
+  render: text => (<span>{moment(text * 1000).format('YYYY-MM-DD')}</span>),
 }, {
   title: '操作人员',
   dataIndex: 'operator',
   key: 'operator',
-  render: () => (<span>{JSON.parse(sessionStorage.getItem('userinfo')).username }</span>),
+  render: () => (<span>{Cookies.getJSON('userinfo').username}</span>),
 }, {
   title: '备注',
   dataIndex: 'remarks',
   key: 'remarks',
+  render: text => (<span>{text || '无'}</span>),
 }];
 
 
@@ -151,6 +154,7 @@ export default class OrderDetail extends Component {
       operationkey: 'tab1',
     };
   }
+
   componentDidMount() {
     const { dispatch } = this.props;
     const { args } = this.state;
@@ -162,6 +166,7 @@ export default class OrderDetail extends Component {
   }
 
   render() {
+    console.log(Cookies.getJSON('userinfo').username);
     const { orders, loading } = this.props;
     const { detail } = orders;// 订单详情
     const orderInfo = detail.order_info || {}; // 订单信息

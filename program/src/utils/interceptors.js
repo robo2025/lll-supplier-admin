@@ -58,7 +58,7 @@ axios.interceptors.response.use((response) => {
    * */
   if ((response.data.rescode >> 0) === 30001) {
     // 没有权限
-    alert(response.data.msg + '1');
+    alert(response.data.msg);
     // logout();
     jumpToLogin();
     return;
