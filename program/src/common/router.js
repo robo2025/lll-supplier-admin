@@ -63,14 +63,18 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, ['product', 'good'], () => import('../routes/GoodDetail')),
     },
     '/deal/orders': {
-      component: dynamicWrapper(app, ['product', 'good'], () => import('../routes/DealManagement/OrderList')),
+      component: dynamicWrapper(app, ['orders', 'upload'], () => import('../routes/DealManagement/OrderList')),
     },
     '/deal/:orders/detail': {
-      component: dynamicWrapper(app, ['product', 'good'], () => import('../routes/DealManagement/OrderDetail')),
+      component: dynamicWrapper(app, ['orders'], () => import('../routes/DealManagement/OrderDetail')),
       name: '订单详情',
     },
     '/returns/list': {
-      component: dynamicWrapper(app, ['product', 'good'], () => import('../routes/ReturnsManagement/ReturnsList')),
+      component: dynamicWrapper(app, ['orders'], () => import('../routes/ReturnsManagement/ReturnsList')),
+    },
+    '/returns/:list/detail': {
+      component: dynamicWrapper(app, ['orders'], () => import('../routes/ReturnsManagement/ReturnsDetail')),
+      name: '退货单详情',
     },
   };
   // Get name from ./menu.js or just set it in the router data.

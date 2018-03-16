@@ -35,6 +35,10 @@ const menuData = [{
       name: '退货单列表',
       path: 'list',
     },
+    {
+      name: '退货单详情',
+      path: 'list/detail',
+    },
   ],
 }];
 

@@ -109,7 +109,7 @@ export default class PageHeader extends PureComponent {
         <Breadcrumb.Item key="home">
           {createElement(linkElement, {
             [linkElement === 'a' ? 'href' : 'to']: '/',
-          }, '首页')}
+          }, '供应商系统首页')}
         </Breadcrumb.Item>
       )].concat(extraBreadcrumbItems);
       breadcrumb = (

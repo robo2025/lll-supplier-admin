@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, Form, Input, Select, Icon, Button, DatePicker } from 'antd';
+import { Row, Col, Card, Form, Input, Select, Icon, Button, DatePicker, Modal, message } from 'antd';
+import { connect } from 'dva';
+import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import List from '../../components/List/List';
+import InvoiceContent from '../../components/ModalContent/InvoiceContent';
+import OpenReceiptContent from '../../components/ModalContent/OpenReceiptContent';
+import ExceptionContent from '../../components/ModalContent/ExceptionContent';
+import { handleServerMsg } from '../../utils/tools';
 
 import styles from './OrderList.less';
 
@@ -9,47 +15,131 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-// 订单列表假数据
-const orderListData = [];
-for (let i = 0; i < 5; i++) {
-  orderListData.push({
-    order_sn: '123456',
-    add_time: '2018-03-02',
-    sub_order: [
-      {
-          son_order_sn: 'DD00000009800000' + i,
-          supplier_id: 100 + i,
-          number: 10,
-          univalent: 19.9,
-          max_delivery_time: 7,
-          status: '已确认收货',
-          subtotal_money: 199,
-          goods_id: 1,
-          model: 'AK-47',
-          brand: 'bronk',
-          commission: 0,
-          open_receipt: [
-              {
-                  receipt_sn: 12345556,
-                  order_sn: 'DD000000098000001',
-                  images: '6ONXsjip0QIZ8tyhnq/it/u=3217455691,1712838045&fm=173&s=99A4E5175FD271EFCAF1C4F803004021&w=218&h=146&img.JPEG',
-                  remarks: '',
-                  add_time: '2018-03-03T11:37:25.048172',
-              },
-          ],
-      },
-  ],
-  });
-}
- 
 
+@connect(({ orders, upload, loading }) => ({
+  orders,
+  upload,
+  loading: loading.models.orders,
+}))
 @Form.create()
 export default class OrderList extends Component {
   constructor(props) {
     super(props);
     this.state = {
       expandForm: false,
+      isShowDeliveryModal: false, // 发货单模态框
+      isShowOpenModal: false, // 开票模态框
+      isShowExceptionModal: false,
+      receiptInfo: {}, // 开票Form信息
+      deliveryInfo: {}, // 发货Form信息
+      exceptionInfo: {}, // 异常Form信息
+      openReceipt: [], // 开票信息
     };
+  }
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'orders/fetch',
+      supplierId: 100,
+    });
+    dispatch({
+      type: 'upload/fetch',
+    });
+  }
+
+  // 显示模态框
+  showModal = (key, id, data) => {
+    console.log('i am click', id, data);
+    const tempJson = {};
+    tempJson[key] = true;
+    this.setState({ ...tempJson, orderId: id, openReceipt: data.open_receipt, data });
+  }
+
+  // 取消
+  cancelModal = (key) => {
+    const tempJson = {};
+    tempJson[key] = false;
+    this.setState(tempJson);
+  }
+
+  // 确定：模态框
+  okModal = (key) => {
+    const tempJson = {};
+    tempJson[key] = false;
+    this.setState(tempJson);
+    if (key === 'isShowOpenModal') { // 开发票
+      this.dispatchOpenReceipt();
+    } else if (key === 'isShowDeliveryModal') { // 发货
+      this.dispatchDelivery();
+    } else if (key === 'isShowExceptionModal') { // 异常处理
+      console.log('异常处理');
+      this.dispatchException();
+    }
+  }
+
+  //  接单 
+  takingOrder = ({ orderId, supplierId, status }) => {
+    console.log('接单', orderId, supplierId, status);
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'orders/modifyStatus',
+      orderId,
+      supplierId,
+      status, 
+      error: (res) => { message.error(handleServerMsg(res.msg)); },      
+    });
+  }
+
+  // 开票表单改变
+  handleFormChange = (values) => {
+    const { receiptInfo } = this.state;
+    this.setState({ receiptInfo: { ...receiptInfo, ...values } });
+  }
+  // 发起开票请求
+  dispatchOpenReceipt = () => {
+    const { dispatch } = this.props;
+    const { orderId, receiptInfo } = this.state;
+    dispatch({
+      type: 'orders/fetchOpenReceipt',
+      orderId,
+      ...receiptInfo,
+      error: (res) => { message.error(handleServerMsg(res.msg)); },      
+    });
+  }
+
+  // 发货表单改变
+  handleDeliveryFormChange = (values) => {
+    const { deliveryInfo } = this.state;
+    this.setState({ deliveryInfo: { ...deliveryInfo, ...values } });
+  }
+  // 发起发货请求
+  dispatchDelivery = () => {
+    const { dispatch } = this.props;
+    const { deliveryInfo, orderId } = this.state;
+    dispatch({
+      type: 'orders/fetchDeliveryGoods',
+      data: { ...deliveryInfo, order_sn: orderId },
+      error: (res) => { message.error(handleServerMsg(res.msg)); },
+    });
+  }
+
+  // 异常表单改变
+  handleExceptionFormChange = (values) => {
+    const { exceptionInfo } = this.state;
+    this.setState({ exceptionInfo: { ...exceptionInfo, ...values } });
+  }
+  // 发起异常申请请求
+  dispatchException = () => {
+    const { dispatch } = this.props;
+    const { exceptionInfo, orderId } = this.state;
+    console.log('------1--------', { ...exceptionInfo, orderId });
+    dispatch({
+      type: 'orders/fetchException',
+      orderId,
+      data: { ...exceptionInfo },
+      error: (res) => { message.error(handleServerMsg(res.msg)); },
+    });
   }
 
   toggleForm = () => {
@@ -217,14 +307,11 @@ export default class OrderList extends Component {
   }
 
   render() {
-    const orderListItemHeader = (
-      <div className={styles['order-list-header']}>
-        <b>客户订单编号：</b>
-        <a href="#" className="order-sn">XH1611060005</a>
-        <span className="order-time">(2017-12-07 17:12)</span>
-      </div>
-    );
+    const { orders, loading, upload } = this.props;
+    const { isShowDeliveryModal, isShowOpenModal, isShowExceptionModal, openReceipt, data } = this.state;
+    const uploadToken = upload.upload_token;
 
+    console.log(this.state);
     return (
       <PageHeaderLayout title="订单列表">
         <Card bordered={false} className={styles['search-wrap']} title="搜索条件">
@@ -232,22 +319,71 @@ export default class OrderList extends Component {
             {this.renderForm()}
           </div>
         </Card>
-        <Card bordered={false}>
-            <div className={styles.tableList}>
-              <List
-                header={orderListItemHeader}
-                data={orderListData}
-              />
-              <List
-                header={orderListItemHeader}
-                data={orderListData}
-              />
-               <List
-                header={orderListItemHeader}
-                data={orderListData}
-               />
-            </div>
+        <Card bordered={false} loading={loading}>
+          <div className={styles.tableList}>
+            <List.Header />
+            {
+              orders.list.map((val, idx) => {
+                const orderListItemHeader = (
+                  <div className={styles['order-list-header']}>
+                    <b>客户订单编号：</b>
+                    <a href="#" className="order-sn">{val.order_sn}</a>
+                    <span className="order-time">{moment(val.add_time).format('YYYY-MM-DD h:mm:ss')}</span>
+                  </div>
+                );
+                return (
+                  <List
+                    header={orderListItemHeader}
+                    data={val.sub_order}
+                    key={idx}
+                    bindModalClick={this.showModal}
+                    handleTakingClick={this.takingOrder}
+                  />
+                );
+              })
+            }
+          </div>
         </Card>
+        {/* 发货单Modal */}
+        <Modal
+          visible={isShowDeliveryModal}
+          width={800}
+          title="发货单"
+          onCancel={this.cancelModal.bind(this, 'isShowDeliveryModal')}
+          onOk={this.okModal.bind(this, 'isShowDeliveryModal')}
+        >
+          <InvoiceContent
+            onChange={this.handleDeliveryFormChange}
+          />
+        </Modal>
+        {/* 开票Modal */}
+        <Modal
+          width={680}        
+          visible={isShowOpenModal}
+          title="开发票"
+          onCancel={this.cancelModal.bind(this, 'isShowOpenModal')}
+          onOk={this.okModal.bind(this, 'isShowOpenModal')}
+        >
+          <OpenReceiptContent
+            list={openReceipt}
+            uploadToken={uploadToken}
+            onChange={this.handleFormChange}
+          />
+        </Modal>
+        {/* 异常处理Modal */}
+        <Modal
+          width={680}        
+          visible={isShowExceptionModal}
+          title="异常处理申请"
+          onCancel={this.cancelModal.bind(this, 'isShowExceptionModal')}
+          onOk={this.okModal.bind(this, 'isShowExceptionModal')}
+        >
+          <ExceptionContent
+            list={openReceipt}
+            data={data ? data.original_delivery_time : '数据还没来'}
+            onChange={this.handleExceptionFormChange}
+          />
+        </Modal>
       </PageHeaderLayout>
     );
   }

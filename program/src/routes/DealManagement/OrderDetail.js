@@ -1,15 +1,23 @@
 import React, { Component } from 'react';
 import { Card, Icon, Table, Badge } from 'antd';
+import { connect } from 'dva';
+import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import DescriptionList from '../../components/DescriptionList';
 import styles from './OrderDetail.less';
+import { queryString } from '../../utils/tools';
 
+const mapPayStatus = ['未支付', '已支付'];
+const mapPayType = ['微信支付', '支付宝支付', '银联支付', '其它方式支付'];
+const mapOrderStatus = ['待支付', '已取消', '待接单', '待发货', '已发货,配送中',
+  '已完成', '', '申请延期中', '', '退款中',
+  '退货中', '作废', '无货', '退款完成', '退货完成'];
 const { Description } = DescriptionList;
 // 订单商品明细列
 const goodsColumns = [{
   title: '商品编号',
-  dataIndex: 'goods_sn',
-  key: 'goods_sn',
+  dataIndex: 'goods_id',
+  key: 'goods_id',
 }, {
   title: '商品名称',
   dataIndex: 'goods_name',
@@ -39,20 +47,21 @@ const goodsColumns = [{
   title: '单价优惠',
   dataIndex: 'price_discount',
   key: 'price_discount',
+  render: () => (<span>0</span>),
 }, {
   title: '商品销售单价',
   key: 'sold_price',
-  render: text => (<span>{text.univalent - text.price_discount}</span>),
+  render: text => (<span>{text.univalent - 0}元</span>),
 }];
 // 发货记录列
 const logisticsColumns = [{
   title: '商品ID',
-  dataIndex: 'good_sn',
-  key: 'good_sn',
+  dataIndex: 'goods_id',
+  key: 'goods_id',
 }, {
   title: '商品名称',
-  dataIndex: 'good_name',
-  key: 'good_name',
+  dataIndex: 'goods_name',
+  key: 'goods_name',
 }, {
   title: '型号',
   dataIndex: 'model',
@@ -63,100 +72,225 @@ const logisticsColumns = [{
   key: 'brand',
 }, {
   title: '发货日期',
-  dataIndex: 'delivery',
-  key: 'delivery',
+  dataIndex: 'add_time',
+  key: 'add_time',
+  render: val => (<span>{moment(val * 1000).format('YYYY-MM-DD h:mm:ss')}</span>),
 }, {
   title: '送货人',
-  dataIndex: 'delivery_man',
-  key: 'delivery_man',
+  dataIndex: 'sender',
+  key: 'sender',
+  render: text => (<span>{text || '---'}</span>),
 }, {
   title: '联系号码',
   dataIndex: 'mobile',
   key: 'mobile',
 }, {
   title: '物流公司',
-  dataIndex: 'delivery_company',
-  key: 'delivery_company',
+  dataIndex: 'logistics_company',
+  key: 'logistics_company',
 }, {
   title: '物流单号',
-  dataIndex: 'delivery_id',
-  key: 'delivery_id',
+  dataIndex: 'logistics_number',
+  key: 'logistics_number',
+}];
+// 操作记录列
+const columns = [{
+  title: '操作员',
+  dataIndex: 'operator',
+  key: 'operator',
+}, {
+  title: '操作记录',
+  dataIndex: 'execution_detail',
+  key: 'execution_detail',
+  render: val => <span>{val}</span>,
+}, {
+  title: '进程',
+  dataIndex: 'progress',
+  key: 'progress',
+}, {
+  title: '操作时间',
+  dataIndex: 'add_time',
+  key: 'add_time',
+  render: val => <span>{moment(val * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>,
+}];
+// 发票列
+const receiptColumns = [{
+  title: '发票编号',
+  dataIndex: 'order_sn',
+  key: 'order_sn',
+}, {
+  title: '发票照片',
+  dataIndex: 'images',
+  key: 'images',
+  render: text => (<img src={text} alt="发票图片" width={20} height={20} />),
+}, {
+  title: '更新日期',
+  dataIndex: 'add_time',
+  key: 'add_time',
+}, {
+  title: '操作人员',
+  dataIndex: 'operator',
+  key: 'operator',
+  render: () => (<span>{JSON.parse(sessionStorage.getItem('userinfo')).username }</span>),
+}, {
+  title: '备注',
+  dataIndex: 'remarks',
+  key: 'remarks',
 }];
 
+
+@connect(({ orders, loading }) => ({
+  orders,
+  loading: loading.models.orders,
+}))
 export default class OrderDetail extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      args: queryString.parse(this.props.location.search),
+      operationkey: 'tab1',
+    };
+  }
+  componentDidMount() {
+    const { dispatch } = this.props;
+    const { args } = this.state;
+    dispatch({
+      type: 'orders/fetchDetail',
+      supplierId: 100,
+      orderId: args.id,
+    });
+  }
+
   render() {
+    const { orders, loading } = this.props;
+    const { detail } = orders;// 订单详情
+    const orderInfo = detail.order_info || {}; // 订单信息
+    const payInfo = detail.pay_info || {}; // 支付信息
+    const receiptInfo = detail.receipt_info || {}; // 开票信息
+    const receiptList = detail.open_receipt || [];// 发票信息
+    const logistics = detail.logistics || [orderInfo]; // 物流信息
+    const operations = detail.operations || []; // 操作日志
+
+    const contentList = {
+      tab1: <Table
+        pagination={{
+          defaultPageSize: 6,
+          pageSize: 6,
+        }}
+        loading={loading}
+        dataSource={operations}
+        columns={columns}
+        rowKey="add_time"
+      />,
+    };
+
+    // const subOrder
+    console.log('hello --:', [{ ...logistics, ...orderInfo }]);
     const descriptionContent = (
       <DescriptionList className={styles.headerList} size="small" col="2">
-        <Description term="状态"><span><Badge status="success" />已完成</span></Description>        
-        <Description term="订单总金额">￥168，702.00元</Description>
-        <Description term="运费">包邮</Description>        
-        <Description term="实收总金额"><span style={{ color: 'red' }}>￥168，702.00元</span></Description>
-        <Description term="生效日期">2017-07-07 16:46</Description>
+        <Description term="状态"><span><Badge status="success" />{mapOrderStatus[orderInfo.status - 1]}</span></Description>
+        <Description term="订单总金额">￥{orderInfo.subtotal_money}元</Description>
+        <Description term="运费">包邮</Description>
+        <Description term="实收总金额"><span style={{ color: 'red' }}>￥{orderInfo.subtotal_money}元</span></Description>
+        <Description term="生效日期">{moment(orderInfo.add_time * 1000).format('YYYY-MM-DD h:mm:ss')}</Description>
       </DescriptionList>
     );
     return (
-      <PageHeaderLayout 
-        title="订单编号：DD1611060005"
+      <PageHeaderLayout
+        title={`订单编号：${orderInfo.son_order_sn}`}
         logo={<img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />}
         content={descriptionContent}
       >
-        <Card title="收货方式：配送" style={{ marginBottom: 24 }} bordered>
-          <div>收货人：张三</div>
-          <div>联系电话：13574488306</div>
-          <div>地址：湖南长沙岳麓区桃子湖路口</div>
-        </Card>
-        <Card title="支付方式：在线网银" style={{ marginBottom: 24 }} bordered>
-          <div>长沙银行：已支付</div>
-        </Card>
-        <Card title="开票信息" style={{ marginBottom: 24 }} bordered>
-          <DescriptionList col={3}>
-            <Description term="公司全称(抬头)">长沙孚中数据科技</Description>
-            <Description term="公司账户">43048219912450145100</Description>
-            <Description term="税务编号">94545111111123SD445DF</Description>
-            <Description term="公司电话">0731-7600216</Description>
-            <Description term="开户银行">中国建设银行某某支行</Description>
-            <Description term="公司地址">随便寄就行</Description>
+        <Card title="收货方式：配送" style={{ marginBottom: 24 }} bordered loading={loading}>
+          <DescriptionList col={1}>
+            <Description term="收货人">{orderInfo.receiver}</Description>
+            <Description term="联系电话">{orderInfo.mobile}</Description>
+            <Description term="地址">{orderInfo.address}</Description>
           </DescriptionList>
         </Card>
-        <Card title="商品明细" style={{ marginBottom: 24 }} bordered>
-          <Table
-              style={{ marginBottom: 24 }}
-              pagination={false}
-              loading={false}
-              dataSource={[]}
-              columns={goodsColumns}
-              rowKey="goods_sn"
-          />
+        <Card title={`支付方式：${mapPayType[payInfo.pay_type - 1]}`} style={{ marginBottom: 24 }} bordered>
+          <div>长沙银行：{mapPayStatus[payInfo.pay_status - 1]}</div>
         </Card>
-        <Card title="发货记录" style={{ marginBottom: 24 }} bordered>
-          <Table
-              style={{ marginBottom: 24 }}
-              pagination={false}
-              loading={false}
-              dataSource={[]}
-              columns={logisticsColumns}
-              rowKey="good_sn"
-          />
-        </Card>
-        <Card title="发票信息" style={{ marginBottom: 24 }} bordered>
+        <Card title="开票信息" style={{ marginBottom: 24 }} bordered loading={loading}>
           <DescriptionList col={3}>
-            <Description term="公司全称(抬头)">长沙孚中数据科技</Description>
-            <Description term="公司账户">43048219912450145100</Description>
-            <Description term="税务编号">94545111111123SD445DF</Description>
-            <Description term="公司电话">0731-7600216</Description>
-            <Description term="开户银行">中国建设银行某某支行</Description>
-            <Description term="公司地址">随便寄就行</Description>
+            <Description term="公司全称(抬头)">{receiptInfo.title}</Description>
+            <Description term="公司账户">{receiptInfo.account}</Description>
+            <Description term="税务编号">{receiptInfo.tax_number}</Description>
+            <Description term="公司电话">{receiptInfo.telephone}</Description>
+            <Description term="开户银行">{receiptInfo.bank}</Description>
+            <Description term="公司地址">{receiptInfo.company_address}</Description>
           </DescriptionList>
         </Card>
-        <Card title="买方备注" style={{ marginBottom: 24 }} bordered>
-          <div className={styles.noData}>
-              <Icon type="smile-o" />买家没有添加备注
-          </div>
+        <Card title="商品明细" style={{ marginBottom: 24 }} bordered loading={loading}>
+          <Table
+            style={{ marginBottom: 24 }}
+            pagination={false}
+            loading={false}
+            dataSource={[orderInfo]}
+            columns={goodsColumns}
+            rowKey="add_time"
+          />
         </Card>
-        <Card title="操作记录" style={{ marginBottom: 24 }} bordered>
-          <div className={styles.noData}>
-              <Icon type="smile-o" />暂无记录
-          </div>
+        <Card title="发货记录" style={{ marginBottom: 24 }} bordered loading={loading}>
+          <Table
+            style={{ marginBottom: 24 }}
+            pagination={false}
+            loading={false}
+            dataSource={[{ ...logistics[0], ...orderInfo }]}
+            columns={logisticsColumns}
+            rowKey="add_time"
+          />
+        </Card>
+        <Card title="发票信息" style={{ marginBottom: 24 }} bordered loading={loading}>
+          {
+            receiptList.length > 0 ? (
+              <Table
+                dataSource={receiptList}
+                columns={receiptColumns}
+                pagination={{
+                  defaultPageSize: 3,
+                }}
+                key="order_sn"
+              />
+            ) : (
+                <div className={styles.noData}>
+                  <Icon type="smile-o" />暂无记录
+                </div>
+              )
+          }
+
+
+        </Card>
+        <Card title="买方备注" style={{ marginBottom: 24 }} bordered loading={loading}>
+          {
+            orderInfo.remarks ? orderInfo.remarks : (
+              <div className={styles.noData}>
+                <Icon type="smile-o" />买家没有添加备注
+              </div>
+            )
+          }
+        </Card>
+        <Card
+          bordered
+          title="操作记录"
+          style={{ marginBottom: 24 }}
+          // tabList={operationTabList}
+          onTabChange={this.onOperationTabChange}
+          loading={loading}
+        >
+          {
+            operations.length > 0 ?
+              (
+                contentList[this.state.operationkey]
+              ) :
+              (
+                <div className={styles.noData}>
+                  <Icon type="smile-o" />暂无记录
+                </div>
+              )
+          }
+
+
         </Card>
       </PageHeaderLayout>
     );

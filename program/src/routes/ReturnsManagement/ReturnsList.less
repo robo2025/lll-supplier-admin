@@ -52,6 +52,24 @@
   }
 }
 
+.returns-list-header{
+  height: 45px;
+  line-height: 45px;
+  padding: 0 15px;
+  background-color: #eee;
+  display: flex;
+  justify-content: space-between;
+  *{
+    margin-left: 5px;
+  }
+  :global{
+    .order-time{
+      color: #999;
+    }
+  }
+  
+}
+
 @media screen and (max-width: @screen-lg) {
   .tableListForm :global(.ant-form-item) {
     margin-right: 24px;

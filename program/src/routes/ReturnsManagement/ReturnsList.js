@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Row, Col, Card, Form, Input, Checkbox, Select, Icon, Button, Menu, DatePicker, Modal, message } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import List from '../../components/List/ReturnsList';
 
 import styles from './ReturnsList.less';
 
@@ -175,11 +176,38 @@ export default class ReturnsList extends Component {
   }
 
   render() {
+    const orderListItemHeader = (
+      <div className={styles['returns-list-header']}>
+        <div>
+          <b>客户订单编号：</b>
+          <a href="#" className="order-sn">DD1611060005</a>
+        </div>
+        <div>
+          <b>客户订单编号：</b>
+          <a href="#" className="order-sn">DH1611060005</a>
+          <span className="order-time">(2017-12-07 17:12)</span>
+        </div>
+      </div>
+    );
     return (
       <PageHeaderLayout title="退货单列表">
         <Card bordered={false} className={styles['search-wrap']} title="搜索条件">
           <div className={styles.tableListForm}>
             {this.renderForm()}
+          </div>
+        </Card>
+        <Card bordered={false}>
+          <div className={styles.tableList}>
+            <List.Header />
+            <List
+              header={orderListItemHeader}
+            />
+            <List
+              header={orderListItemHeader}
+            />
+            <List
+              header={orderListItemHeader}
+            />
           </div>
         </Card>
       </PageHeaderLayout>
