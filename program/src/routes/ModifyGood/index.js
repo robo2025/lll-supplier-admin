@@ -194,7 +194,7 @@ export default class ModifyGood extends Component {
     console.log('商品修改详情页:', good, loading.models.good);
 
     return (
-      <PageHeaderLayout title="新增商品信息" >
+      <PageHeaderLayout title="修改商品信息" >
         <Card bordered={false} className={styles['modify-good-wrap']}>
           <ModifyGoodForm
             loading={loading.models.good}

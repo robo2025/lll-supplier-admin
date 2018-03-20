@@ -9,6 +9,7 @@ import styles from './good-form.less';
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
 const FILE_TYPES = ['jpg', 'png', 'gif', 'jpeg']; // 支持上传的文件类型
+const mapImageType = ['正面', '侧面', '反面', '包装图一', '包装图二', '包装图三'];
 // 将服务器目录转换成需求目录
 function getStanrdCatalog(data) {
   data.forEach((val) => {
@@ -199,7 +200,7 @@ export default class NewGoodForm extends Component {
             onPreview={this.handlePreview}
             onChange={({ fileList }) => { this.handleUploaderChange('b', fileList); }}
           />
-          <p className="upload-pic-desc">{val.img_type}</p>
+          <p className="upload-pic-desc">{mapImageType[val.img_type - 1] }</p>
         </Col>
       ));
       // 商品cad图
