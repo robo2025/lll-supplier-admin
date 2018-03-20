@@ -1,21 +1,18 @@
 /*
 * 后台管理系统常量：
-* sso：      https://login.robo2025.com
-* 后台管理API：http://139.199.96.235:9002
 * */
 
 // 单点登录URL
 export const URL = 'https://login.robo2025.com';
-// export const URL = 'http://120.27.46.167:8011';
 
 // 网站内容接口URL
-export const API_URL = 'http://139.199.96.235:9005/api';
+export const API_URL = 'http://api-product.robo2025.com/api';
 
 // 上传文件获取token URL
-export const UPLOAD_URL = 'http://123.206.92.160:9020';
+export const UPLOAD_URL = 'http://api-common-service.robo2025.com';
 
 // 用户管理系统API URL
-export const USERS_URL = 'http://139.199.96.235:9006';
+export const USERS_URL = 'http://api-user.robo2025.com';
 
 // 验证登录接口URL
 export const LOGIN_URL = `${URL}/server/authorize`;
