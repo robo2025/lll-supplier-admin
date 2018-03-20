@@ -3,9 +3,9 @@ import { connect } from 'dva';
 import moment from 'moment';
 import { Row, Col, Card, Form, Input, Select, Icon, Button, DatePicker } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import List from '../../components/List/ReturnsList';
+import List from '../../components/List/RefundsList';
 
-import styles from './ReturnsList.less';
+import styles from './RefundsList.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -16,7 +16,7 @@ const { RangePicker } = DatePicker;
   loading: loading.models.orders,
 }))
 @Form.create()
-export default class ReturnsList extends Component {
+export default class RefundsList extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -27,7 +27,7 @@ export default class ReturnsList extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'orders/fetchReturns',
+      type: 'orders/fetchRefunds',
     });
   }
 
@@ -200,10 +200,10 @@ export default class ReturnsList extends Component {
 
   render() {
     const { orders, loading } = this.props;
-    console.log('退货单列表--', orders.returns);
+    console.log('退款单', orders.refunds);
 
     return (
-      <PageHeaderLayout title="退货单列表">
+      <PageHeaderLayout title="退款单列表">
         <Card bordered={false} className={styles['search-wrap']} title="搜索条件">
           <div className={styles.tableListForm}>
             {this.renderForm()}
@@ -213,14 +213,14 @@ export default class ReturnsList extends Component {
           <div className={styles.tableList}>
             <List.Header />
             {
-               orders.returns.length > 0 
+               orders.refunds.length > 0 
                ?
                 null
                :
-               <div style={{ textAlign: 'center' }}>暂无退货单数据</div>
+               <div style={{ textAlign: 'center' }}>暂无退款单数据</div>
             }
             {
-              orders.returns.map((val, idx) => {
+              orders.refunds.map((val, idx) => {
                 const orderListItemHeader = (
                   <div className={styles['returns-list-header']}>
                     <div>

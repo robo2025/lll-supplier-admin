@@ -2,7 +2,7 @@
  * @Author: lll
  * @Date: 2018-01-26 14:08:45
  * @Last Modified by: lll
- * @Last Modified time: 2018-03-12 16:59:08
+ * @Last Modified time: 2018-03-20 11:50:25
  */
 import React, { PureComponent, Fragment } from 'react';
 import moment from 'moment';
@@ -57,15 +57,15 @@ class GoodsTable extends PureComponent {
       {
         title: '商品ID',
         dataIndex: 'gno',
-        width: 100,
+        width: 130,
         fixed: 'left',
       },
       {
         title: '商品名称',
         dataIndex: 'product',
-        render: val => (<span >{val.product_name}</span>),
+        render: val => (<span className="td-col">{val.product_name}</span>),
         key: 'product_name',
-        width: 150,
+        width: 200,
         fixed: 'left',
       },
       {
@@ -161,7 +161,7 @@ class GoodsTable extends PureComponent {
           <Fragment>
             <a href={'#/goods/detail?goodId=' + record.id}>查看</a>
             <Divider type="vertical" />
-            <a href={'#/goods/modify?goodId=' + record.id}>修改</a>
+            <a href={'#/goods/list/modify?goodId=' + record.id}>修改</a>
             <Divider type="vertical" />            
             <a
               onClick={() => onPublish(record.id, (record.is_publish === 1) ? 0 : 1)}
@@ -191,12 +191,6 @@ class GoodsTable extends PureComponent {
         disabled: record.disabled,
       }),
     };
-
-    if (data.length < 1) {
-      return (<div>没有数据</div>);
-    } else {
-      console.log('-------------', data, loading);
-    }
 
     return (
       <div className={styles.standardTable}>

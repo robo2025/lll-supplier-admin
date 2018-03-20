@@ -5,14 +5,14 @@ import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import DescriptionList from '../../components/DescriptionList';
 import { queryString } from '../../utils/tools';
-import styles from './ReturnsDetail.less';
+import styles from './RefundDetail.less';
 
 const { Description } = DescriptionList;
 // 订单商品明细列
 const goodsColumns = [{
   title: '商品编号',
-  dataIndex: 'son_order_sn',
-  key: 'son_order_sn',
+  dataIndex: 'goods_sn',
+  key: 'goods_sn',
 }, {
   title: '商品名称',
   dataIndex: 'goods_name',
@@ -40,12 +40,12 @@ const goodsColumns = [{
   key: 'univalent',
 }, {
   title: '单价优惠',
-  key: 'yh',
-  rener: () => (<span>无</span>),
+  dataIndex: 'price_discount',
+  key: 'price_discount',
 }, {
   title: '商品销售单价',
   key: 'sold_price',
-  render: text => (<span>{text.univalent - 0}</span>),
+  render: text => (<span>{text.univalent - text.price_discount}</span>),
 }];
 // 发货记录列
 const logisticsColumns = [{
@@ -101,14 +101,14 @@ const columns = [{
   dataIndex: 'progress',
   key: 'progress',
 }];
-const mapOrderStatus = ['退货', '退款'];
+const mapOrderStatus = ['等待退款', '退款完成'];
 const mapOrderProgress = ['processing', 'success'];
 
 @connect(({ orders, loading }) => ({
   orders,
   loading: loading.models.loading,
 }))
-export default class ReturnsDetail extends Component {
+export default class RefundDetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -118,21 +118,20 @@ export default class ReturnsDetail extends Component {
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
+    console.log('退款单详情');
     const { args } = this.state;
+    const { dispatch } = this.props;
     dispatch({
-      type: 'orders/fetchReturnDetail',
+      type: 'orders/fetchRefundDetail',
       orderId: args.orderId,
     });
   }
 
   render() {
     const { orders, loading } = this.props;
-    const orderInfo = orders.returnDetail.order_info; // 订单信息
-    const returnInfo = orders.returnDetail.return_info;// 退货信息
-    const operationRecord = orders.returnDetail.operation_record || [];// 开票信息
-    const returnLogistics = orders.returnDetail.return_logistics; // 退货物流信息
-
+    const refundInfo = orders.refundDetail.refund_info;// 退款单信息
+    const orderInfo = orders.refundDetail.order_info;// 订单信息
+    const operations = orders.refundDetail.operation_record || [];
 
     if (!orderInfo) {
       console.log('数据还没来');
@@ -146,48 +145,50 @@ export default class ReturnsDetail extends Component {
           pageSize: 6,
         }}
         loading={loading}
-        dataSource={operationRecord}
+        dataSource={operations}
         columns={columns}
         rowKey="add_time"
       />,
     };
+    console.log('---退款单', orderInfo, refundInfo);
+
 
     const descriptionContent = (
       <DescriptionList className={styles.headerList} size="small" col="2">
-        <Description term="状态"><span><Badge status={mapOrderProgress[returnInfo.status - 1]} />{mapOrderStatus[returnInfo.status - 1]}</span></Description>
-        <Description term="退货金额"><span style={{ color: 'red' }}>￥{returnInfo.returns_money}元</span></Description>
-        <Description term="客户订单号">{returnInfo.order_sn}</Description>
+        <Description term="状态"><span><Badge status={mapOrderProgress[refundInfo.status - 1]} />{mapOrderStatus[refundInfo.status - 1]}</span></Description>
+        <Description term="退货金额"><span style={{ color: 'red' }}>￥{refundInfo.amount}元</span></Description>
+        <Description term="客户订单号">{refundInfo.order_sn}</Description>
         <Description term="运费">包邮</Description>
-        <Description term="退货单号">{returnInfo.returns_sn}</Description>
+        <Description term="退货单号">{refundInfo.refund_sn}</Description>
       </DescriptionList>
     );
     return (
       <PageHeaderLayout
-        title={`退货单号：${returnInfo.returns_sn}`}
+        title="退货单号：TH1611060005"
         logo={<img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />}
         content={descriptionContent}
       >
-        <Card title="退货说明" style={{ marginBottom: 24 }} bordered>
+        <Card title="退款说明" style={{ marginBottom: 24 }} bordered>
           <div>{orderInfo.remarks}</div>
         </Card>
-        <Card title="退货商品明细" style={{ marginBottom: 24 }} bordered>
+        {/* <Card title="退货商品明细" style={{ marginBottom: 24 }} bordered>
           <Table
             style={{ marginBottom: 24 }}
             pagination={false}
             loading={false}
-            dataSource={[orderInfo]}
+            dataSource={[]}
             columns={goodsColumns}
             rowKey="goods_sn"
           />
         </Card>
         <Card title="物流信息" style={{ marginBottom: 24 }} bordered>
           <DescriptionList className={styles.headerList} col="4">
-            <Description term="收货人">{returnLogistics.receiver}</Description>
-            <Description term="联系号码">{returnLogistics.mobile}</Description>
-            <Description term="物流公司">{returnLogistics.logistics_company}</Description>
-            <Description term="物流单号">{returnLogistics.logistics_number}</Description>
+            <Description term="送货人">天阙子</Description>
+            <Description term="联系号码">1886688778</Description>
+            <Description term="物流公司">量子快递</Description>
+            <Description term="物流单号">YHX00101011101</Description>
           </DescriptionList>
-        </Card>
+        </Card> */}
         <Card
           bordered
           loading={loading}
@@ -196,9 +197,9 @@ export default class ReturnsDetail extends Component {
           onTabChange={this.onOperationTabChange}
         >
          {
-            operationRecord.length > 0 ?
+            operations.length > 0 ?
               (
-                contentList[this.state.operationkey]               
+                contentList[this.state.operationkey]
               ) :
               (
                 <div className={styles.noData}>

@@ -7,7 +7,7 @@ import List from '../../components/List/List';
 import InvoiceContent from '../../components/ModalContent/InvoiceContent';
 import OpenReceiptContent from '../../components/ModalContent/OpenReceiptContent';
 import ExceptionContent from '../../components/ModalContent/ExceptionContent';
-import { handleServerMsg } from '../../utils/tools';
+import { handleServerMsgObj } from '../../utils/tools';
 
 import styles from './OrderList.less';
 
@@ -34,6 +34,7 @@ export default class OrderList extends Component {
       deliveryInfo: {}, // 发货Form信息
       exceptionInfo: {}, // 异常Form信息
       openReceipt: [], // 开票信息
+      data: {},
     };
   }
 
@@ -65,9 +66,6 @@ export default class OrderList extends Component {
 
   // 确定：模态框
   okModal = (key) => {
-    const tempJson = {};
-    tempJson[key] = false;
-    this.setState(tempJson);
     if (key === 'isShowOpenModal') { // 开发票
       this.dispatchOpenReceipt();
     } else if (key === 'isShowDeliveryModal') { // 发货
@@ -86,8 +84,8 @@ export default class OrderList extends Component {
       type: 'orders/modifyStatus',
       orderId,
       supplierId,
-      status, 
-      error: (res) => { message.error(handleServerMsg(res.msg)); },      
+      status,
+      error: (res) => { message.error(handleServerMsgObj(res.msg)); },
     });
   }
 
@@ -100,11 +98,19 @@ export default class OrderList extends Component {
   dispatchOpenReceipt = () => {
     const { dispatch } = this.props;
     const { orderId, receiptInfo } = this.state;
-    dispatch({
-      type: 'orders/fetchOpenReceipt',
-      orderId,
-      ...receiptInfo,
-      error: (res) => { message.error(handleServerMsg(res.msg)); },      
+    const that = this;
+    this.formObj.validateFields((error, values) => {
+      if (!error) {
+        that.setState({ isShowOpenModal: false });
+        dispatch({
+          type: 'orders/fetchOpenReceipt',
+          orderId,
+          ...receiptInfo,
+          error: (res) => { message.error(handleServerMsgObj(res.msg)); },
+          succuess: (res) => { message.success('开票成功'); },
+
+        });
+      }
     });
   }
 
@@ -117,10 +123,18 @@ export default class OrderList extends Component {
   dispatchDelivery = () => {
     const { dispatch } = this.props;
     const { deliveryInfo, orderId } = this.state;
-    dispatch({
-      type: 'orders/fetchDeliveryGoods',
-      data: { ...deliveryInfo, order_sn: orderId },
-      error: (res) => { message.error(handleServerMsg(res.msg)); },
+    console.log('表单对象', this.formObj);
+    const that = this;
+    this.formObj.validateFields((error, values) => {
+      console.log('校验结果：', error, values);
+      if (!error) {
+        that.setState({ isShowDeliveryModal: false });
+        dispatch({
+          type: 'orders/fetchDeliveryGoods',
+          data: { ...deliveryInfo, order_sn: orderId },
+          error: (res) => { message.error(handleServerMsgObj(res.msg)); },
+        });
+      }
     });
   }
 
@@ -134,12 +148,29 @@ export default class OrderList extends Component {
     const { dispatch } = this.props;
     const { exceptionInfo, orderId } = this.state;
     console.log('------1--------', { ...exceptionInfo, orderId });
-    dispatch({
-      type: 'orders/fetchException',
-      orderId,
-      data: { ...exceptionInfo },
-      error: (res) => { message.error(handleServerMsg(res.msg)); },
+    const that = this;
+    this.formObj.validateFields((error, values) => {
+      console.log('校验结果：', error, values);
+      if (!error) {
+        that.setState({ isShowExceptionModal: false });
+        dispatch({
+          type: 'orders/fetchException',
+          orderId,
+          data: { ...exceptionInfo },
+          error: (res) => { message.error(handleServerMsgObj(res.msg)); },
+          succuess: (res) => { message.success('订单异常处理提交成功'); },
+        });
+      }
     });
+  }
+
+  // 校验表单：传入的是this.props.form对象
+  validateForm = (formObj) => {
+    console.log('我被调用了');
+    this.formObj = formObj;
+    // formObj.validateFields((error, values) => {
+    //   console.log('校验出错', error, values);
+    // });
   }
 
   toggleForm = () => {
@@ -157,9 +188,7 @@ export default class OrderList extends Component {
   handleSearch = (e) => {
     e.preventDefault();
     e.preventDefault();
-
     const { dispatch, form } = this.props;
-
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       const values = {
@@ -167,7 +196,6 @@ export default class OrderList extends Component {
         start_time: fieldsValue.create_time ? fieldsValue.create_time[0].format('YYYY-MM-DD') : '',
         end_time: fieldsValue.create_time ? fieldsValue.create_time[1].format('YYYY-MM-DD') : '',
       };
-
       console.log('搜索字段', values);
       dispatch({
         type: 'orders/fetchSearch',
@@ -308,7 +336,12 @@ export default class OrderList extends Component {
 
   render() {
     const { orders, loading, upload } = this.props;
-    const { isShowDeliveryModal, isShowOpenModal, isShowExceptionModal, openReceipt, data } = this.state;
+    const {
+      isShowDeliveryModal,
+      isShowOpenModal,
+      isShowExceptionModal,
+      openReceipt,
+      data } = this.state;
     const uploadToken = upload.upload_token;
 
     console.log(this.state);
@@ -323,12 +356,19 @@ export default class OrderList extends Component {
           <div className={styles.tableList}>
             <List.Header />
             {
+               orders.list.length > 0 
+               ?
+                null
+               :
+               <div style={{ textAlign: 'center' }}>暂无订单数据</div>
+            }
+            {
               orders.list.map((val, idx) => {
                 const orderListItemHeader = (
                   <div className={styles['order-list-header']}>
                     <b>客户订单编号：</b>
                     <a href="#" className="order-sn">{val.order_sn}</a>
-                    <span className="order-time">{moment(val.add_time).format('YYYY-MM-DD h:mm:ss')}</span>
+                    <span className="order-time">{moment(val.add_time * 1000).format('YYYY-MM-DD h:mm:ss')}</span>
                   </div>
                 );
                 return (
@@ -353,12 +393,14 @@ export default class OrderList extends Component {
           onOk={this.okModal.bind(this, 'isShowDeliveryModal')}
         >
           <InvoiceContent
+            data={this.state.data}
             onChange={this.handleDeliveryFormChange}
+            handleValidate={this.validateForm}
           />
         </Modal>
         {/* 开票Modal */}
         <Modal
-          width={680}        
+          width={680}
           visible={isShowOpenModal}
           title="开发票"
           onCancel={this.cancelModal.bind(this, 'isShowOpenModal')}
@@ -368,11 +410,12 @@ export default class OrderList extends Component {
             list={openReceipt}
             uploadToken={uploadToken}
             onChange={this.handleFormChange}
+            handleValidate={this.validateForm}
           />
         </Modal>
         {/* 异常处理Modal */}
         <Modal
-          width={680}        
+          width={680}
           visible={isShowExceptionModal}
           title="异常处理申请"
           onCancel={this.cancelModal.bind(this, 'isShowExceptionModal')}
@@ -382,6 +425,7 @@ export default class OrderList extends Component {
             list={openReceipt}
             data={data ? data.original_delivery_time : '数据还没来'}
             onChange={this.handleExceptionFormChange}
+            handleValidate={this.validateForm}
           />
         </Modal>
       </PageHeaderLayout>

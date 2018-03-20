@@ -57,6 +57,11 @@ export default class OpenReceiptContent extends Component {
     },
   };
 
+  componentDidMount() {
+    console.log('开票弹出框didmount');
+    this.props.handleValidate(this.props.form);
+  }
+
   beforeUpload = (file) => {
     this.setState({ file });
     const isJPG = file.type === 'image/jpeg';

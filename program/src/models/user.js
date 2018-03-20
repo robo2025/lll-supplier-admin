@@ -1,5 +1,5 @@
-import Cookies from 'js-cookie';
 import { queryCurrent, getUserInfo } from '../services/user';
+import { SUCCESS_STATUS } from '../constant/config.js';
 
 export default {
   namespace: 'user',
@@ -12,14 +12,16 @@ export default {
   },
 
   effects: {
-    *fetch(_, { call, put }) {
+    *fetch({ success, error }, { call, put }) {
       yield put({
         type: 'changeLoading',
         payload: true,
       });
       const response = yield call(getUserInfo);
-      window.sessionStorage.setItem('userinfo', JSON.stringify(response.data));
-      Cookies.set('userinfo', JSON.stringify(response.data), { expires: 7 });
+      if (response.rescode >> 0 === SUCCESS_STATUS) {
+        if (typeof success === 'function') { success(response); }
+      } else if (typeof error === 'function') { error(response); return; }
+
       yield put({
         type: 'save',
         payload: response.data,

@@ -61,6 +61,12 @@ class InvoiceContent extends Component {
       isShowDetail: false,
     };
   }
+
+  componentDidMount() {
+    console.log('发货单didmount');
+    this.props.handleValidate(this.props.form);
+  }
+
   handleChange = (value) => {
     console.log(`selected ${value}`);
   }
@@ -77,28 +83,29 @@ class InvoiceContent extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     const { isShowDetail } = this.state;
-
+    const { data } = this.props;
+    console.log('props---', data);
     return (
       <div className="invoice-content">
         <div>
-          <p>收货单位：湖南化工贸易有限公司</p>
+          <p>收货单位：{data.guest_company_name}</p>
           <p>收货方式：配送</p>
         </div>
 
         <div className="">
-          <p>收货人：张三</p>
-          <p>联系电话：18888888888</p>
-          <p>地址：湖南长沙岳麓区桃子湖路口</p>
+          <p>收货人：{data.receiver}</p>
+          <p>联系电话：{data.mobile}</p>
+          <p>地址：{data.address}</p>
         </div>
 
-        <Table
+        {/* <Table
           bordered
           title={() => (<span>发货商品明细</span>)}
           columns={goodColumns}
           dataSource={[]}
           size="small"
-        />
-        <h2>填写物流信息</h2>
+        /> */}
+        <h3>填写物流信息</h3>
         <Form>
           <FormItem
             label="物流公司名称"
@@ -141,83 +148,97 @@ class InvoiceContent extends Component {
             }
           </FormItem>
         </Form>
-        <Form style={{ display: isShowDetail ? 'block' : 'none' }}>
-          <Row>
-            <Col span={12}>
-              <FormItem
-                label="物流公司名称"
-                onChange={this.handleChange}
-                {...formItemLayout2}
-              >
-                {
-                  getFieldDecorator('logistics_company', {
-                    rules: [{
-                      required: true,
-                      message: '请填写物流公司名称',
-                    }],
-                  })(
-                    <Input />
-                  )
-                }
-              </FormItem>
+        {
+          isShowDetail ?
+            (
+              <Form>
+                <Row>
+                  <Col span={12}>
+                    <FormItem
+                      label="物流公司名称"
+                      onChange={this.handleChange}
+                      {...formItemLayout2}
+                    >
+                      {
+                        getFieldDecorator('logistics_company', {
+                          rules: [{
+                            required: true,
+                            message: '请填写物流公司名称',
+                          }],
+                        })(
+                          <Input />
+                        )
+                      }
+                    </FormItem>
 
-            </Col>
-            <Col span={12} >
-              <FormItem
-                label="送货人"
-                onChange={this.handleChange}
-                {...formItemLayout2}
-              >
-                {
-                  getFieldDecorator('sender', {
-                    rules: [{
-                      required: true,
-                      message: '送货人',
-                    }],
-                  })(
-                    <Input />
-                  )
-                }
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                label="物流单号"
-                onChange={this.handleChange}
-                {...formItemLayout2}
-              >
-                {
-                  getFieldDecorator('logistics_number', {
-                    rules: [{
-                      required: true,
-                      message: '物流单号',
-                    }],
-                  })(
-                    <Input />
-                  )
-                }
-              </FormItem>
-            </Col>
-            <Col span={12}>
-              <FormItem
-                label="联系号码"
-                onChange={this.handleChange}
-                {...formItemLayout2}
-              >
-                {
-                  getFieldDecorator('mobile', {
-                    rules: [{
-                      required: true,
-                      message: '物流单号',
-                    }],
-                  })(
-                    <Input />
-                  )
-                }
-              </FormItem>
-            </Col>
-          </Row>
-        </Form>
+                  </Col>
+                  <Col span={12} >
+                    <FormItem
+                      label="送货人"
+                      onChange={this.handleChange}
+                      {...formItemLayout2}
+                    >
+                      {
+                        getFieldDecorator('sender', {
+                          rules: [{
+                            required: true,
+                            message: '送货人',
+                          }],
+                        })(
+                          <Input />
+                        )
+                      }
+                    </FormItem>
+                  </Col>
+                  <Col span={12}>
+                    <FormItem
+                      label="物流单号"
+                      onChange={this.handleChange}
+                      {...formItemLayout2}
+                    >
+                      {
+                        getFieldDecorator('logistics_number', {
+                          rules: [{
+                            required: true,
+                            message: '物流单号',
+                          }],
+                        })(
+                          <Input />
+                        )
+                      }
+                    </FormItem>
+                  </Col>
+                  <Col span={12}>
+                    <FormItem
+                      label="联系号码"
+                      onChange={this.handleChange}
+                      {...formItemLayout2}
+                    >
+                      {
+                        getFieldDecorator('mobile', {
+                          rules: [{
+                            required: true,
+                            message: '请填写手机号码',
+                          }, {
+                            len: 11,
+                            message: '请输入11位手机号码',
+                          }, {
+                            pattern: /^[0-9]+$/,
+                            message: '手机号只能为数字',
+                          }],
+                        })(
+                          <Input type="tel" />
+                        )
+                      }
+                    </FormItem>
+                  </Col>
+                </Row>
+              </Form>
+            )
+            :
+            null
+        }
+
       </div>
     );
   }

@@ -7,6 +7,9 @@ import {
   submitException,
   getReturnsOrders,
   getRefundOrders,
+  confirmReturn,
+  getReturnOrderDetail,
+  getRefundOrderDetail,
 } from '../services/orders';
 import { SUCCESS_STATUS } from '../constant/config.js';
 
@@ -18,6 +21,8 @@ export default {
     detail: {},
     returns: [],
     refunds: [],
+    returnDetail: {},
+    refundDetail: {},
   },
 
   effects: {
@@ -114,6 +119,40 @@ export default {
         payload: res.data,
       });
     },
+    *fetchConfirmReturn({ orderId, status, success, error }, { call, put }) {
+      const res = yield call(confirmReturn, { orderId, status });
+      if (res.rescode >> 0 === SUCCESS_STATUS) {
+        if (typeof success === 'function') { success(res); }
+      } else if (typeof error === 'function') { error(res); }
+
+      const response = yield call(getReturnsOrders);
+      yield put({
+        type: 'saveReturns',
+        payload: response.data,
+      });
+    },
+    *fetchReturnDetail({ orderId, success, error }, { call, put }) {
+      const res = yield call(getReturnOrderDetail, { orderId });
+      if (res.rescode >> 0 === SUCCESS_STATUS) {
+        if (typeof success === 'function') { success(res); }
+      } else if (typeof error === 'function') { error(res); }
+
+      yield put({
+        type: 'saveReturnDetail',
+        payload: res.data,
+      });
+    },
+    *fetchRefundDetail({ orderId, success, error }, { call, put }) {
+      const res = yield call(getRefundOrderDetail, { orderId });
+      if (res.rescode >> 0 === SUCCESS_STATUS) {
+        if (typeof success === 'function') { success(res); }
+      } else if (typeof error === 'function') { error(res); }
+
+      yield put({
+        type: 'saveRefundDetail',
+        payload: res.data,
+      });
+    },
   },
 
   reducers: {
@@ -139,6 +178,18 @@ export default {
       return {
         ...state,
         refunds: action.payload,
+      };
+    },
+    saveReturnDetail(state, action) {
+      return {
+        ...state,
+        returnDetail: action.payload,
+      };
+    },
+    saveRefundDetail(state, action) {
+      return {
+        ...state,
+        refundDetail: action.payload,
       };
     },
   },

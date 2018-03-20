@@ -3,7 +3,7 @@ import lyRequest from '../utils/lyRequest';
 
 const SUPPLIER_SYS_URL = 'http://13.250.57.253:8000/v1/supplier';
 const ORDER_URL = 'http://13.250.57.253:8000/v1/order';
-const TEST_SUPPLIER_ID = 100;
+const TEST_SUPPLIER_ID = Cookies.getJSON('userinfo').id;
 
 // ------------------ 请求订单信息---------------------
 
@@ -107,6 +107,17 @@ export async function getReturnsOrders() {
     },
   });
 }
+// 退货单详情接口
+export async function getReturnOrderDetail({ orderId }) {
+  const accessToken = Cookies.get('access_token');
+  const supplierId = TEST_SUPPLIER_ID;
+  return lyRequest(`${SUPPLIER_SYS_URL}/order/${orderId}?supplier_id=${supplierId}&is_type=1`, {
+    method: 'get',    
+    headers: {
+      Authorization: accessToken,
+    },
+  });
+}
 
 
 // 退款单接口
@@ -120,6 +131,33 @@ export async function getRefundOrders() {
     },
   });
 }
+// 退货单详情接口
+export async function getRefundOrderDetail({ orderId }) {
+  const accessToken = Cookies.get('access_token');
+  const supplierId = TEST_SUPPLIER_ID;
+  return lyRequest(`${SUPPLIER_SYS_URL}/order/${orderId}?supplier_id=${supplierId}&is_type=2`, {
+    method: 'get',    
+    headers: {
+      Authorization: accessToken,
+    },
+  });
+}
+
+// 确认退货接口
+export async function confirmReturn({ orderId, status }) {
+  const accessToken = Cookies.get('access_token');
+  const supplierId = TEST_SUPPLIER_ID;
+  return lyRequest(`${SUPPLIER_SYS_URL}/order/${orderId}?supplier_id=${supplierId}`, {
+    method: 'put', 
+    headers: {
+      Authorization: accessToken,
+    },
+    data: {
+      status,
+    },
+  });
+}
+
 
 /**
  * 搜索接口

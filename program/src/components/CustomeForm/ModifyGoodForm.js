@@ -46,6 +46,7 @@ function getPic(key, pics) {
     };
   },
   onValuesChange(props, values) {
+    console.log('----', values);
     props.onChange(values);
   },
 })

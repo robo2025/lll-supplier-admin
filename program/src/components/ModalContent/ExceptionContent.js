@@ -17,10 +17,7 @@ const formItemLayout = {
     sm: { span: 14 },
   },
 };
-function disabledDate(current) {
-  // Can not select days before today and today
-  return current && current < moment().endOf('day');
-}
+
 
 @Form.create({
   onValuesChange: (props, fields) => {
@@ -37,6 +34,12 @@ class ExceptionContent extends Component {
   state = {
     isHaveGoods: false,
   }
+
+  componentDidMount() {
+    console.log('异常处理弹窗didmount');
+    this.props.handleValidate(this.props.form);
+  }
+
   handleSelected = (value) => {
     console.log(`selected ${value}`);
     if (value >> 0 === 1) {
@@ -46,6 +49,11 @@ class ExceptionContent extends Component {
     }
   }
 
+  disabledDate = (current, last) => {
+    // Can not select days before today and today
+    console.log('当前时间:', current && current < moment().endOf('day'), moment(last).format('YYYY-MM-DD'));
+    return current && current < moment(last).endOf('day');
+  }
 
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -93,25 +101,32 @@ class ExceptionContent extends Component {
               )
             }
           </FormItem>
-          <FormItem
-            label="预计发货时间"
-            {...formItemLayout}
-            style={{ display: isHaveGoods ? 'none' : 'block' }}
-          >
-            {
-              getFieldDecorator('expect_date_of_delivery', {
-                rules: [{
-                  required: true,
-                  message: '请选择预计发货时间',
-                }],
-              })(
-                <DatePicker 
-                  allowClear={false}
-                  disabledDate={disabledDate}
-                />
-              )
-            }
-          </FormItem>
+          {
+            isHaveGoods ?
+            null
+            :
+            (
+              <FormItem
+              label="预计发货时间"
+              {...formItemLayout}
+              >
+              {
+                getFieldDecorator('expect_date_of_delivery', {
+                  rules: [{
+                    required: true,
+                    message: '请选择预计发货时间',
+                  }],
+                })(
+                  <DatePicker 
+                    allowClear={false}
+                    disabledDate={current => (this.disabledDate(current, data * 1000))}
+                  />
+                )
+              }
+              </FormItem>
+            )
+          }
+         
           <FormItem
             label="说明"
             {...formItemLayout}

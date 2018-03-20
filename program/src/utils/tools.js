@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie';
 import { LOGIN_URL, NEXT_URL, HOME_PAGE, VERIFY_PAGE } from '../constant/config';
+import { getUserInfo } from '../services/user';
 
 // 验证是否登录
 export function verifyLogin() {
@@ -12,7 +13,6 @@ export function verifyLogin() {
     const access_token = paramas.access_token.split('#/')[0];
     console.log('token:', access_token);
     Cookies.set('access_token', access_token, { expires: 7 });
-    window.location.href = HOME_PAGE;
   } else {
     console.log('不存在token');
     window.location.href = `${LOGIN_URL}?next=${VERIFY_PAGE}`;
@@ -147,5 +147,15 @@ export function handleServerMsg(str) {
     return strArr[1];
   } else {
     return strArr[0];
+  }
+}
+
+// 处理服务器错误信息
+export function handleServerMsgObj(obj) {
+  if (typeof obj === 'object') {
+    const objKeys = Object.keys(obj);
+    return obj[objKeys[0]];
+  } else if (typeof obj === 'string') {
+    return handleServerMsg(obj);
   }
 }

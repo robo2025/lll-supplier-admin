@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
-import { Row, Col, Button } from 'antd';
+import { Row, Col, Spin, Badge } from 'antd';
 import styles from './List.less';
 
-const mapReturnStatus = ['待收货', '确认收货', '待审核', '审核未通过', '待上传物流信息'];
+const mapRefundStatus = ['等待退款', '退款完成'];
+const mapRefundProgress = [{ color: '#2395FF' }, { color: '#52C41A' }];
 
-class ReturnsList extends Component {
+class RefundsList extends Component {
   render() {
+    console.log('-------------------');
     const { header, data, onConfirmReturn } = this.props;
     return (
       <div className={styles.list}>
@@ -15,6 +17,7 @@ class ReturnsList extends Component {
     );
   }
 };
+
 
 const ListItem = ({ data, onConfirmReturn }) => (
   <Row gutter={16} className="list-item">
@@ -40,17 +43,17 @@ const ListItem = ({ data, onConfirmReturn }) => (
       <span className="money">￥{data.subtotal_money - 0}</span>
       <span className="delivery">（含运费：0元）</span>
     </Col>
-    <Col span={2} className="item vertical">
-      {mapReturnStatus[data.status - 1]}
+    <Col span={2} className="item vertical" style={mapRefundProgress[data.status - 1]}>
+      {mapRefundStatus[data.status - 1]}
     </Col>
     <Col span={3} className="extra item vertical">
-      <Button
+      {/* <span
+        className="btn"
         onClick={() => { onConfirmReturn({ orderId: data.id, status: 3 }); }}
-        disabled={data.status !== 1}
-        size="small"
-      >确认收货
-      </Button>
-      <a href={`#/returns/list/detail?orderId=${data.id}`}>查看详情</a>
+      >
+        确认收货
+      </span> */}
+      <a href={`#/refunds/list/detail?orderId=${data.id}`}>查看详情</a>
     </Col>
   </Row>
 );
@@ -59,16 +62,16 @@ const ListItem = ({ data, onConfirmReturn }) => (
 const ListHeader = data => (
   <Row gutter={16} className={styles['list-header']}>
     <Col span={15} className="item" >
-      退货商品商品明细
+      退款商品商品明细
     </Col>
     <Col span={2} className="item">
       交易金额
     </Col>
     <Col span={2} className="item">
-      退货金额
+      退款金额
     </Col>
     <Col span={2} className="item">
-      退货状态
+      退款状态
     </Col>
     <Col span={3} className="item">
       操作
@@ -76,5 +79,5 @@ const ListHeader = data => (
   </Row>
 );
 
-ReturnsList.Header = ListHeader;
-export default ReturnsList;
+RefundsList.Header = ListHeader;
+export default RefundsList;

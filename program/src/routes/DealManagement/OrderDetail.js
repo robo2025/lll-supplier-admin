@@ -214,7 +214,7 @@ export default class OrderDetail extends Component {
           </DescriptionList>
         </Card>
         <Card title={`支付方式：${mapPayType[payInfo.pay_type - 1]}`} style={{ marginBottom: 24 }} bordered>
-          <div>长沙银行：{mapPayStatus[payInfo.pay_status - 1]}</div>
+          <div>支付状态：{mapPayStatus[payInfo.pay_status - 1]}</div>
         </Card>
         <Card title="开票信息" style={{ marginBottom: 24 }} bordered loading={loading}>
           <DescriptionList col={3}>
@@ -241,9 +241,12 @@ export default class OrderDetail extends Component {
             style={{ marginBottom: 24 }}
             pagination={false}
             loading={false}
-            dataSource={[{ ...logistics[0], ...orderInfo }]}
+            dataSource={logistics.length > 0 ? [{ ...logistics[0], ...orderInfo }] : []}
             columns={logisticsColumns}
             rowKey="add_time"
+            locale={{
+              emptyText: '暂无发货记录',
+            }}
           />
         </Card>
         <Card title="发票信息" style={{ marginBottom: 24 }} bordered loading={loading}>
@@ -294,8 +297,6 @@ export default class OrderDetail extends Component {
                 </div>
               )
           }
-
-
         </Card>
       </PageHeaderLayout>
     );

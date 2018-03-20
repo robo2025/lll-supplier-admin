@@ -21,10 +21,6 @@ const menuData = [{
       name: '客户订单列表',
       path: 'orders',
     },
-    {
-      name: '订单详情页',
-      path: 'orders/detail',
-    },
   ],
 }, {
   name: '退货管理',
@@ -35,9 +31,15 @@ const menuData = [{
       name: '退货单列表',
       path: 'list',
     },
+  ],
+}, {
+  name: '退款管理',
+  icon: 'check-square',
+  path: 'refunds',
+  children: [
     {
-      name: '退货单详情',
-      path: 'list/detail',
+      name: '退款单列表',
+      path: 'list',
     },
   ],
 }];

@@ -29,6 +29,7 @@ export function logout() {
   const access_token = Cookies.get('access_token');
   if (access_token) {
     Cookies.remove('access_token');
+    Cookies.remove('userinfo');
     window.location.href = `${LOGOUT_URL}?access_token=${access_token}&next=${HOME_PAGE}`;
   } else {
     window.location.href = `${LOGOUT_URL}`;

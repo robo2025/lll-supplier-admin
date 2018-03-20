@@ -18,9 +18,8 @@ const { TextArea } = Input;
 
 // 商品列表
 @connect(({ rule, loading, good }) => ({
-  rule,
   good,
-  loading: loading.models.rule,
+  loading: loading.models.good,
 }))
 @Form.create()
 export default class GoodsList extends Component {
