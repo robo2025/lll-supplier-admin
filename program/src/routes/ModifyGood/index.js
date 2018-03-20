@@ -12,13 +12,7 @@ import styles from './index.less';
 const actionFlag = ['新增', '修改', '删除']; // 操作类型 (1:新增 2:修改 3:删除)
 const operationTabList = [{
   key: 'tab1',
-  tab: '操作日志一',
-}, {
-  key: 'tab2',
-  tab: '操作日志二',
-}, {
-  key: 'tab3',
-  tab: '操作日志三',
+  tab: '商品操作记录',
 }];
 // 操作记录列
 const columns = [{
@@ -150,24 +144,6 @@ export default class ModifyGood extends Component {
         pagination={{
           defaultPageSize: 6,
           pageSize: 6,
-        }}
-        loading={loading.models.good}
-        dataSource={good.logs}
-        columns={columns}
-      />,
-      tab2: <Table
-        pagination={{
-          defaultPageSize: 5,
-          pageSize: 5,
-        }}
-        loading={loading.models.good}
-        dataSource={good.logs}
-        columns={columns}
-      />,
-      tab3: <Table
-        pagination={{
-          defaultPageSize: 3,
-          pageSize: 3,
         }}
         loading={loading.models.good}
         dataSource={good.logs}
