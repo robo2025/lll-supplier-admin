@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Modal, Button, Row, Col, Form, Input, Upload } from 'antd';
+import { Card, Table, Button, Row, Col, Form, Input, Upload } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import SectionHeader from '../../components/PageHeader/SectionHeader';
 import ProductList from '../../components/CustomTable/ProductList';
@@ -10,6 +10,17 @@ import { queryString } from '../../utils/tools';
 import styles from './index.less';
 
 const FormItem = Form.Item;
+// 其他属性列
+const attrClomns = [{
+  title: '属性名',
+  dataIndex: 'attr_name',
+  key: 'attr_name',
+}, {
+  title: '属性值',
+  dataIndex: 'attr_value',
+  key: 'attr_value',
+}];
+
 
 @connect(({ loading, good }) => ({
   good,
@@ -111,7 +122,7 @@ export default class GoodDetail extends Component {
       },
     };
 
-    console.log('商品详情页:', this.props.good);
+    console.log('商品详情页:', good.detail);
 
     return (
       <PageHeaderLayout title="新增商品信息" >
@@ -125,46 +136,18 @@ export default class GoodDetail extends Component {
           <SectionHeader
             title="产品其他属性"
           />
-          <Form style={{ width: 700, maxWidth: '70%' }} >
-            {
-              good.product ? (good.product.detail.map((val, idx) => (
-                <FormItem
-                  label={val.attr_name}
-                  key={'otherAttr' + idx}
-                  {...formItemLayout}
-                >
-                  <Row gutter={12}>
-                    <Col span={6}>
-                      <Input
-                        defaultValue={val.attr_value}
-                        onChange={(e) => {
-                          this.handleAddProductOtherAttr(idx - 100, {
-                            attr_name: val.attr_name,
-                            attr_value: e.target.value,
-                          });
-                        }
-                        }
-                      />
-                    </Col>
-                    <Col span={4}>
-                      <Upload>
-                        <Button icon="upload">上传图片</Button>
-                      </Upload>
-                    </Col>
-                    <Col span={4}>
-                      <span>{val.img_url}</span>
-                    </Col>
-                    <Col span={5}>
-                      <span>
-                        <a>删除</a>|
-                        <a>查看</a>
-                      </span>
-                    </Col>
-                  </Row>
-                </FormItem>
-              ))) : <span>无</span>
-            }
-          </Form>
+          <div style={{ width: '50%', maxWidth: 500 }}>
+            <Table
+              className="attr-table"
+              bordered
+              pagination={false}
+              columns={attrClomns}
+              dataSource={good.detail.product ? good.detail.product.other_attrs : []}
+              locale={{
+                emptyText: '该产品没有其它属性',
+              }}
+            />
+          </div>
           <div className={styles['submit-btn-wrap']}>
             <Button type="primary" onClick={() => { this.props.history.push('/goods/list'); }}>返回列表</Button>
           </div>

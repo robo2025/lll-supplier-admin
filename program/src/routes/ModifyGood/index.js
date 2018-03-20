@@ -212,6 +212,9 @@ export default class ModifyGood extends Component {
               pagination={false}
               columns={attrClomns}
               dataSource={good.product ? good.product.detail : []}
+              locale={{
+                emptyText: '该产品没有其它属性',
+              }}
             />
           </div>
           <div className={styles['section-header']}>
