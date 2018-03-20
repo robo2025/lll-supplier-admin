@@ -183,12 +183,6 @@ export default class ModifyGood extends Component {
       title: '属性值',
       dataIndex: 'attr_value',
       key: 'attr_value',
-      render: (text, record) => (
-        <Input
-          defaultValue={text}
-          onChange={(e) => { this.handleAddProductOtherAttr(record.id, { attr_name: record.attr_name, attr_value: e.target.value }); }}
-        />
-      ),
     }];
 
     console.log('商品修改详情页:', good, loading.models.good);
@@ -211,7 +205,7 @@ export default class ModifyGood extends Component {
               bordered
               pagination={false}
               columns={attrClomns}
-              dataSource={good.product ? good.product.detail : []}
+              dataSource={good.detail.product ? good.detail.product.other_attrs : []}
               locale={{
                 emptyText: '该产品没有其它属性',
               }}
