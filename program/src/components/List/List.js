@@ -5,7 +5,8 @@ import styles from './List.less';
 const mapGoodUnit = ['盒', '个']; // 商品单位
 const mapOrderStatus = ['待支付', '已取消', '待接单', '待发货', '已发货,配送中',
   '已完成', '', '申请延期中', '', '退款中',
-  '退货中', '作废', '无货', '退款完成', '退货完成'];
+  '退货中', '作废', '无货', '退款完成', '退货完成',
+  '订单流转结束'];
 const mapOrderProgress = [
   'default', 'error', 'processing', 'processing', 'processing',
   'success', 'default', 'processing', 'processing', 'processing',
