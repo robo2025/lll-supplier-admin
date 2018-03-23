@@ -12,6 +12,7 @@ const mapOrderProgress = [
   'success', 'default', 'processing', 'processing', 'processing',
   'processing', 'error', 'warning', 'success', 'success',
 ];
+const mapAbnormalTypes = ['', '(无货)', '(延期)'];
 
 class List extends Component {
   render() {
@@ -68,10 +69,10 @@ const ListItem = ({ data, onSendClick, onTakingClick, onOpenReceiptClick, onExce
       {data.brand}
     </Col>
     <Col span={2} className="item">
-      {data.number}/{mapGoodUnit[data.goods_unit - 1]}
+      {data.number}{data.goods_unit}
     </Col>
     <Col span={3} className="item">
-      ￥{data.univalent}元/{mapGoodUnit[data.goods_unit - 1]}
+      ￥{data.univalent}元/{data.goods_unit}
     </Col>
     <Col span={3} className="item vertical amount">
       <span className="money">￥{data.subtotal_money}</span>
@@ -79,7 +80,7 @@ const ListItem = ({ data, onSendClick, onTakingClick, onOpenReceiptClick, onExce
     </Col>
     <Col span={2} className="item vertical">
       <Badge status={mapOrderProgress[data.status - 1]} />
-      {mapOrderStatus[data.status - 1]}
+      {mapOrderStatus[data.status - 1]}{mapAbnormalTypes[data.abnormal_type]}
     </Col>
     <Col span={3} className="extra item vertical">
       {

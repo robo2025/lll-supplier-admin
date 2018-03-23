@@ -12,8 +12,8 @@ const TEST_SUPPLIER_ID = Cookies.getJSON('userinfo').id;
 */
 export async function queryOrders({ offset = 0, limit = 10 }) {
   const accessToken = Cookies.get('access_token');
-  const supplierId = TEST_SUPPLIER_ID;  
-  return lyRequest(`${SUPPLIER_SYS_URL}/order?supplier_id=${supplierId}?offset=${offset}&limit=${limit}`, {
+  const supplierId = TEST_SUPPLIER_ID;
+  return lyRequest(`${SUPPLIER_SYS_URL}/order?offset=${offset}&limit=${limit}`, {
     headers: {
       Authorization: accessToken,
     },
@@ -40,7 +40,7 @@ export async function takingOrder({ orderId, status }) {
   const accessToken = Cookies.get('access_token');
   const supplierId = TEST_SUPPLIER_ID;
   return lyRequest(`${SUPPLIER_SYS_URL}/order/${orderId}?supplier_id=${supplierId}`, {
-    method: 'put',    
+    method: 'put',
     headers: {
       Authorization: accessToken,
     },
@@ -54,7 +54,7 @@ export async function takingOrder({ orderId, status }) {
 export async function openReceipt({ orderId, receiptId, images, remarks }) {
   const accessToken = Cookies.get('access_token');
   return lyRequest(`${ORDER_URL}/receipt`, {
-    method: 'post',    
+    method: 'post',
     headers: {
       Authorization: accessToken,
     },
@@ -71,12 +71,12 @@ export async function openReceipt({ orderId, receiptId, images, remarks }) {
 export async function deliveryGood({ data }) {
   const accessToken = Cookies.get('access_token');
   return lyRequest(`${ORDER_URL}/logistics`, {
-    method: 'post',    
+    method: 'post',
     headers: {
       Authorization: accessToken,
     },
     data: {
-     ...data,
+      ...data,
     },
   });
 }
@@ -86,12 +86,12 @@ export async function submitException({ orderId, data }) {
   const accessToken = Cookies.get('access_token');
   const supplierId = TEST_SUPPLIER_ID;
   return lyRequest(`${SUPPLIER_SYS_URL}/order/${orderId}?supplier_id=${supplierId}`, {
-    method: 'put',    
+    method: 'put',
     headers: {
       Authorization: accessToken,
     },
     data: {
-     ...data,
+      ...data,
     },
   });
 }
@@ -101,7 +101,7 @@ export async function getReturnsOrders() {
   const accessToken = Cookies.get('access_token');
   const supplierId = TEST_SUPPLIER_ID;
   return lyRequest(`${SUPPLIER_SYS_URL}/order?supplier_id=${supplierId}&is_type=1`, {
-    method: 'get',    
+    method: 'get',
     headers: {
       Authorization: accessToken,
     },
@@ -112,7 +112,7 @@ export async function getReturnOrderDetail({ orderId }) {
   const accessToken = Cookies.get('access_token');
   const supplierId = TEST_SUPPLIER_ID;
   return lyRequest(`${SUPPLIER_SYS_URL}/order/${orderId}?supplier_id=${supplierId}&is_type=1`, {
-    method: 'get',    
+    method: 'get',
     headers: {
       Authorization: accessToken,
     },
@@ -125,7 +125,7 @@ export async function getRefundOrders() {
   const accessToken = Cookies.get('access_token');
   const supplierId = TEST_SUPPLIER_ID;
   return lyRequest(`${SUPPLIER_SYS_URL}/order?supplier_id=${supplierId}&is_type=2`, {
-    method: 'get', 
+    method: 'get',
     headers: {
       Authorization: accessToken,
     },
@@ -136,7 +136,7 @@ export async function getRefundOrderDetail({ orderId }) {
   const accessToken = Cookies.get('access_token');
   const supplierId = TEST_SUPPLIER_ID;
   return lyRequest(`${SUPPLIER_SYS_URL}/order/${orderId}?supplier_id=${supplierId}&is_type=2`, {
-    method: 'get',    
+    method: 'get',
     headers: {
       Authorization: accessToken,
     },
@@ -148,7 +148,7 @@ export async function confirmReturn({ orderId, status }) {
   const accessToken = Cookies.get('access_token');
   const supplierId = TEST_SUPPLIER_ID;
   return lyRequest(`${SUPPLIER_SYS_URL}/order/${orderId}?supplier_id=${supplierId}`, {
-    method: 'put', 
+    method: 'put',
     headers: {
       Authorization: accessToken,
     },
@@ -163,9 +163,9 @@ export async function confirmReturn({ orderId, status }) {
  * 搜索接口
  * 
  */
-export async function querySearchResults({ 
+export async function querySearchResults({
   guest_order_sn, pay_status, order_status, supplier_name, guest_company_name, start_time, end_time,
- }) {
+}) {
   const guestOrderSN = guest_order_sn || '';
   const orderStatus = order_status || '';
   const payStatus = pay_status || '';
@@ -177,8 +177,8 @@ export async function querySearchResults({
   const accessToken = Cookies.get('access_token');
   return lyRequest(`${ORDER_URL}/order?
   guest_order_sn=${guestOrderSN}&pay_status=${payStatus}&order_status=${orderStatus}&supplier_name=${supplierName}&guest_company_name=${guestCompanyName}&start_time=${startTime}&end_time=${endTime}`, {
-    headers: {
-      Authorization: accessToken,
-    },
-  });
+      headers: {
+        Authorization: accessToken,
+      },
+    });
 }

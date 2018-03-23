@@ -94,10 +94,12 @@ export default {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); }
 
-      const response = yield call(queryOrders);
+      const response = yield call(queryOrders, {});
+      const { headers } = response;      
       yield put({
         type: 'save',
         payload: response.data,
+        headers,
       });
     },
     *fetchReturns({ success, error }, { call, put }) {

@@ -156,8 +156,8 @@ export default class OrderList extends Component {
           type: 'orders/fetchException',
           orderId,
           data: { ...exceptionInfo },
+          success: () => { message.success('订单异常申请提交成功'); },
           error: (res) => { message.error(handleServerMsgObj(res.msg)); },
-          succuess: (res) => { message.success('订单异常处理提交成功'); },
         });
       }
     });
@@ -354,6 +354,7 @@ export default class OrderList extends Component {
   render() {
     const { orders, loading, upload } = this.props;
     const { total } = orders;
+    console.log('订单总量', total);
     const {
       isShowDeliveryModal,
       isShowOpenModal,
@@ -368,6 +369,7 @@ export default class OrderList extends Component {
       showSizeChanger: true,
       showQuickJumper: true,
       current: currentPage,
+      defaultPageSize: this.state.limit || 10,
       total,
     };
 
