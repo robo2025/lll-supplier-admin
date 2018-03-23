@@ -10,10 +10,10 @@ const TEST_SUPPLIER_ID = Cookies.getJSON('userinfo').id;
 /**
  *  获取服务器客户订单列表
 */
-export async function queryOrders() {
+export async function queryOrders({ offset = 0, limit = 10 }) {
   const accessToken = Cookies.get('access_token');
   const supplierId = TEST_SUPPLIER_ID;  
-  return lyRequest(`${SUPPLIER_SYS_URL}/order?supplier_id=${supplierId}`, {
+  return lyRequest(`${SUPPLIER_SYS_URL}/order?supplier_id=${supplierId}?offset=${offset}&limit=${limit}`, {
     headers: {
       Authorization: accessToken,
     },

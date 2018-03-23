@@ -23,19 +23,22 @@ export default {
     refunds: [],
     returnDetail: {},
     refundDetail: {},
+    total: 0,
   },
 
   effects: {
-    *fetch({ supplierId, success, error }, { call, put }) {
-      const res = yield call(queryOrders, { supplierId });
+    *fetch({ offset, limit, supplierId, success, error }, { call, put }) {
+      const res = yield call(queryOrders, { supplierId, offset, limit });
       // console.log('服务器目录列表', response);
       if (res.rescode >> 0 === SUCCESS_STATUS) {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); return; }
 
+      const { headers } = res;
       yield put({
         type: 'save',
         payload: res.data,
+        headers,
       });
     },
     *fetchDetail({ orderId, supplierId, success, error }, { call, put }) {
@@ -160,6 +163,7 @@ export default {
       return {
         ...state,
         list: action.payload,
+        total: action.headers['x-content-total'] >> 0,
       };
     },
     saveDetail(state, action) {

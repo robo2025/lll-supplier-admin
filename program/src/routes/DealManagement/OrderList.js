@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, Form, Input, Select, Icon, Button, DatePicker, Modal, message } from 'antd';
+import { Row, Col, Card, Form, Input, Select, Icon, Button, DatePicker, Modal, message, Pagination } from 'antd';
 import { connect } from 'dva';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
@@ -35,6 +35,7 @@ export default class OrderList extends Component {
       exceptionInfo: {}, // 异常Form信息
       openReceipt: [], // 开票信息
       data: {},
+      currentPage: 1,
     };
   }
 
@@ -43,9 +44,6 @@ export default class OrderList extends Component {
     dispatch({
       type: 'orders/fetch',
       supplierId: 100,
-    });
-    dispatch({
-      type: 'upload/fetch',
     });
   }
 
@@ -85,6 +83,7 @@ export default class OrderList extends Component {
       orderId,
       supplierId,
       status,
+      success: () => { message.success('接单成功'); },
       error: (res) => { message.error(handleServerMsgObj(res.msg)); },
     });
   }
@@ -201,6 +200,24 @@ export default class OrderList extends Component {
         type: 'orders/fetchSearch',
         data: values,
       });
+    });
+  }
+
+  // 处理表单改变
+  handlePaginationChange = (page, pageSize) => {
+    const params = {
+      currentPage: page,
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+    };
+    this.setState(params);
+    const { dispatch } = this.props;
+    console.log('分页改变', params);    
+    dispatch({
+      type: 'orders/fetch',
+      supplierId: 100,
+      offset: params.offset,
+      limit: params.limit,
     });
   }
 
@@ -336,15 +353,24 @@ export default class OrderList extends Component {
 
   render() {
     const { orders, loading, upload } = this.props;
+    const { total } = orders;
     const {
       isShowDeliveryModal,
       isShowOpenModal,
       isShowExceptionModal,
       openReceipt,
-      data } = this.state;
+      data,
+      currentPage,
+    } = this.state;
     const uploadToken = upload.upload_token;
 
-    console.log(this.state);
+    const paginationOptions = {
+      showSizeChanger: true,
+      showQuickJumper: true,
+      current: currentPage,
+      total,
+    };
+
     return (
       <PageHeaderLayout title="订单列表">
         <Card bordered={false} className={styles['search-wrap']} title="搜索条件">
@@ -383,6 +409,11 @@ export default class OrderList extends Component {
               })
             }
           </div>
+          <Pagination
+            className="pull-right"
+            {...paginationOptions}
+            onChange={this.handlePaginationChange}
+          />
         </Card>
         {/* 发货单Modal */}
         <Modal
