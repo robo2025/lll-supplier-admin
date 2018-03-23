@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, Form, Input, Select, Icon, Button, DatePicker, Modal, message, Pagination } from 'antd';
+import { Row, Col, Card, Form, Input, Select, Icon, Button, DatePicker, Modal, message, Pagination, Spin } from 'antd';
 import { connect } from 'dva';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
@@ -14,7 +14,7 @@ import styles from './OrderList.less';
 const FormItem = Form.Item;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
-
+const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
 
 @connect(({ orders, upload, loading }) => ({
   orders,
@@ -380,7 +380,7 @@ export default class OrderList extends Component {
             {this.renderForm()}
           </div>
         </Card>
-        <Card bordered={false} loading={loading}>
+        <Card bordered={false}>
           <div className={styles.tableList}>
             <List.Header />
             {
@@ -390,6 +390,7 @@ export default class OrderList extends Component {
                :
                <div style={{ textAlign: 'center' }}>暂无订单数据</div>
             }
+            <Spin indicator={antIcon} tip="别急，我拼了老命也要把数据加载出来..." spinning={loading} >
             {
               orders.list.map((val, idx) => {
                 const orderListItemHeader = (
@@ -410,6 +411,7 @@ export default class OrderList extends Component {
                 );
               })
             }
+            </Spin>
           </div>
           <Pagination
             className="pull-right"
