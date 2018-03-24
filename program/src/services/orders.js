@@ -1,8 +1,9 @@
 import Cookies from 'js-cookie';
+import { ORDERS_URL } from '../constant/config';
 import lyRequest from '../utils/lyRequest';
 
-const SUPPLIER_SYS_URL = 'http://192.168.4.4:8009/v1/supplier';
-const ORDER_URL = 'http://192.168.4.4:8009/v1/order';
+const SUPPLIER_SYS_URL = `${ORDERS_URL}/v1/supplier`;
+const ORDER_URL = `${ORDERS_URL}/v1/order`;
 const TEST_SUPPLIER_ID = Cookies.getJSON('userinfo').id;
 
 // ------------------ 请求订单信息---------------------
