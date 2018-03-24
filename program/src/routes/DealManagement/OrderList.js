@@ -98,7 +98,7 @@ export default class OrderList extends Component {
     const { dispatch } = this.props;
     const { orderId, receiptInfo } = this.state;
     const that = this;
-    this.formObj.validateFields((error, values) => {
+    this.formObj.validateFields((error) => {
       if (!error) {
         that.setState({ isShowOpenModal: false });
         dispatch({
@@ -106,7 +106,7 @@ export default class OrderList extends Component {
           orderId,
           ...receiptInfo,
           error: (res) => { message.error(handleServerMsgObj(res.msg)); },
-          succuess: (res) => { message.success('开票成功'); },
+          succuess: () => { message.success('开票成功'); },
 
         });
       }

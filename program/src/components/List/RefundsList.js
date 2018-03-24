@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Spin, Badge } from 'antd';
+import { Row, Col } from 'antd';
 import styles from './List.less';
 
 const mapRefundStatus = ['等待退款', '退款完成'];
@@ -59,7 +59,7 @@ const ListItem = ({ data, onConfirmReturn }) => (
 );
 
 // 退换货Header
-const ListHeader = data => (
+const ListHeader = () => (
   <Row gutter={16} className={styles['list-header']}>
     <Col span={15} className="item" >
       退款商品商品明细

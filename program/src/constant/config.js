@@ -3,16 +3,16 @@
 * */
 
 // 单点登录URL
-export const URL = 'https://login.robo2025.com';
+export const URL = '//login.robo2025.com';
 
 // 网站内容接口URL
-export const API_URL = 'http://api-product.robo2025.com/api';
+export const API_URL = '//api-product.robo2025.com/api';
 
 // 上传文件获取token URL
-export const UPLOAD_URL = 'http://api-common-service.robo2025.com';
+export const UPLOAD_URL = '//api-common-service.robo2025.com';
 
 // 用户管理系统API URL
-export const USERS_URL = 'http://api-user.robo2025.com';
+export const USERS_URL = '//api-user.robo2025.com';
 
 // 验证登录接口URL
 export const LOGIN_URL = `${URL}/server/authorize`;

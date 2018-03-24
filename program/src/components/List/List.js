@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Row, Col, Badge } from 'antd';
 import styles from './List.less';
 
-const mapGoodUnit = ['盒', '个']; // 商品单位
 const mapOrderStatus = ['待支付', '已取消', '待接单', '待发货', '已发货,配送中',
   '已完成', '', '申请延期中', '', '退款中',
   '退货中', '作废', '无货', '退款完成', '退货完成',
@@ -38,7 +37,15 @@ class List extends Component {
   }
 };
 
-const action = ({ status, onSendClick, onTakingClick, id, orderSn, data, onOpenReceiptClick, onExceptionClick }) => {
+const action = ({
+  status,
+  onSendClick,
+  onTakingClick,
+  id,
+  orderSn,
+  data,
+  onOpenReceiptClick,
+  onExceptionClick }) => {
   if (status === 3) { // 待结单
     return (
       <React.Fragment>
@@ -101,7 +108,7 @@ const ListItem = ({ data, onSendClick, onTakingClick, onOpenReceiptClick, onExce
 );
 
 // 订单Header
-const ListHeader = data => (
+const ListHeader = () => (
   <Row gutter={16} className={styles['list-header']}>
     <Col span={3} className="item">
       订单号

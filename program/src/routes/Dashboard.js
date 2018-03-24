@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Row, Col, Card, Table, Icon, Divider } from 'antd';
 
+const a = '123456';
+
 const columns = [{
   title: 'Name',
   dataIndex: 'name',
@@ -47,7 +49,7 @@ class Dashboard extends PureComponent {
               <p>卡片内容</p>
               <p>卡片内容</p>
             </Card>
-          </Col>
+          </Col>git
           <Col span={8}>
             <Card bordered={false}>
               <p>卡片内容</p>
@@ -94,6 +96,7 @@ class Dashboard extends PureComponent {
     );
   }
 }
+
 
 export default connect(state => ({
   user: state.user,
