@@ -123,7 +123,7 @@ const receiptColumns = [{
   title: '发票照片',
   dataIndex: 'images',
   key: 'images',
-  render: text => (<img src={text} alt="发票图片" width={20} height={20} />),
+  render: text => (text ? <img src={text} alt="发票图片" width={20} height={20} /> : <span>无</span>),
 }, {
   title: '更新日期',
   dataIndex: 'add_time',
