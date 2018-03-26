@@ -458,7 +458,7 @@ export default class OrderList extends Component {
         >
           <ExceptionContent
             list={openReceipt}
-            data={data ? data.original_delivery_time : '数据还没来'}
+            data={data}
             onChange={this.handleExceptionFormChange}
             handleValidate={this.validateForm}
           />

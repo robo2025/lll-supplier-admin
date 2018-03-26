@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import moment from 'moment';
 import { DatePicker, Form, Select, Input } from 'antd';
+import styles from './ExceptionContent.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -24,9 +25,9 @@ const formItemLayout = {
     if (fields.expect_date_of_delivery) {
       // console.log(fields.expect_date_of_delivery.format('YYYY-MM-DD'));
       const ExpectTime = fields.expect_date_of_delivery.format('YYYY-MM-DD');
-      props.onChange({ expect_date_of_delivery: ExpectTime });             
+      props.onChange({ expect_date_of_delivery: ExpectTime });
     } else {
-    props.onChange(fields);      
+      props.onChange(fields);
     }
   },
 })
@@ -60,9 +61,24 @@ class ExceptionContent extends Component {
     const { isHaveGoods } = this.state;
     const { data } = this.props;
 
+    console.log('---------------------------------', data);
+
     return (
-      <div className="exception-content">
+      <div className={styles['exception-content']}>
         <Form>
+          <FormItem
+            label="订单ID"
+            labelCol={{
+              xs: { span: 24 },
+              sm: { span: 4 },
+            }}
+            wrapperCol={{
+              xs: { span: 24 },
+              sm: { span: 8 },
+            }}
+          >
+            <span>{data.son_order_sn}</span>
+          </FormItem>
           <FormItem
             label="原发货时间"
             labelCol={{
@@ -74,7 +90,7 @@ class ExceptionContent extends Component {
               sm: { span: 8 },
             }}
           >
-            <span>{moment(data * 1000).format('YYYY-MM-DD')}</span>
+            <span>{moment(data.original_delivery_time * 1000).format('YYYY-MM-DD')}</span>
           </FormItem>
           <FormItem
             label="异常情况"
@@ -103,30 +119,30 @@ class ExceptionContent extends Component {
           </FormItem>
           {
             isHaveGoods ?
-            null
-            :
-            (
-              <FormItem
-              label="预计发货时间"
-              {...formItemLayout}
-              >
-              {
-                getFieldDecorator('expect_date_of_delivery', {
-                  rules: [{
-                    required: true,
-                    message: '请选择预计发货时间',
-                  }],
-                })(
-                  <DatePicker 
-                    allowClear={false}
-                    disabledDate={current => (this.disabledDate(current, data * 1000))}
-                  />
-                )
-              }
-              </FormItem>
-            )
+              null
+              :
+              (
+                <FormItem
+                  label="预计发货时间"
+                  {...formItemLayout}
+                >
+                  {
+                    getFieldDecorator('expect_date_of_delivery', {
+                      rules: [{
+                        required: true,
+                        message: '请选择预计发货时间',
+                      }],
+                    })(
+                      <DatePicker
+                        allowClear={false}
+                        disabledDate={current => (this.disabledDate(current, data * 1000))}
+                      />
+                    )
+                  }
+                </FormItem>
+              )
           }
-         
+
           <FormItem
             label="说明"
             {...formItemLayout}
