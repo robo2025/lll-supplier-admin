@@ -56,6 +56,8 @@ export default class NewGood extends Component {
     // 获取产品列表
     dispatch({
       type: 'product/fetch',
+      offset: 0,
+      limit: 8,
     });
     if (args.origin_prdId) {
       dispatch({
@@ -149,6 +151,22 @@ export default class NewGood extends Component {
     console.log('商品信息', { ...this.state.fields, ...obj });
   }
 
+  // 当商品列表数据改变时：分页
+  handleProductTableChange = (pagination, filtersArg, sorter) => {
+    const { dispatch } = this.props;
+    console.log('产品table改变--：', pagination, filtersArg, sorter);
+    const params = {
+      currentPage: pagination.current,
+      pageSize: pagination.pageSize,
+      offset: (pagination.current - 1) * (pagination.pageSize),
+    };
+    dispatch({
+      type: 'product/fetch',
+      offset: params.offset,
+      limit: params.pageSize,
+    });
+  }
+
   /**
   * 提交商品信息
   * 
@@ -163,7 +181,7 @@ export default class NewGood extends Component {
         ...fields,
         product_id: args.origin_prdId,
       },
-      success: (res) => { this.props.history.push('/goods/list'); },
+      success: () => { this.props.history.push('/goods/list'); },
       error: (res) => { message.error(res.msg, 2.5); },
     });
   }
@@ -171,16 +189,8 @@ export default class NewGood extends Component {
   render() {
     const { isShowModal, isShowAttrMOdal, otherAttrsFiled, fields } = this.state;
     const { product, good, loading } = this.props;
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 3 },
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 21 },
-      },
-    };
+    const { total } = product;
+   
      // 其他属性列
      const attrClomns = [{
       title: '属性名',
@@ -193,7 +203,12 @@ export default class NewGood extends Component {
       render: (text, record) => (
       <Input 
         defaultValue={text}      
-        onChange={(e) => { this.handleAddProductOtherAttr(record.id, { attr_name: record.attr_name, attr_value: e.target.value }); }}
+        onChange={(e) => { 
+          this.handleAddProductOtherAttr(
+            record.id,
+            { attr_name: record.attr_name, attr_value: e.target.value }
+          ); 
+        }}
       />
       ),
     }];
@@ -205,7 +220,7 @@ export default class NewGood extends Component {
         <Card bordered={false} className={styles['new-good-wrap']}>
           {/* 参照数据Modal */}
           <Modal
-            width="80%"
+            width="90%"
             visible={isShowModal}
             title="关联参照数据"
             okText=""
@@ -214,8 +229,11 @@ export default class NewGood extends Component {
             onOk={this.onOk}
           >
             <ProductList
+              loading={loading.models.product}
               data={product.list}
               onAssociate={this.handleAssociate}
+              onChange={this.handleProductTableChange}
+              total={total}
             />
           </Modal>
           <NewGoodForm
