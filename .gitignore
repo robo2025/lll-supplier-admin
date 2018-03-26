@@ -9,7 +9,7 @@
 _roadhog-api-doc
 
 # production
-/program/dist
+# /program/dist
 
 # misc
 .DS_Store
