@@ -251,16 +251,19 @@ export default class OrderDetail extends Component {
         </Card>
         <Card title="发票信息" style={{ marginBottom: 24 }} bordered loading={loading}>
           {
-            receiptList.length > 0 ? (
-              <Table
-                dataSource={receiptList}
-                columns={receiptColumns}
-                pagination={{
-                  defaultPageSize: 3,
-                }}
-                key="order_sn"
-              />
-            ) : (
+            receiptList.length > 0 ?
+              (
+                <Table
+                  dataSource={receiptList}
+                  columns={receiptColumns}
+                  pagination={{
+                    defaultPageSize: 3,
+                  }}
+                  key="order_sn"
+                />
+              )
+              :
+              (
                 <div className={styles.noData}>
                   <Icon type="smile-o" />暂无记录
                 </div>
