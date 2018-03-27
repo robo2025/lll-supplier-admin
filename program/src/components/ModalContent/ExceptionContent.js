@@ -51,7 +51,6 @@ class ExceptionContent extends Component {
   }
 
   disabledDate = (current, last) => {
-    // Can not select days before today and today
     console.log('当前时间:', current && current < moment().endOf('day'), moment(last).format('YYYY-MM-DD'));
     return current && current < moment(last).endOf('day');
   }
