@@ -61,7 +61,6 @@ class ExceptionContent extends Component {
     const { isHaveGoods } = this.state;
     const { data } = this.props;
 
-    console.log('---------------------------------', data);
 
     return (
       <div className={styles['exception-content']}>
@@ -135,7 +134,7 @@ class ExceptionContent extends Component {
                     })(
                       <DatePicker
                         allowClear={false}
-                        disabledDate={current => (this.disabledDate(current, data * 1000))}
+                        disabledDate={current => (this.disabledDate(current, data.original_delivery_time * 1000))}
                       />
                     )
                   }
