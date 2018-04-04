@@ -2,7 +2,7 @@
  * @Author: lll
  * @Date: 2018-01-26 14:08:45
  * @Last Modified by: lll
- * @Last Modified time: 2018-03-20 11:50:25
+ * @Last Modified time: 2018-04-03 18:06:45
  */
 import React, { PureComponent, Fragment } from 'react';
 import moment from 'moment';
@@ -159,7 +159,7 @@ class GoodsTable extends PureComponent {
         title: '操作',
         render: (text, record) => (
           <Fragment>
-            <a href={'#/goods/detail?goodId=' + record.id}>查看</a>
+            <a href={'#/goods/list/detail?goodId=' + record.id}>查看</a>
             <Divider type="vertical" />
             <a href={'#/goods/list/modify?goodId=' + record.id}>修改</a>
             <Divider type="vertical" />            

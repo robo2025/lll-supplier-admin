@@ -60,7 +60,7 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, ['product', 'good'], () => import('../routes/ModifyGood')),
       name: '修改商品信息',
     },
-    '/:goods/detail': {
+    '/goods/:list/detail': {
       component: dynamicWrapper(app, ['product', 'good'], () => import('../routes/GoodDetail')),
     },
     '/deal/orders': {

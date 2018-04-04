@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Modal, Button, Row, Col, Form, Input, Table, message } from 'antd';
+import { Card, Modal, Button, Input, Table, message } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import SectionHeader from '../../components/PageHeader/SectionHeader';
 import ProductList from '../../components/CustomTable/ProductList';
@@ -9,7 +9,6 @@ import { queryString } from '../../utils/tools';
 
 import styles from './index.less';
 
-const FormItem = Form.Item;
 
 @connect(({ loading, product, good }) => ({
   product,
@@ -67,7 +66,6 @@ export default class NewGood extends Component {
     }
     window.onhashchange = this.hashChangeFire;
   }
-
 
   onCancel = () => {
     this.setState({ isShowModal: false });
@@ -187,8 +185,8 @@ export default class NewGood extends Component {
   }
 
   render() {
-    const { isShowModal, isShowAttrMOdal, otherAttrsFiled, fields } = this.state;
-    const { product, good, loading } = this.props;
+    const { isShowModal, fields } = this.state;
+    const { product, loading } = this.props;
     const { total } = product;
    
      // 其他属性列
@@ -200,17 +198,6 @@ export default class NewGood extends Component {
       title: '属性值',
       dataIndex: 'attr_value',
       key: 'attr_value',
-      render: (text, record) => (
-      <Input 
-        defaultValue={text}      
-        onChange={(e) => { 
-          this.handleAddProductOtherAttr(
-            record.id,
-            { attr_name: record.attr_name, attr_value: e.target.value }
-          ); 
-        }}
-      />
-      ),
     }];
 
     console.log('新建props和state', this.props.product, this.state);
@@ -244,7 +231,7 @@ export default class NewGood extends Component {
             onAttrChange={this.handleGoodAttr}
           />
           <SectionHeader
-            title="产品其他属性"
+            title="商品其他属性"
           />
           <div style={{ width: '50%', maxWidth: 500 }}>
             <Table

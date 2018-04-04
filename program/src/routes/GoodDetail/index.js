@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Table, Button, Row, Col, Form, Input, Upload } from 'antd';
+import moment from 'moment';
+import { Card, Table, Button, Form } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import SectionHeader from '../../components/PageHeader/SectionHeader';
-import ProductList from '../../components/CustomTable/ProductList';
-import ModifyGoodForm from '../../components/CustomeForm/ModifyGoodForm';
+import ShowGoodForm from '../../components/CustomeForm/ShowGoodForm';
 import { queryString } from '../../utils/tools';
 
 import styles from './index.less';
 
-const FormItem = Form.Item;
 // 其他属性列
 const attrClomns = [{
   title: '属性名',
@@ -20,7 +19,32 @@ const attrClomns = [{
   dataIndex: 'attr_value',
   key: 'attr_value',
 }];
-
+// 操作记录列
+const actionFlag = ['新增', '修改', '删除']; // 操作类型 (1:新增 2:修改 3:删除)
+const columns = [{
+  title: '操作类型',
+  dataIndex: 'action_flag',
+  key: 'action_flag',
+  render: val => <span>{actionFlag[val - 1]}</span>,
+}, {
+  title: '操作员',
+  dataIndex: 'username',
+  key: 'username',
+}, {
+  title: '执行结果',
+  dataIndex: 'status',
+  key: 'status',
+  render: () => (<span>成功</span>),
+}, {
+  title: '操作时间',
+  dataIndex: 'action_time',
+  key: 'action_time',
+  render: val => <span>{moment(val * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>,
+}, {
+  title: '说明',
+  dataIndex: 'change_message',
+  key: 'change_message',
+}];
 
 @connect(({ loading, good }) => ({
   good,
@@ -48,6 +72,12 @@ export default class GoodDetail extends Component {
     // 获取商品详情
     dispatch({
       type: 'good/fetchDetail',
+      goodId: args.goodId,
+    });
+    // 获取商品日志
+    dispatch({
+      type: 'good/queryLogs',
+      module: 'goods',
       goodId: args.goodId,
     });
   }
@@ -127,14 +157,13 @@ export default class GoodDetail extends Component {
     return (
       <PageHeaderLayout title="新增商品信息" >
         <Card bordered={false} className={styles['new-good-wrap']}>
-
-          <ModifyGoodForm
+          <ShowGoodForm
             loading={loading.models.good}
             data={good.detail}
             onChange={this.handleFormChange}
           />
           <SectionHeader
-            title="产品其他属性"
+            title="商品其他属性"
           />
           <div style={{ width: '50%', maxWidth: 500 }}>
             <Table
@@ -148,6 +177,23 @@ export default class GoodDetail extends Component {
               }}
             />
           </div>
+          <div className={styles['section-header']}>
+            <h2>操作日志</h2>
+          </div>
+          <Card
+            className={styles.tabsCard}
+            bordered={false}
+          >
+            <Table
+              pagination={{
+                defaultPageSize: 6,
+                pageSize: 6,
+              }}
+              loading={loading.models.good}
+              dataSource={good.logs}
+              columns={columns}
+            />
+          </Card>
           <div className={styles['submit-btn-wrap']}>
             <Button type="primary" onClick={() => { this.props.history.push('/goods/list'); }}>返回列表</Button>
           </div>
