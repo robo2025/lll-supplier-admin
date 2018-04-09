@@ -87,7 +87,12 @@ const ListItem = ({ data, onSendClick, onTakingClick, onOpenReceiptClick, onExce
     </Col>
     <Col span={2} className="item vertical">
       <Badge status={mapOrderProgress[data.status - 1]} />
-      {mapOrderStatus[data.status - 1]}{mapAbnormalTypes[data.abnormal_type]}
+      <span
+        title={`${mapOrderStatus[data.status - 1]}${mapAbnormalTypes[data.abnormal_type]}`}
+      >
+        {mapOrderStatus[data.status - 1]}{mapAbnormalTypes[data.abnormal_type]}
+      </span>
+
     </Col>
     <Col span={3} className="extra item vertical">
       {
@@ -104,7 +109,7 @@ const ListItem = ({ data, onSendClick, onTakingClick, onOpenReceiptClick, onExce
       }
       <a href={'#/deal/orders/detail?id=' + data.id}>订单详情</a>
     </Col>
-  </Row>
+  </Row >
 );
 
 // 订单Header

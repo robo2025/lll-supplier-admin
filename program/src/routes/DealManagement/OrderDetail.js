@@ -235,6 +235,16 @@ export default class OrderDetail extends Component {
             columns={goodsColumns}
             rowKey="add_time"
           />
+          <div className={styles['extra-good-info']} >
+            <div className="info">
+              <span>运费：</span>
+              <span>包邮</span>
+            </div>
+            <div className="info">
+              <span>商品总金额：</span>
+              <span className="money">￥{orderInfo.subtotal_money}</span>
+            </div>
+          </div>
         </Card>
         <Card title="发货记录" style={{ marginBottom: 24 }} bordered loading={loading}>
           <Table
