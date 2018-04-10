@@ -291,7 +291,7 @@ export default class OrderDetail extends Component {
             )
           }
         </Card>
-        <Card
+        {/* <Card
           bordered
           title="操作记录"
           style={{ marginBottom: 24 }}
@@ -310,7 +310,7 @@ export default class OrderDetail extends Component {
                 </div>
               )
           }
-        </Card>
+        </Card> */}
       </PageHeaderLayout>
     );
   }
