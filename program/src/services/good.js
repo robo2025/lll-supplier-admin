@@ -1,15 +1,16 @@
 import Cookies from 'js-cookie';
 import lyRequest from '../utils/lyRequest';
 import { API_URL } from '../constant/config';
+import { queryString } from '../utils/tools';
 
 
 /**
  *  获取服务器商品列表
  *
 */
-export async function queryGoods() {
+export async function queryGoods({ params, offset = 0, limit = 10 }) {
   const acess_token = Cookies.get('access_token');
-  return lyRequest(`${API_URL}/goods`, {
+  return lyRequest(`${API_URL}/goods?offset=${offset}&limit=${limit}&${queryString.toQueryString(params)}`, {
     headers: {
       Authorization: acess_token,
     },

@@ -53,6 +53,19 @@ export const queryString = {
     }
     return parseObj;
   },
+  toQueryString(params) {
+    console.log('参数params:', Object.prototype.toString.call(params), params);
+    if (Object.prototype.toString.call(params) !== '[object Object]') {
+      // throw new Error('toString方法传参必须是一个JSON');
+      return '';
+    }
+    let queryStr = '';
+    Object.keys(params).forEach((key) => {
+      queryStr += `${key}=${params[key] || ''}&`;
+    });
+    console.log('queryString---', queryStr);
+    return queryStr.substring(0, queryStr.length - 1);
+  },
 };
 
 

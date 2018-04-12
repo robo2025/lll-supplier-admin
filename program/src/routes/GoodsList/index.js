@@ -17,7 +17,7 @@ const plainOptions = ['gno', 'product_name', 'brand_name', 'english_name', 'part
 const { TextArea } = Input;
 
 // 商品列表
-@connect(({ rule, loading, good }) => ({
+@connect(({ loading, good }) => ({
   good,
   loading: loading.models.good,
 }))
@@ -48,9 +48,6 @@ export default class GoodsList extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    dispatch({
-      type: 'rule/fetch',
-    });
     dispatch({
       type: 'good/fetch',
     });
@@ -138,7 +135,7 @@ export default class GoodsList extends Component {
       goodStatus: status,
       // success: (res) => { message.success('修改成功'); },
       error: (res) => { message.error(handleServerMsg(res.msg)); },
-      
+
     });
   }
 
@@ -166,8 +163,8 @@ export default class GoodsList extends Component {
     const selectedGood = GoodsList1.filter(val => (
       val.id === goodId
     ));
-    this.setState({ 
-      prices: selectedGood[0].prices, 
+    this.setState({
+      prices: selectedGood[0].prices,
       isShowPriceSettingModal: true,
       goodId,
     });
@@ -183,7 +180,7 @@ export default class GoodsList extends Component {
       data: {
         prices,
       },
-      error: (res) => { message.error(handleServerMsg(res.msg)); },      
+      error: (res) => { message.error(handleServerMsg(res.msg)); },
     });
   }
   // 取消：价格设置Modal 
@@ -284,18 +281,33 @@ export default class GoodsList extends Component {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
+      const createTime = {};
+      if (fieldsValue.create_time) {
+        createTime.created_start = fieldsValue.create_time[0].format('YYYY-MM-DD');
+        createTime.created_end = fieldsValue.create_time[1].format('YYYY-MM-DD');
+      }
       const values = {
         ...fieldsValue,
-        updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
+        ...createTime,
       };
 
+      const {
+        gno,
+        created_start,
+        created_end,
+      }
+        = values;
       this.setState({
         formValues: values,
       });
 
       dispatch({
-        type: 'rule/fetch',
-        payload: values,
+        type: 'good/fetch',
+        params: {
+          gno,
+          created_start,
+          created_end,
+        },
       });
     });
   }
@@ -307,14 +319,14 @@ export default class GoodsList extends Component {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="商品ID编号">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('gno')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="审核状态">
-              {getFieldDecorator('status')(
+              {getFieldDecorator('audit_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="0">待审核</Option>
                   <Option value="1">审核通过</Option>
@@ -325,7 +337,7 @@ export default class GoodsList extends Component {
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="上限架状态">
-              {getFieldDecorator('status')(
+              {getFieldDecorator('publish_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="0">全部</Option>
                   <Option value="1">下架中</Option>
@@ -336,14 +348,14 @@ export default class GoodsList extends Component {
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="佣金比率">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('yj')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={8} sm={24}>
             <FormItem label="价格">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('price')(
                 <InputGroup>
                   <Input style={{ width: 80, textAlign: 'center' }} placeholder="最低价" />
                   <Input style={{ width: 30, borderLeft: 0, pointerEvents: 'none', backgroundColor: '#fff' }} placeholder="~" disabled />
@@ -352,7 +364,7 @@ export default class GoodsList extends Component {
               )}
             </FormItem>
           </Col>
-          
+
         </Row>
         <div style={{ overflow: 'hidden' }}>
           <span style={{ float: 'right', marginBottom: 24 }}>
@@ -374,14 +386,14 @@ export default class GoodsList extends Component {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="商品ID编号">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('gno')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="审核状态">
-              {getFieldDecorator('status')(
+              {getFieldDecorator('audit_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="0">待审核</Option>
                   <Option value="1">审核通过</Option>
@@ -392,7 +404,7 @@ export default class GoodsList extends Component {
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="上限架状态">
-              {getFieldDecorator('status')(
+              {getFieldDecorator('publish_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="0">全部</Option>
                   <Option value="1">下架中</Option>
@@ -403,14 +415,14 @@ export default class GoodsList extends Component {
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="佣金比率">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('yj')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={8} sm={24}>
             <FormItem label="价格">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('price')(
                 <InputGroup>
                   <Input style={{ width: 80, textAlign: 'center' }} placeholder="最低价" />
                   <Input style={{ width: 30, borderLeft: 0, pointerEvents: 'none', backgroundColor: '#fff' }} placeholder="~" disabled />
@@ -423,28 +435,28 @@ export default class GoodsList extends Component {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="商品名称">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('good_name')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="型号">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('model')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="品牌">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('brand_name')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="所属类目">
-              {getFieldDecorator('status')(
+              {getFieldDecorator('cata')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="0">未知</Option>
                   <Option value="1">未知</Option>
@@ -455,7 +467,7 @@ export default class GoodsList extends Component {
           </Col>
           <Col xll={4} md={10} sm={24}>
             <FormItem label="产品提交日期">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('create_time')(
                 <RangePicker onChange={this.onDatepickerChange} />
               )}
             </FormItem>
@@ -494,9 +506,9 @@ export default class GoodsList extends Component {
     return (
       <PageHeaderLayout title="商品列表">
         <Card bordered={false} className={styles['search-wrap']} title="搜索条件">
-            <div className={styles.tableListForm}>
-              {this.renderForm()}
-            </div>
+          <div className={styles.tableListForm}>
+            {this.renderForm()}
+          </div>
         </Card>
         <Card bordered={false}>
           <div className={styles.tableList}>

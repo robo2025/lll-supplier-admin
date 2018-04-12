@@ -9,19 +9,21 @@ export default {
     list: [],
     detail: {},
     logs: [],
+    total: 0,
   },
 
   effects: {
-    *fetch({ success, error }, { call, put }) {
-      const res = yield call(queryGoods);
-      // console.log('服务器目录列表', response);
+    *fetch({ params, offset, limit, success, error }, { call, put }) {
+      const res = yield call(queryGoods, { params, offset, limit });
       if (res.rescode >> 0 === SUCCESS_STATUS) {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); return; }
 
+      const { headers } = res;      
       yield put({
         type: 'save',
         payload: res.data,
+        headers,
       });
     },
     *fetchDetail({ goodId, success, error }, { call, put }) {
@@ -112,6 +114,7 @@ export default {
       return {
         ...state,
         list: action.payload,
+        total: action.headers['x-content-total'] >> 0,        
       };
     },
     saveDetail(state, action) {
