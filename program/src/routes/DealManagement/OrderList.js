@@ -146,7 +146,6 @@ export default class OrderList extends Component {
   dispatchException = () => {
     const { dispatch } = this.props;
     const { exceptionInfo, orderId } = this.state;
-    console.log('------1--------', { ...exceptionInfo, orderId });
     const that = this;
     this.formObj.validateFields((error, values) => {
       console.log('校验结果：', error, values);

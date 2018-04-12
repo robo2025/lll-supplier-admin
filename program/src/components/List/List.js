@@ -1,17 +1,13 @@
 import React, { Component } from 'react';
 import { Row, Col, Badge } from 'antd';
+import { ORDER_STATUS, ABNORMAL_TYPE } from '../../constant/statusList';
 import styles from './List.less';
 
-const mapOrderStatus = ['待支付', '已取消', '待接单', '待发货', '已发货,配送中',
-  '已完成', '', '申请延期中', '', '退款中',
-  '退货中', '作废', '无货', '退款完成', '退货完成',
-  '订单流转结束'];
 const mapOrderProgress = [
   'default', 'error', 'processing', 'processing', 'processing',
   'success', 'default', 'processing', 'processing', 'processing',
   'processing', 'error', 'warning', 'success', 'success',
 ];
-const mapAbnormalTypes = ['', '(无货)', '(延期)'];
 
 class List extends Component {
   render() {
@@ -88,9 +84,9 @@ const ListItem = ({ data, onSendClick, onTakingClick, onOpenReceiptClick, onExce
     <Col span={2} className="item vertical">
       <Badge status={mapOrderProgress[data.status - 1]} />
       <span
-        title={`${mapOrderStatus[data.status - 1]}${mapAbnormalTypes[data.abnormal_type]}`}
+        title={`${ORDER_STATUS[data.status]}${ABNORMAL_TYPE[data.abnormal_type]}`}
       >
-        {mapOrderStatus[data.status - 1]}{mapAbnormalTypes[data.abnormal_type]}
+        {ORDER_STATUS[data.status]}{ABNORMAL_TYPE[data.abnormal_type]}
       </span>
 
     </Col>

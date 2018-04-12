@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Row, Col, Button } from 'antd';
+import { RETURNS_STATUS } from '../../constant/statusList';
 import styles from './List.less';
 
-const mapReturnStatus = ['待收货', '确认收货', '待审核', '审核未通过', '待上传物流信息'];
 
 class ReturnsList extends Component {
   render() {
@@ -41,12 +41,12 @@ const ListItem = ({ data, onConfirmReturn }) => (
       <span className="delivery">（含运费：0元）</span>
     </Col>
     <Col span={2} className="item vertical">
-      {mapReturnStatus[data.status - 1]}
+      {RETURNS_STATUS[data.status]}
     </Col>
     <Col span={3} className="extra item vertical">
       <Button
         onClick={() => { onConfirmReturn({ orderId: data.id, status: 3 }); }}
-        disabled={data.status !== 1}
+        disabled={data.status !== 2}
         size="small"
       >确认收货
       </Button>

@@ -4,7 +4,9 @@ import { connect } from 'dva';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import DescriptionList from '../../components/DescriptionList';
+import { RETURNS_STATUS } from '../../constant/statusList';
 import { queryString } from '../../utils/tools';
+
 import styles from './ReturnsDetail.less';
 
 const { Description } = DescriptionList;
@@ -101,8 +103,7 @@ const columns = [{
   dataIndex: 'progress',
   key: 'progress',
 }];
-const mapOrderStatus = ['退货', '退款'];
-const mapOrderProgress = ['processing', 'success'];
+const mapOrderProgress = ['processing', 'processing', 'error', 'success'];
 
 @connect(({ orders, loading }) => ({
   orders,
@@ -154,7 +155,7 @@ export default class ReturnsDetail extends Component {
 
     const descriptionContent = (
       <DescriptionList className={styles.headerList} size="small" col="2">
-        <Description term="状态"><span><Badge status={mapOrderProgress[returnInfo.status - 1]} />{mapOrderStatus[returnInfo.status - 1]}</span></Description>
+        <Description term="状态"><span><Badge status={mapOrderProgress[returnInfo.status - 1]} />{RETURNS_STATUS[returnInfo.status]}</span></Description>
         <Description term="退货金额"><span style={{ color: 'red' }}>￥{returnInfo.returns_money}元</span></Description>
         <Description term="客户订单号">{returnInfo.order_sn}</Description>
         <Description term="运费">包邮</Description>
@@ -168,7 +169,7 @@ export default class ReturnsDetail extends Component {
         content={descriptionContent}
       >
         <Card title="退货说明" style={{ marginBottom: 24 }} bordered>
-          <div>{orderInfo.remarks}</div>
+          <div>{orderInfo.remarks || '无'}</div>
         </Card>
         <Card title="退货商品明细" style={{ marginBottom: 24 }} bordered>
           <Table
@@ -188,7 +189,7 @@ export default class ReturnsDetail extends Component {
             <Description term="物流单号">{returnLogistics.logistics_number}</Description>
           </DescriptionList>
         </Card>
-        <Card
+        {/* <Card
           bordered
           loading={loading}
           title="操作记录"
@@ -206,7 +207,7 @@ export default class ReturnsDetail extends Component {
                 </div>
               )
           }
-        </Card>
+        </Card> */}
       </PageHeaderLayout>
     );
   }
