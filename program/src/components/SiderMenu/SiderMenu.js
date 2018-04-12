@@ -150,12 +150,12 @@ export default class SiderMenu extends PureComponent {
         collapsed={collapsed}
         breakpoint="md"
         onCollapse={onCollapse}
-        width={200}
+        width={226}
         className={styles.sider}
       >
         <div className={styles.logo}>
           <Link to="/">
-            <img src={collapsed ? logoS : logoO} alt="logo" style={{ height: collapsed ? 32 : 62 }} />
+            <img src={collapsed ? logoS : logoO} alt="logo" style={{ height: collapsed ? 38 : 76 }} />
             {/* <h1>工业魔方</h1> */}
           </Link>
         </div>
