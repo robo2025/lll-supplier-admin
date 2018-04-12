@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react';
 import { Layout, Menu, Icon } from 'antd';
 import { Link } from 'dva/router';
-import logo from '../../assets/logo.svg';
+import logoO from '../../assets/logo-o.png';
+import logoS from '../../assets/logo-s.png';
 import styles from './index.less';
 import { getMenuData } from '../../common/menu';
 
@@ -107,15 +108,15 @@ export default class SiderMenu extends PureComponent {
                   {icon}<span>{item.name}</span>
                 </a>
               ) : (
-                <Link
-                  to={itemPath}
-                  target={item.target}
-                  replace={itemPath === this.props.location.pathname}
-                  onClick={this.props.isMobile ? () => { this.props.onCollapse(true); } : undefined}
-                >
-                  {icon}<span>{item.name}</span>
-                </Link>
-              )
+                  <Link
+                    to={itemPath}
+                    target={item.target}
+                    replace={itemPath === this.props.location.pathname}
+                    onClick={this.props.isMobile ? () => { this.props.onCollapse(true); } : undefined}
+                  >
+                    {icon}<span>{item.name}</span>
+                  </Link>
+                )
             }
           </Menu.Item>
         );
@@ -154,12 +155,12 @@ export default class SiderMenu extends PureComponent {
       >
         <div className={styles.logo}>
           <Link to="/">
-            <img src={logo} alt="logo" />
-            <h1>工业魔方</h1>
+            <img src={collapsed ? logoS : logoO} alt="logo" style={{ height: collapsed ? 32 : 62 }} />
+            {/* <h1>工业魔方</h1> */}
           </Link>
         </div>
         <Menu
-          theme="dark"
+          theme="light"
           mode="inline"
           {...menuProps}
           onOpenChange={this.handleOpenChange}
