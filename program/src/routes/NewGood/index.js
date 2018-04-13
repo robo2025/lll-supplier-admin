@@ -185,7 +185,7 @@ export default class NewGood extends Component {
   }
 
   render() {
-    const { isShowModal, fields } = this.state;
+    const { isShowModal, fields, args } = this.state;
     const { product, loading } = this.props;
     const { total } = product;
    
@@ -229,6 +229,7 @@ export default class NewGood extends Component {
             data={{ ...product.detail, ...fields }}
             onChange={this.handleFormChange}
             onAttrChange={this.handleGoodAttr}
+            args={args}
           />
           <SectionHeader
             title="商品其他属性"

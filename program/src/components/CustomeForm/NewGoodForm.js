@@ -167,7 +167,7 @@ export default class NewGoodForm extends Component {
       wrapperCol: { span: 18 },
     };
     const { getFieldDecorator } = this.props.form;
-    const { data, loading } = this.props;
+    const { data, loading, args } = this.props;
     const { category } = data;
     const slectedCatagory = category ? [
       category.category_name,
@@ -219,7 +219,7 @@ export default class NewGoodForm extends Component {
       }
     }
 
-    // console.log('新建页面表单', this.props.data);
+    console.log('新建页面表单', args.origin_prdId);
 
     return (
       <div className={styles['good-info-wrap']} >
@@ -230,7 +230,7 @@ export default class NewGoodForm extends Component {
               label="选择产品"
               {...formItemLayout}
             >
-              <Button type="primary" onClick={this.props.showModal}>选择产品</Button>
+              <Button type="primary" onClick={this.props.showModal}>{args.origin_prdId ? '重选产品' : '选择产品'}</Button>
             </FormItem>
             <FormItem
               label="产品ID"
@@ -367,6 +367,7 @@ export default class NewGoodForm extends Component {
             >
               <EditableTable
                 data={data.prices}
+                dataLen={data.prices.length}
                 onChange={this.props.onAttrChange}
               />
             </FormItem>
