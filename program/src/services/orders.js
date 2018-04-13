@@ -1,6 +1,7 @@
 import Cookies from 'js-cookie';
 import { ORDERS_URL } from '../constant/config';
 import lyRequest from '../utils/lyRequest';
+import { queryString } from '../utils/tools';
 
 const SUPPLIER_SYS_URL = `${ORDERS_URL}/v1/supplier`;
 const ORDER_URL = `${ORDERS_URL}/v1/order`;
@@ -11,10 +12,9 @@ const TEST_SUPPLIER_ID = Cookies.getJSON('userinfo').id;
 /**
  *  获取服务器客户订单列表
 */
-export async function queryOrders({ offset = 0, limit = 10 }) {
+export async function queryOrders({ params, offset = 0, limit = 10 }) {
   const accessToken = Cookies.get('access_token');
-  const supplierId = TEST_SUPPLIER_ID;
-  return lyRequest(`${SUPPLIER_SYS_URL}/order?offset=${offset}&limit=${limit}`, {
+  return lyRequest(`${SUPPLIER_SYS_URL}/order?offset=${offset}&limit=${limit}&${queryString.toQueryString(params)}`, {
     headers: {
       Authorization: accessToken,
     },

@@ -197,7 +197,7 @@ export default class OrderList extends Component {
       console.log('搜索字段', values);
       dispatch({
         type: 'orders/fetchSearch',
-        data: values,
+        params: values,
       });
     });
   }
@@ -227,29 +227,37 @@ export default class OrderList extends Component {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="客户订单号">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('order_sn')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="商品ID">
-              {getFieldDecorator('brand')(
+              {getFieldDecorator('goods_id')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="订单状态">
-              {getFieldDecorator('status')(
+              {getFieldDecorator('order_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="0">全部</Option>
-                  <Option value="1">待接单</Option>
-                  <Option value="2">已发货</Option>
-                  <Option value="3">已收货</Option>
-                  <Option value="4">商家无货</Option>
-                  <Option value="5">申请延时发货</Option>
-                  <Option value="5">允许延时发货</Option>
+                  <Option value="1">待支付</Option>
+                  <Option value="2">取消订单</Option>
+                  <Option value="3">待结单</Option>
+                  <Option value="4">待发货</Option>
+                  <Option value="5">已发货,配送中</Option>
+                  <Option value="6">已完成</Option>
+                  <Option value="8">申请延期中</Option>
+                  <Option value="10">退款中</Option>
+                  <Option value="11">退货中</Option>
+                  <Option value="12">作废</Option>
+                  <Option value="13">无货</Option>
+                  <Option value="14">退款完成</Option>
+                  <Option value="15">退货完成</Option>
+                  <Option value="16">订单流转结束</Option>
                 </Select>
               )}
             </FormItem>
@@ -282,21 +290,21 @@ export default class OrderList extends Component {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="客户订单号">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('order_sn')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="商品ID">
-              {getFieldDecorator('brand')(
+              {getFieldDecorator('goods_id')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="订单状态">
-              {getFieldDecorator('status')(
+              {getFieldDecorator('order_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="0">全部</Option>
                   <Option value="1">待接单</Option>
@@ -320,14 +328,14 @@ export default class OrderList extends Component {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="商品名称">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('good_name')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={10} sm={24}>
-            <FormItem label="产品提交日期">
-              {getFieldDecorator('no')(
+            <FormItem label="订单日期">
+              {getFieldDecorator('create_time')(
                 <RangePicker onChange={this.onDatepickerChange} />
               )}
             </FormItem>

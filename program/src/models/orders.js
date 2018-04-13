@@ -27,8 +27,8 @@ export default {
   },
 
   effects: {
-    *fetch({ offset, limit, supplierId, success, error }, { call, put }) {
-      const res = yield call(queryOrders, { supplierId, offset, limit });
+    *fetch({ params, offset, limit, supplierId, success, error }, { call, put }) {
+      const res = yield call(queryOrders, { params, supplierId, offset, limit });
       // console.log('服务器目录列表', response);
       if (res.rescode >> 0 === SUCCESS_STATUS) {
         if (typeof success === 'function') { success(res); }
@@ -162,6 +162,19 @@ export default {
       yield put({
         type: 'saveRefundDetail',
         payload: res.data,
+      });
+    },
+    *fetchSearch({ params, offset, limit, success, error }, { call, put }) {
+      const res = yield call(queryOrders, { params, offset, limit });
+      if (res.rescode >> 0 === SUCCESS_STATUS) {
+        if (typeof success === 'function') { success(res); }
+      } else if (typeof error === 'function') { error(res); return; }
+
+      const { headers } = res;
+      yield put({
+        type: 'save',
+        payload: res.data,
+        headers,
       });
     },
   },
