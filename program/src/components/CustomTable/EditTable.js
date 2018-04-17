@@ -52,7 +52,7 @@ export default class EditableTable extends Component {
           {this.renderColumns(record.max_quantity, record, 'max_quantity', record.min_quantity)}
         </div>),
     }, {
-      title: '销售单价(含税)',
+      title: '销售单价/元(含税)',
       dataIndex: 'price',
       render: (text, record) => this.renderColumns(text, record, 'price', 1),
     }, {

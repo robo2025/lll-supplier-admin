@@ -50,6 +50,7 @@ export default class GoodsList extends Component {
     const { dispatch } = this.props;
     dispatch({
       type: 'good/fetch',
+      params: null,
     });
   }
 
@@ -115,8 +116,8 @@ export default class GoodsList extends Component {
       type: 'good/queryExport',
       fields: this.state.exportFields,
       success: (res) => {
-        console.log('http://139.199.96.235:9005/api/goods_reports?filename=' + res.filename);
-        window.open('http://139.199.96.235:9005/api/goods_reports?filename=' + res.filename);
+        console.log('http://139.199.96.235:9005/api/goods/goods_reports?filename=' + res.filename);
+        window.open('http://139.199.96.235:9005/api/goods/goods_reports?filename=' + res.filename);
       },
     });
   }
@@ -133,7 +134,7 @@ export default class GoodsList extends Component {
       type: 'good/modifyGoodStatus',
       goodId,
       goodStatus: status,
-      // success: (res) => { message.success('修改成功'); },
+      success: () => { message.success('修改成功'); },
       error: (res) => { message.error(handleServerMsg(res.msg)); },
 
     });
@@ -200,27 +201,15 @@ export default class GoodsList extends Component {
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch } = this.props;
-    const { formValues } = this.state;
-
-    const filters = Object.keys(filtersArg).reduce((obj, key) => {
-      const newObj = { ...obj };
-      newObj[key] = getValue(filtersArg[key]);
-      return newObj;
-    }, {});
-
     const params = {
       currentPage: pagination.current,
       pageSize: pagination.pageSize,
-      ...formValues,
-      ...filters,
+      offset: (pagination.current - 1) * (pagination.pageSize),
     };
-    if (sorter.field) {
-      params.sorter = `${sorter.field}_${sorter.order}`;
-    }
-
     dispatch({
-      type: 'rule/fetch',
-      payload: params,
+      type: 'good/fetch',
+      offset: params.offset,
+      limit: params.pageSize,
     });
   }
 
@@ -271,6 +260,11 @@ export default class GoodsList extends Component {
     this.setState({
       selectedRows: rows,
     });
+  }
+
+  jumpToPage = (url) => {
+    const { history } = this.props;
+    history.push(url);
   }
 
   handleSearch = (e) => {
@@ -513,7 +507,9 @@ export default class GoodsList extends Component {
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListOperator}>
-              <Button onClick={this.showExportModal}>导出数据</Button>
+              <Button type="primary" icon="plus" onClick={this.jumpToPage.bind(this, 'new')}>新建</Button>
+
+              {/* <Button onClick={this.showExportModal}>导出数据</Button> */}
             </div>
             {/* 导出数据Modal */}
             <Modal
@@ -574,6 +570,7 @@ export default class GoodsList extends Component {
               selectedRows={selectedRows}
               loading={loading}
               data={data}
+              total={good.total}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
               onPublish={this.handlePublishGood}

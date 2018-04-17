@@ -121,6 +121,7 @@ export default class ModifyGood extends Component {
       data: {
         shelf_life, sales_unit, stock, min_buy, prices,
       },
+      success: () => { this.props.history.push('/goods/list'); },
       error: (res) => { message.error(handleServerMsg(res.msg)); },  
     });
   }

@@ -2,7 +2,7 @@
  * @Author: lll
  * @Date: 2018-01-26 14:08:45
  * @Last Modified by: lll
- * @Last Modified time: 2018-04-03 18:06:45
+ * @Last Modified time: 2018-04-16 17:29:57
  */
 import React, { PureComponent, Fragment } from 'react';
 import moment from 'moment';
@@ -51,7 +51,7 @@ class GoodsTable extends PureComponent {
 
   render() {
     const { selectedRowKeys, totalCallNo } = this.state;
-    const { data, loading, onPublish, onPriceSetting } = this.props;
+    const { data, loading, onPublish, onPriceSetting, total } = this.props;
 
     const columns = [
       {
@@ -106,7 +106,7 @@ class GoodsTable extends PureComponent {
         render: val => (<span >{val.category ? val.category.children.children.category_name : ''}</span>),
         key: 'category_name_3',
       },
-      
+
       {
         title: '销售单价',
         dataIndex: 'prices',
@@ -161,8 +161,13 @@ class GoodsTable extends PureComponent {
           <Fragment>
             <a href={'#/goods/list/detail?goodId=' + record.id}>查看</a>
             <Divider type="vertical" />
-            <a href={'#/goods/list/modify?goodId=' + record.id}>修改</a>
-            <Divider type="vertical" />            
+            <a
+              href={'#/goods/list/modify?goodId=' + record.id}
+              disabled={record.audit_status === 0}
+              title={record.audit_status === 0 ? '待审核商品不可修改' : ''}
+            >修改
+            </a>
+            <Divider type="vertical" />
             <a
               onClick={() => onPublish(record.id, (record.is_publish === 1) ? 0 : 1)}
               disabled={record.audit_status !== 1}
@@ -181,6 +186,7 @@ class GoodsTable extends PureComponent {
     const paginationProps = {
       showSizeChanger: true,
       showQuickJumper: true,
+      total,
       // ...pagination,
     };
 
@@ -198,7 +204,12 @@ class GoodsTable extends PureComponent {
           <Alert
             message={(
               <div>
-                已选择 <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 项
+                查询到
+                <a style={{ fontWeight: 600 }}>
+                  {/* {selectedRowKeys.length} */}
+                  {total}
+                </a>
+                条资源
               </div>
             )}
             type="info"

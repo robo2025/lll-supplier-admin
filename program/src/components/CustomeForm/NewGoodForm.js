@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Form, Spin, Cascader, Input, Row, Col, Upload, Icon, Modal, Button, Tabs, message } from 'antd';
+import { Form, Input, Row, Col, Upload, Modal, Button, Tabs, message } from 'antd';
 import EditableTable from '../../components/CustomTable/EditTable';
-import { checkFile, getFileSuffix, replaceObjFromArr } from '../../utils/tools';
+import { checkFile, replaceObjFromArr } from '../../utils/tools';
 import RichEditorShow from '../../components/RichEditor/RichEidtorShow';
 import styles from './good-form.less';
 
@@ -34,18 +34,6 @@ function getPic(key, pics) {
 const imagesType = ['正面', '反面', '侧面', '包装图1', '包装图2', '包装图3'];
 
 @Form.create({
-  mapPropsToFields(props) {
-    const { data } = props;
-    const fields = {};
-    Object.keys(data).forEach((key) => {
-      fields[key] = Form.createFormField({
-        value: data[key],
-      });
-    });
-    return {
-      ...fields,
-    };
-  },
   onValuesChange(props, values) {
     props.onChange(values);
   },
@@ -237,6 +225,7 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('pno', {
+                initialValue: data.pno,
               })(
                 <Input disabled />
               )}
@@ -252,6 +241,7 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('product_name', {
+                initialValue: data.product_name,
               })(
                 <Input disabled />
               )}
@@ -261,6 +251,7 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('partnumber', {
+                initialValue: data.partnumber,
               })(
                 <Input disabled />
               )}
@@ -270,6 +261,7 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('brand_name', {
+                initialValue: data.brand_name,
               })(
                 <Input disabled />
               )}
@@ -279,6 +271,7 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('english_name', {
+                initialValue: data.english_name,
               })(
                 <Input disabled />
               )}
@@ -288,6 +281,7 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('prodution_place', {
+                initialValue: data.prodution_place,
               })(
                 <Input disabled />
               )}
@@ -297,6 +291,11 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('min_buy', {
+                rules: [{
+                  type: 'number',
+                  message: '最低采购量必须是整数',
+                }],
+                initialValue: data.min_buy,
               })(
                 <Input />
               )}
@@ -310,6 +309,7 @@ export default class NewGoodForm extends Component {
                   required: true,
                   message: '请输入库质保期',
                 }],
+                initialValue: data.shelf_life,
               })(
                 <Input />
               )}
@@ -322,7 +322,14 @@ export default class NewGoodForm extends Component {
                 rules: [{
                   required: true,
                   message: '请输入销售单位',
+                }, {
+                  max: 5,
+                  message: '销售单位5个汉字以内',
+                }, {
+                  min: 1,
+                  message: '销售单位至少一个字',
                 }],
+                initialValue: data.sales_unit,
               })(
                 <Input />
               )}
@@ -335,7 +342,11 @@ export default class NewGoodForm extends Component {
                 rules: [{
                   required: true,
                   message: '请输入库存数量',
+                }, {
+                  type: 'number',
+                  message: '库存数量必须是整数',
                 }],
+                initialValue: data.stock,
               })(
                 <Input />
               )}
