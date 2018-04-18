@@ -5,14 +5,11 @@ import { connect } from 'dva';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import DescriptionList from '../../components/DescriptionList';
-import styles from './OrderDetail.less';
 import { queryString } from '../../utils/tools';
+import { ORDER_STATUS, PAY_STATUS } from '../../constant/statusList';
+import styles from './OrderDetail.less';
 
 const mapPayStatus = ['未支付', '已支付'];
-const mapPayType = ['微信支付', '支付宝支付', '银联支付', '其它方式支付'];
-const mapOrderStatus = ['待支付', '已取消', '待接单', '待发货', '已发货,配送中',
-  '已完成', '', '申请延期中', '', '退款中',
-  '退货中', '作废', '无货', '退款完成', '退货完成'];
 const { Description } = DescriptionList;
 // 订单商品明细列
 const goodsColumns = [{
@@ -176,24 +173,11 @@ export default class OrderDetail extends Component {
     const logistics = detail.logistics || [orderInfo]; // 物流信息
     const operations = detail.operations || []; // 操作日志
 
-    const contentList = {
-      tab1: <Table
-        pagination={{
-          defaultPageSize: 6,
-          pageSize: 6,
-        }}
-        loading={loading}
-        dataSource={operations}
-        columns={columns}
-        rowKey="add_time"
-      />,
-    };
-
     // const subOrder
     console.log('hello --:', [{ ...logistics, ...orderInfo }]);
     const descriptionContent = (
       <DescriptionList className={styles.headerList} size="small" col="2">
-        <Description term="状态"><span><Badge status="success" />{mapOrderStatus[orderInfo.status - 1]}</span></Description>
+        <Description term="状态"><span><Badge status="success" />{ORDER_STATUS[orderInfo.status]}</span></Description>
         <Description term="订单总金额">￥{orderInfo.subtotal_money}元</Description>
         <Description term="运费">包邮</Description>
         <Description term="实收总金额"><span style={{ color: 'red' }}>￥{orderInfo.subtotal_money}元</span></Description>
@@ -213,7 +197,7 @@ export default class OrderDetail extends Component {
             <Description term="地址">{orderInfo.address}</Description>
           </DescriptionList>
         </Card>
-        <Card title={`支付方式：${mapPayType[payInfo.pay_type - 1]}`} style={{ marginBottom: 24 }} bordered>
+        <Card title={`支付方式：${PAY_STATUS[payInfo.pay_type]}`} style={{ marginBottom: 24 }} bordered>
           <div>支付状态：{mapPayStatus[payInfo.pay_status - 1]}</div>
         </Card>
         <Card title="开票信息" style={{ marginBottom: 24 }} bordered loading={loading}>

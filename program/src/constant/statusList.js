@@ -20,10 +20,10 @@ const ACTION_STATUS = {
 };
 
 // 异常状态
-const ABNORMAL_TYPE = { 
-  0: '', 
-  1: '(无货)', 
-  2: '(延期)', 
+const ABNORMAL_TYPE = {
+  0: '',
+  1: '(无货)',
+  2: '(延期)',
 };
 
 
@@ -89,8 +89,8 @@ export {
   ABNORMAL_TYPE,
   ORDER_STATUS,
   PAY_STATUS,
-  RETURNS_STATUS, 
+  RETURNS_STATUS,
   REFUND_STATUS,
-  RESPONSIBLE_PARTY, 
+  RESPONSIBLE_PARTY,
   MONTHER_ORDER_STATUS,
 };

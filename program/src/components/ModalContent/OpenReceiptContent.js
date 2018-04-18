@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Form, Input, Upload, message, Icon } from 'antd';
+import moment from 'moment';
 import { getFileSuffix } from '../../utils/tools';
 
 import styles from './OpenReceiptContent.less';
@@ -10,8 +11,8 @@ const UPLOAD_URL = '//up.qiniu.com';
 
 const receiptColumns = [{
   title: '发票编号',
-  dataIndex: 'order_sn',
-  key: 'order_sn',
+  dataIndex: 'receipt_sn',
+  key: 'receipt_sn',
 }, {
   title: '发票照片',
   dataIndex: 'images',
@@ -21,6 +22,7 @@ const receiptColumns = [{
   title: '更新日期',
   dataIndex: 'add_time',
   key: 'add_time',
+  render: text => (<span>{moment(text * 1000).format('YYYY-MM-DD hh:mm')}</span>),
 }, {
   title: '操作人员',
   dataIndex: 'operator',
@@ -58,7 +60,6 @@ export default class OpenReceiptContent extends Component {
   };
 
   componentDidMount() {
-    console.log('开票弹出框didmount');
     this.props.handleValidate(this.props.form);
   }
 

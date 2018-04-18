@@ -43,7 +43,9 @@ export default class OrderList extends Component {
     const { dispatch } = this.props;
     dispatch({
       type: 'orders/fetch',
-      supplierId: 100,
+    });
+    dispatch({
+      type: 'upload/fetch',
     });
   }
 
@@ -74,7 +76,7 @@ export default class OrderList extends Component {
     }
   }
 
-  //  接单 
+  // 接单
   takingOrder = ({ orderId, supplierId, status }) => {
     console.log('接单', orderId, supplierId, status);
     const { dispatch } = this.props;
@@ -211,7 +213,7 @@ export default class OrderList extends Component {
     };
     this.setState(params);
     const { dispatch } = this.props;
-    console.log('分页改变', params);    
+    console.log('分页改变', params);
     dispatch({
       type: 'orders/fetch',
       supplierId: 100,
@@ -391,14 +393,14 @@ export default class OrderList extends Component {
           <div className={styles.tableList}>
             <List.Header />
             {
-               orders.list.length > 0 
+               orders.list.length > 0
                ?
                 null
                :
-               <div style={{ textAlign: 'center' }}>暂无订单数据</div>
+                <div style={{ textAlign: 'center' }}>暂无订单数据</div>
             }
             <Spin indicator={antIcon} tip="别急，我拼了老命也要把数据加载出来..." spinning={loading} >
-            {
+              {
               orders.list.map((val, idx) => {
                 const orderListItemHeader = (
                   <div className={styles['order-list-header']}>
