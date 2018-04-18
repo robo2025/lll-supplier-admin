@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Modal, Button, Input, Table, message } from 'antd';
+import { Card, Modal, Button, Input, Table, message, Form, Select, Row, Col, Cascader } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import SectionHeader from '../../components/PageHeader/SectionHeader';
 import ProductList from '../../components/CustomTable/ProductList';
@@ -9,12 +9,15 @@ import { queryString } from '../../utils/tools';
 
 import styles from './index.less';
 
+const FormItem = Form.Item;
+const { Option } = Select;
 
 @connect(({ loading, product, good }) => ({
   product,
   good,
   loading,
 }))
+@Form.create()
 export default class NewGood extends Component {
   constructor(props) {
     super(props);
@@ -112,7 +115,7 @@ export default class NewGood extends Component {
   showModal = () => {
     this.setState({ isShowModal: true });
   }
-  // 显示添加其他属性modal  
+  // 显示添加其他属性modal
   ShowAttrModal = () => {
     this.setState({ isShowAttrMOdal: true });
   }
@@ -138,9 +141,9 @@ export default class NewGood extends Component {
 
   /**
   * 当商品其他属性被修改事件[产品概述、详情、FAQ,其他属性，图片]
-  * 
+  *
   * @param {object} obj json对象，产品属性key=>value
-  * 
+  *
   */
   handleGoodAttr = (obj) => {
     this.setState({
@@ -167,7 +170,7 @@ export default class NewGood extends Component {
 
   /**
   * 提交商品信息
-  * 
+  *
   */
   handleSubmitProduct = () => {
     const { fields, args } = this.state;
@@ -184,13 +187,94 @@ export default class NewGood extends Component {
     });
   }
 
+  handleSearch = () => {
+    Modal.info({
+      title: '提示',
+      content: (
+        <div>
+          <p>搜索功能还没有提供接口</p>
+        </div>
+      ),
+      onOk() {},
+    });
+  }
+
+  renderSimpleForm() {
+    const { getFieldDecorator } = this.props.form;
+    return (
+      <Form onSubmit={this.handleSearch} layout="inline">
+        <Row gutter={{ md: 8, lg: 8, xl: 16 }}>
+          <Col xll={6} md={8} sm={24}>
+            <FormItem label="所属分类">
+              {getFieldDecorator('catalog')(
+                <Cascader
+                  options={[]}
+                  placeholder="请您选择类目"
+                />
+              )}
+            </FormItem>
+          </Col>
+          <Col xll={6} md={8} sm={24}>
+            <FormItem label="型号">
+              {getFieldDecorator('type')(
+                <Input placeholder="请输入" />
+              )}
+            </FormItem>
+          </Col>
+          <Col xll={6} md={8} sm={24}>
+            <FormItem label="品牌">
+              {getFieldDecorator('brand')(
+                <Input placeholder="请输入" />
+              )}
+            </FormItem>
+          </Col>
+        </Row>
+        <Row gutter={{ md: 8, lg: 8, xl: 16 }}>
+          <Col xll={8} md={8} sm={24}>
+            <FormItem label="产品ID">
+              {getFieldDecorator('pno')(
+                <Input placeholder="请输入" />
+              )}
+            </FormItem>
+          </Col>
+          <Col xll={8} md={8} sm={24}>
+            <FormItem label="产品名称">
+              {getFieldDecorator('catalog')(
+                <Input placeholder="请输入" />
+              )}
+            </FormItem>
+          </Col>
+          <Col xll={8} md={8} sm={24}>
+            <FormItem label="是否已关联">
+              {getFieldDecorator('Association', {
+                initialValue: '全部',
+              })(
+                <Select placeholder="请选择" style={{ width: '100%' }}>
+                  <Option value="0">全部</Option>
+                  <Option value="1">是</Option>
+                  <Option value="2">否</Option>
+                </Select>
+              )}
+            </FormItem>
+          </Col>
+        </Row>
+        <div style={{ overflow: 'hidden' }}>
+          <span style={{ float: 'right', marginTop: 18 }}>
+            <Button type="primary" htmlType="submit">查询</Button>
+            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>重置</Button>
+          </span>
+        </div>
+      </Form>
+    );
+  }
+
   render() {
     const { isShowModal, fields, args } = this.state;
     const { product, loading } = this.props;
     const { total } = product;
-   
-     // 其他属性列
-     const attrClomns = [{
+
+    // 其他属性列
+    const attrClomns = [{
       title: '属性名',
       dataIndex: 'attr_name',
       key: 'attr_name',
@@ -215,6 +299,9 @@ export default class NewGood extends Component {
             onCancel={this.onCancel}
             onOk={this.onOk}
           >
+            <div className={styles.tableListForm}>
+              {this.renderSimpleForm()}
+            </div>
             <ProductList
               loading={loading.models.product}
               data={product.list}
