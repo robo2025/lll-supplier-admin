@@ -2,7 +2,7 @@
  * @Author: lll
  * @Date: 2018-01-26 14:08:45
  * @Last Modified by: lll
- * @Last Modified time: 2018-04-16 17:29:57
+ * @Last Modified time: 2018-04-24 10:42:28
  */
 import React, { PureComponent, Fragment } from 'react';
 import moment from 'moment';
@@ -110,7 +110,7 @@ class GoodsTable extends PureComponent {
       {
         title: '销售单价',
         dataIndex: 'prices',
-        render: val => (<span >{val[0].price}</span>),
+        render: val => (<span >{val[0].price}~{val.slice(-1)[0].price}</span>),
         key: 'price',
       },
       {
@@ -159,10 +159,10 @@ class GoodsTable extends PureComponent {
         title: '操作',
         render: (text, record) => (
           <Fragment>
-            <a href={'#/goods/list/detail?goodId=' + record.id}>查看</a>
+            <a href={`#/goods/list/detail?goodId=${record.id}`}>查看</a>
             <Divider type="vertical" />
             <a
-              href={'#/goods/list/modify?goodId=' + record.id}
+              href={`#/goods/list/modify?goodId=${record.id}`}
               disabled={record.audit_status === 0}
               title={record.audit_status === 0 ? '待审核商品不可修改' : ''}
             >修改
@@ -224,7 +224,7 @@ class GoodsTable extends PureComponent {
           columns={columns}
           pagination={paginationProps}
           onChange={this.handleTableChange}
-          scroll={{ x: 1800 }}
+          scroll={{ x: 2000 }}
         />
       </div>
     );

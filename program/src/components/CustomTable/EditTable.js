@@ -72,7 +72,7 @@ export default class EditableTable extends Component {
         return (idx + 1 === this.state.data.length ?
           (
             <span>
-              <a onClick={this.removeLastRow}>删除</a>
+              <a onClick={this.removeLastRow} disabled={!idx}>删除</a>
               <Divider type="vertical" />
               <a onClick={this.addLastRow}>增加</a>
             </span>
@@ -81,7 +81,6 @@ export default class EditableTable extends Component {
       },
     }];
     const propsData = this.props.data;
-    console.log('价格设置构造函数', propsData);
     this.state = {
       data: propsData ? addKeyValToArr(propsData, { shipping_fee_type: 0, editable: true }) : data,
     };
@@ -142,7 +141,9 @@ export default class EditableTable extends Component {
   // 删除最后一条区间
   removeLastRow = () => {
     const newData = [...this.state.data];
-    newData.pop();
+    if (newData.length > 1) {
+      newData.pop();
+    }
     this.setState({ data: newData });
   }
 
