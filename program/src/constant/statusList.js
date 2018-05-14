@@ -1,4 +1,4 @@
-// 操作记录 status 字段说明
+// 江朝 操作记录 status 字段说明
 const ACTION_STATUS = {
   1: '提交订单',
   2: '支付订单',
@@ -18,6 +18,15 @@ const ACTION_STATUS = {
   16: '处理无货订单',
   17: '填写退货物流',
   18: '退货审核失败',
+};
+
+// 刘彪 操作记录类型
+const ACTION_FLAG = {
+  1: '新增',
+  2: '修改',
+  4: '审核',
+  8: '发布',
+  16: '删除',
 };
 
 // 异常状态
@@ -85,8 +94,35 @@ const MONTHER_ORDER_STATUS = {
   6: '全部发货',
 };
 
+const PIC_TYPES = {
+  1: '正面',
+  2: '反面',
+  3: '侧面',
+  4: '包装图一',
+  5: '包装图二',
+  6: '包装图三',
+};
+
+const SHIPPING_FEE_TYPE = {
+  1: '包邮',
+  2: '货到付款',
+};
+
+const AUDIT_STATUS = {
+  0: '未审核',
+  1: '审核通过',
+  2: '审核不通过',
+};
+
+const PUBLISH_STATUS = {
+  0: '下架中',
+  1: '上架中',
+  2: '待下架(无法交易)',
+};
+
 export {
   ACTION_STATUS,
+  ACTION_FLAG,
   ABNORMAL_TYPE,
   ORDER_STATUS,
   PAY_STATUS,
@@ -94,4 +130,8 @@ export {
   REFUND_STATUS,
   RESPONSIBLE_PARTY,
   MONTHER_ORDER_STATUS,
+  PIC_TYPES,
+  SHIPPING_FEE_TYPE,
+  AUDIT_STATUS,
+  PUBLISH_STATUS,
 };

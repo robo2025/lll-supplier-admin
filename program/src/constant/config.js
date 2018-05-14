@@ -6,7 +6,10 @@
 export const URL = 'https://login.robo2025.com';
 
 // 网站内容接口URL
-export const API_URL = '//api-product.robo2025.com/api';
+export const API_URL = '//testapi.robo2025.com/scm';
+
+// 操作日志URL
+export const OPERATION_URL = '//testapi.robo2025.com/scm';
 
 // 上传文件获取token URL
 export const UPLOAD_URL = '//api-common-service.robo2025.com';
