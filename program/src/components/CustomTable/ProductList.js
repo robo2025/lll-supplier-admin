@@ -110,7 +110,6 @@ class ProductList extends React.Component {
       defaultPageSize: 6,
       total,
     };
-
     console.log('产品列表props', this.props);
     return (
       <div>

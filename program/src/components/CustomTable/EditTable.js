@@ -188,10 +188,10 @@ export default class EditableTable extends Component {
 
 
   render() {
-    console.log('可修改table', this.props.data);
     return (
       <Table
         bordered
+        rowKey="id"
         pagination={false}
         dataSource={this.state.data}
         columns={this.columns}

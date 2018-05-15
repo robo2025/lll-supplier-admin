@@ -191,8 +191,6 @@ export default {
           dispatch({
             type: 'saveProductDetail',
             payload: {},
-
-
           });
         }
       });

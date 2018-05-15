@@ -62,8 +62,6 @@ export default class NewGood extends Component {
     // 获取产品列表
     dispatch({
       type: 'good/fetchAassociatedProduct',
-      offset: 0,
-      limit: 8,
     });
     if (args.mno) {
       dispatch({
@@ -165,7 +163,7 @@ export default class NewGood extends Component {
       offset: (pagination.current - 1) * (pagination.pageSize),
     };
     dispatch({
-      type: 'product/fetch',
+      type: 'good/fetchAassociatedProduct',
       offset: params.offset,
       limit: params.pageSize,
     });
@@ -178,7 +176,6 @@ export default class NewGood extends Component {
   handleSubmitProduct = () => {
     const { fields, args } = this.state;
     const { dispatch } = this.props;
-    console.log('新建商品信息', { ...fields, mno: args.mno });
     dispatch({
       type: 'good/add',
       data: {
@@ -273,8 +270,8 @@ export default class NewGood extends Component {
 
   render() {
     const { isShowModal, fields, args } = this.state;
-    const { good, product, loading } = this.props;
-    const { total } = product;
+    const { good, loading } = this.props;
+    const { total } = good;
     const { getFieldDecorator } = this.props.form;
 
     console.log('新建props和state', this.props.product, this.state);

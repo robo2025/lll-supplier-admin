@@ -218,6 +218,13 @@ export default class GoodsList extends Component {
       pageSize: pagination.pageSize,
       offset: (pagination.current - 1) * (pagination.pageSize),
     };
+
+    // 分页：将页数提取到url上
+    history.push({
+      pathname: '/goods/list',
+      search: `?page=${params.currentPage}`,
+    });
+
     dispatch({
       type: 'good/fetch',
       offset: params.offset,
