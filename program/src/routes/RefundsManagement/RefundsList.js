@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
-import { Row, Col, Card, Form, Input, Select, Icon, Button, DatePicker } from 'antd';
+import qs from 'qs';
+import { Row, Col, Card, Form, Input, Select, Icon, Button, Pagination, DatePicker } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import { PAGE_SIZE } from '../../constant/config';
 import List from '../../components/List/RefundsList';
 
 import styles from './RefundsList.less';
@@ -21,13 +23,18 @@ export default class RefundsList extends Component {
     super(props);
     this.state = {
       expandForm: false,
+      args: qs.parse(props.location.search, { ignoreQueryPrefix: true }),
     };
   }
 
   componentDidMount() {
     const { dispatch } = this.props;
+    const { args } = this.state;
+
     dispatch({
       type: 'orders/fetchRefunds',
+      offset: (args.page - 1) * PAGE_SIZE,
+      limit: PAGE_SIZE,
     });
   }
 
@@ -57,13 +64,37 @@ export default class RefundsList extends Component {
         end_time: fieldsValue.create_time ? fieldsValue.create_time[1].format('YYYY-MM-DD') : '',
       };
 
-      console.log('搜索字段', values);
       dispatch({
         type: 'orders/fetchSearch',
         data: values,
       });
     });
   }
+
+    // 处理表单改变
+    handlePaginationChange = (page, pageSize) => {
+      const { dispatch, history } = this.props;
+
+      const params = {
+        currentPage: page,
+        offset: (page - 1) * pageSize,
+        limit: pageSize,
+      };
+      this.setState(params);
+
+      // 分页：将页数提取到url上
+      history.push({
+        pathname: '/refunds/list',
+        search: `?page=${params.currentPage}`,
+      });
+
+      dispatch({
+        type: 'orders/fetch',
+        supplierId: 100,
+        offset: params.offset,
+        limit: params.limit,
+      });
+    }
 
   // 确认收货
   handleConfirmReturn = ({ orderId, status }) => {
@@ -200,7 +231,15 @@ export default class RefundsList extends Component {
 
   render() {
     const { orders, loading } = this.props;
-    console.log('退款单', orders.refunds);
+    const { total } = orders;
+    const { args } = this.state;
+    const paginationOptions = {
+      showSizeChanger: true,
+      showQuickJumper: true,
+      defaultCurrent: args.page ? args.page >> 0 : 1,
+      defaultPageSize: this.state.limit || 10,
+      total,
+    };
 
     return (
       <PageHeaderLayout title="退款单列表">
@@ -213,11 +252,11 @@ export default class RefundsList extends Component {
           <div className={styles.tableList}>
             <List.Header />
             {
-               orders.refunds.length > 0 
-               ?
+              orders.refunds.length > 0
+                ?
                 null
-               :
-               <div style={{ textAlign: 'center' }}>暂无退款单数据</div>
+                :
+                <div style={{ textAlign: 'center' }}>暂无退款单数据</div>
             }
             {
               orders.refunds.map((val, idx) => {
@@ -230,7 +269,7 @@ export default class RefundsList extends Component {
                     <div>
                       <b>退货单编号：</b>
                       <a href="#" className="order-sn">{val.returns_sn}</a>
-                      <span className="order-time">({moment(val.returns_time * 1000).format('YYYY-MM-DD hh:mm') })</span>
+                      <span className="order-time">({moment(val.returns_time * 1000).format('YYYY-MM-DD hh:mm')})</span>
                     </div>
                   </div>
                 );
@@ -245,6 +284,11 @@ export default class RefundsList extends Component {
               })
             }
           </div>
+          <Pagination
+            className="pull-right"
+            {...paginationOptions}
+            onChange={this.handlePaginationChange}
+          />
         </Card>
       </PageHeaderLayout>
     );

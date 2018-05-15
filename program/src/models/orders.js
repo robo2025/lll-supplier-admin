@@ -59,7 +59,7 @@ export default {
       } else if (typeof error === 'function') { error(res); return; }
 
       const response = yield call(queryOrders, { supplierId });
-      const { headers } = response;      
+      const { headers } = response;
       yield put({
         type: 'save',
         payload: response.data,
@@ -73,7 +73,7 @@ export default {
       } else if (typeof error === 'function') { error(res); }
 
       const response = yield call(queryOrders, {});
-      const { headers } = response;            
+      const { headers } = response;
       yield put({
         type: 'save',
         payload: response.data,
@@ -87,7 +87,7 @@ export default {
       } else if (typeof error === 'function') { error(res); }
 
       const response = yield call(queryOrders, {});
-      const { headers } = response;                  
+      const { headers } = response;
       yield put({
         type: 'save',
         payload: response.data,
@@ -101,7 +101,7 @@ export default {
       } else if (typeof error === 'function') { error(res); }
 
       const response = yield call(queryOrders, {});
-      const { headers } = response;      
+      const { headers } = response;
       yield put({
         type: 'save',
         payload: response.data,
@@ -114,9 +114,11 @@ export default {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); }
 
+      const { headers } = res;
       yield put({
         type: 'saveReturns',
         payload: res.data,
+        headers,
       });
     },
     *fetchRefunds({ success, error }, { call, put }) {
@@ -124,10 +126,11 @@ export default {
       if (res.rescode >> 0 === SUCCESS_STATUS) {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); }
-
+      const { headers } = res;
       yield put({
         type: 'saveRefunds',
         payload: res.data,
+        headers,
       });
     },
     *fetchConfirmReturn({ orderId, status, success, error }, { call, put }) {
@@ -197,12 +200,14 @@ export default {
       return {
         ...state,
         returns: action.payload,
+        total: action.headers['x-content-total'] >> 0,
       };
     },
     saveRefunds(state, action) {
       return {
         ...state,
         refunds: action.payload,
+        total: action.headers['x-content-total'] >> 0,
       };
     },
     saveReturnDetail(state, action) {

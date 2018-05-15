@@ -150,13 +150,11 @@ export default class NewGood extends Component {
     this.setState({
       fields: { ...this.state.fields, ...obj },
     });
-    console.log('商品信息', { ...this.state.fields, ...obj });
   }
 
   // 当商品列表数据改变时：分页
   handleProductTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch } = this.props;
-    console.log('产品table改变--：', pagination, filtersArg, sorter);
     const params = {
       currentPage: pagination.current,
       pageSize: pagination.pageSize,
@@ -175,14 +173,14 @@ export default class NewGood extends Component {
   */
   handleSubmitProduct = () => {
     const { fields, args } = this.state;
-    const { dispatch } = this.props;
+    const { dispatch, history } = this.props;
     dispatch({
       type: 'good/add',
       data: {
         ...fields,
         mno: args.mno,
       },
-      success: () => { this.props.history.goBack(); },
+      success: () => { history.goBack(); },
       error: (res) => { message.error(res.msg, 2.5); },
     });
   }

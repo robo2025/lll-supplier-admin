@@ -97,7 +97,7 @@ export default class EditableTable extends Component {
   }
 
   handleChange(value, key, column) {
-    // console.log('handleChange', this.props, value, key, column);
+    console.log('价格设置handleChange', value, key, column);
     const { onChange } = this.props;
     const newData = [...this.state.data];
     const target = newData.filter(item => key === item.id)[0];
@@ -144,7 +144,9 @@ export default class EditableTable extends Component {
     if (newData.length > 1) {
       newData.pop();
     }
-    this.setState({ data: newData });
+    this.setState({ data: newData }, () => {
+      this.props.onChange({ prices: this.state.data });
+    });
   }
 
   // 增加一条区间

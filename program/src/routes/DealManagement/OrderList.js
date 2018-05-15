@@ -371,6 +371,7 @@ export default class OrderList extends Component {
   render() {
     const { orders, loading, upload } = this.props;
     const { total } = orders;
+    const { args } = this.state;
     const {
       isShowDeliveryModal,
       isShowOpenModal,
@@ -383,9 +384,8 @@ export default class OrderList extends Component {
     const paginationOptions = {
       showSizeChanger: true,
       showQuickJumper: true,
-      defaultCurrent: this.state.args.page >> 0 || 1,
+      defaultCurrent: args.page ? args.page >> 0 : 1,
       defaultPageSize: this.state.limit || 10,
-
       total,
     };
 

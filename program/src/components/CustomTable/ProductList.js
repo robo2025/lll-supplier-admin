@@ -16,12 +16,11 @@ class ProductList extends React.Component {
         render: (text, record, idx) => (<span>{idx + 1}</span>),
       },
       {
-        title: '产品ID',
-        dataIndex: 'product',
-        key: 'pno',
-        width: 120,
+        title: '产品型号ID',
+        dataIndex: 'mno',
+        key: 'mno',
+        width: 150,
         fixed: 'left',
-        render: val => (<span>{val.pno}</span>),
       },
       {
         title: '产品图片',
