@@ -12,7 +12,7 @@ import styles from './index.less';
 const FormItem = Form.Item;
 const { Option } = Select;
 const formItemLayout2 = {
-  labelCol: { span: 2 },
+  labelCol: { span: 3 },
   wrapperCol: { span: 6 },
 };
 
@@ -180,7 +180,7 @@ export default class NewGood extends Component {
         ...fields,
         mno: args.mno,
       },
-      success: () => { history.goBack(); },
+      success: () => { history.push('/goods/list'); },
       error: (res) => { message.error(res.msg, 2.5); },
     });
   }
@@ -332,7 +332,7 @@ export default class NewGood extends Component {
           </div>
           <div className={styles['submit-btn-wrap']}>
             <Button type="primary" onClick={this.handleSubmitProduct}>提交审核</Button>
-            <Button onClick={() => { this.props.history.goBack(); }}>取消</Button>
+            <Button onClick={() => { this.props.history.push('/goods/list'); }}>取消</Button>
           </div>
         </Card>
       </PageHeaderLayout>
