@@ -9,16 +9,7 @@ import styles from './good-form.less';
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
 const FILE_TYPES = ['jpg', 'png', 'gif', 'jpeg']; // 支持上传的文件类型
-// 将服务器目录转换成需求目录
-function getStanrdCatalog(data) {
-  data.forEach((val) => {
-    val.value = val.id;
-    val.label = val.category_name;
-    if (val.children.length > 0) {
-      getStanrdCatalog(val.children);
-    }
-  });
-}
+
 // 拼凑单个商品图片数据
 function getPic(key, pics) {
   if (!Array.isArray(pics)) {
@@ -190,21 +181,9 @@ export default class NewGoodForm extends Component {
       if (data.product) {
         uploaderCAD = data.product.cad_urls.map((val, idx) => (
           <Col span={24} key={idx}>
-            <a href={val} style={{ display: 'block' }}>
+            <a href={val} style={{ display: 'block' }} target="_blank">
               {val}
             </a>
-            {/* <Upload
-              action="//jsonplaceholder.typicode.com/posts/"
-              listType="picture-card"
-              fileList={[{
-                uid: -1,
-                name: 'CAD文件预览失败',
-                url: val,
-              }]}
-              onPreview={this.handlePreview}
-              onChange={({ fileList }) => { this.handleUploaderChange('b', fileList); }}
-            />
-            <p className="upload-pic-desc">cad图</p> */}
           </Col>
         ));
       }
