@@ -189,8 +189,11 @@ export default class NewGoodForm extends Component {
       // 商品cad集合
       if (data.product) {
         uploaderCAD = data.product.cad_urls.map((val, idx) => (
-          <Col span={8} key={idx}>
-            <Upload
+          <Col span={24} key={idx}>
+            <a href={val} style={{ display: 'block' }}>
+              {val}
+            </a>
+            {/* <Upload
               action="//jsonplaceholder.typicode.com/posts/"
               listType="picture-card"
               fileList={[{
@@ -201,7 +204,7 @@ export default class NewGoodForm extends Component {
               onPreview={this.handlePreview}
               onChange={({ fileList }) => { this.handleUploaderChange('b', fileList); }}
             />
-            <p className="upload-pic-desc">cad图</p>
+            <p className="upload-pic-desc">cad图</p> */}
           </Col>
         ));
       }

@@ -70,7 +70,7 @@ export const queryString = {
  * @param {array} fileNameArr 包含文件名的数组
  */
 export function checkFile(fileName, fileNameArr) {
-  const partter = '(\\.' + fileNameArr.join('|\\.') + ')$';
+  const partter = `(\\.${fileNameArr.join('|\\.')})$`;
   return new RegExp(partter, 'i').test(fileName);
 }
 
@@ -102,7 +102,7 @@ export function getCategoryStr(category) {
   if (typeof category !== 'object') {
     throw new Error('参数必须是一个json对象');
   }
-  categoryStr += '-' + category.category_name;
+  categoryStr += `-${category.category_name}`;
   if (category.children) { getCategoryStr(category.children); }
   return categoryStr;
 }
@@ -110,12 +110,12 @@ export function getCategoryStr(category) {
 
 /**
  * 根据指定key替换数组中的的某一个对象
- * 
+ *
  * @param {obj} obj 用来替换的json对象
  * @param {arr} arr 放置了很多个json对象的数据
  * @param {string} key 用于替换查找的key
- * 
- * demo 
+ *
+ * demo
  * var arr1 = [{name:'test1'},{name:'test2'},{name:'test3'}]
  * 执行replaceObjFromArr({name:'test1',age:25},arr1,"name");
  * 结果：[{name:'test1',age:23},{name:'test2'},{name:'test3'}]
@@ -179,8 +179,17 @@ export function transformSecondsToHuman(seconds) {
     data.h = 0;
     data.m = 0;
     data.s = seconds;
-    data.str = seconds + 's';
+    data.str = `${seconds}s`;
   } else if (seconds > 216000) {
     data.h = seconds / 360;
   }
+}
+
+/**
+ * 给一个json数组中的每一个元素增加key-value
+ */
+export function addKeyValToArr(arr, obj) {
+  return arr.map((val) => {
+    return { ...val, ...obj };
+  });
 }
