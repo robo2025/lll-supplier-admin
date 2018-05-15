@@ -1,6 +1,5 @@
 import { isUrl } from '../utils/utils';
 
-
 const menuData = [{
   name: '商品管理',
   icon: 'shop',
