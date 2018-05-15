@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Row, Col, Card, Form, Input, Checkbox, Select, Icon, Button, Menu, DatePicker, Modal, message } from 'antd';
+import qs from 'qs';
+import { Row, Col, Card, Form, Input, Checkbox, Select, Icon, Button, DatePicker, Modal, message } from 'antd';
 import GoodsTable from '../../components/StandardTable/GoodsTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import GoodCheckboxGroup from '../../components/Checkbox/GoodCheckboxGroup';
 import EditableTable from '../../components/CustomTable/EditTable';
-import { handleServerMsg } from '../../utils/tools';
+import { handleServerMsg, handleServerMsgObj } from '../../utils/tools';
+import { PAGE_SIZE } from '../../constant/config';
 import styles from './index.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
-const getValue = obj => Object.keys(obj).map(key => obj[key]).join(',');
 const InputGroup = Input.Group;
 const { RangePicker } = DatePicker;
 const plainOptions = ['gno', 'product_name', 'brand_name', 'english_name', 'partnumber', 'prodution_place', 'category', 'stock', 'price', 'supplier_name', 'min_buy', 'audit_status', 'publish_status', 'created_time'];// 所有选项
@@ -34,25 +35,23 @@ export default class GoodsList extends Component {
       selectedRows: [],
       formValues: {},
       isShowExportModal: false,
-      exportFields: [], // 导出产品字段 
-      isCheckAll: false, // 是否全选导出数据  
+      exportFields: [], // 导出产品字段
+      isCheckAll: false, // 是否全选导出数据
       isShowUnpublishModal: false, // 是否显示下架原因Modal
       isShowPriceSettingModal: false,
       unpublishReason: {
         publish_type: 1,
       }, // 下架原因
       prices: [], // 商品价格区间数组
+      args: qs.parse(props.location.search, { ignoreQueryPrefix: true }),
     };
   }
 
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'good/fetch',
-      params: null,
-    });
+    this.dispatchDefaultList();
   }
+
 
   onDatepickerChange = (date, dateString) => {
     console.log(date, dateString);
@@ -80,22 +79,37 @@ export default class GoodsList extends Component {
     this.setState({ isShowUnpublishModal: false });
   }
 
-  // 确定下架原因弹窗  
+  // 确定下架原因弹窗
   onOkUnpublishModal = () => {
     const { dispatch } = this.props;
-    const { unpublishReason, goodId } = this.state;
-    console.log('确定下架', unpublishReason.publish_type);
+    const { unpublishReason, gno } = this.state;
     this.setState({ isShowUnpublishModal: false });
     if (unpublishReason.publish_type) {
       dispatch({
         type: 'good/modifyGoodStatus',
-        goodId,
+        gno,
         goodStatus: 0,
         publishType: unpublishReason.publish_type,
         desc: unpublishReason.desc,
-        success: (res) => { message.success('下架成功。'); },
+        success: () => {
+          message.success('下架成功。');
+          this.dispatchDefaultList();
+        },
+        error: (res) => { message.error(handleServerMsgObj(res.msg)); },
       });
     }
+  }
+
+  // 获取商品列表
+  dispatchDefaultList = () => {
+    const { dispatch } = this.props;
+    const { args } = this.state;
+    dispatch({
+      type: 'good/fetch',
+      params: null,
+      offset: args.page ? (args.page - 1) * PAGE_SIZE : 0,
+      limit: PAGE_SIZE,
+    });
   }
 
   // 显示导出数据Modal
@@ -110,39 +124,37 @@ export default class GoodsList extends Component {
   // 确定导出数据
   handleOk() {
     this.setState({ isShowExportModal: false });
-    console.log('商品导出数据项目', this.state.exportFields);
     const { dispatch } = this.props;
     dispatch({
       type: 'good/queryExport',
       fields: this.state.exportFields,
       success: (res) => {
-        console.log('http://139.199.96.235:9005/api/goods/goods_reports?filename=' + res.filename);
-        window.open('http://139.199.96.235:9005/api/goods/goods_reports?filename=' + res.filename);
+        window.open(`http://139.199.96.235:9005/api/goods/goods_reports?filename=${res.filename}`);
       },
     });
   }
 
   // 上下架商品
-  handlePublishGood(goodId, status) {
+  handlePublishGood(gno, status) {
     const { dispatch } = this.props;
-    console.log(goodId, status);
     if (status === 0) { // 如果是下架商品，需要填写下架原因
-      this.setState({ isShowUnpublishModal: true, goodId });
+      this.setState({ isShowUnpublishModal: true, gno });
       return;
     }
     dispatch({
       type: 'good/modifyGoodStatus',
-      goodId,
+      gno,
       goodStatus: status,
-      success: () => { message.success('修改成功'); },
-      error: (res) => { message.error(handleServerMsg(res.msg)); },
-
+      success: () => {
+        message.success('修改成功');
+        this.dispatchDefaultList();
+      },
+      error: (res) => { message.error(handleServerMsgObj(res.msg)); },
     });
   }
 
   // 选择下架原因类型
   handlePublishType = (type) => {
-    console.log('type', type);
     const { unpublishReason } = this.state;
     this.setState({
       unpublishReason: { ...unpublishReason, publish_type: type },
@@ -150,7 +162,6 @@ export default class GoodsList extends Component {
   }
   // 下架原因描述
   handlePublishDesc = (desc) => {
-    console.log('desc', desc);
     const { unpublishReason } = this.state;
     this.setState({
       unpublishReason: { ...unpublishReason, desc },
@@ -158,33 +169,35 @@ export default class GoodsList extends Component {
   }
 
   // 点击价格设置按钮
-  handleClickPriceSettingBtn = (goodId) => {
-    console.log('需要设置价格商品ID', goodId);
+  handleClickPriceSettingBtn = (gno) => {
     const GoodsList1 = this.props.good.list;
     const selectedGood = GoodsList1.filter(val => (
-      val.id === goodId
+      val.gno === gno
     ));
     this.setState({
-      prices: selectedGood[0].prices,
+      prices: selectedGood[0].prices.sort((a, b) => a.min_quantity - b.min_quantity),
       isShowPriceSettingModal: true,
-      goodId,
+      gno,
     });
   }
   // 确定：价格设置Modal
   okPriceSettingModal = () => {
     const { dispatch } = this.props;
-    const { prices, goodId } = this.state;
+    const { prices, gno } = this.state;
     this.setState({ isShowPriceSettingModal: false });
     dispatch({
       type: 'good/modifyPrice',
-      goodId,
+      gno,
       data: {
         prices,
+      },
+      success: () => {
+        this.dispatchDefaultList();
       },
       error: (res) => { message.error(handleServerMsg(res.msg)); },
     });
   }
-  // 取消：价格设置Modal 
+  // 取消：价格设置Modal
   cancelPriceSettingModal = () => {
     this.setState({ isShowPriceSettingModal: false });
   }
@@ -193,7 +206,6 @@ export default class GoodsList extends Component {
   * @param {object} obj json对象，产品属性key=>value
   */
   handleGoodPrice = (obj) => {
-    console.log('商品列表·组件收到：', obj);
     this.setState({
       prices: obj.prices,
     });
@@ -488,12 +500,6 @@ export default class GoodsList extends Component {
     const { loading, good } = this.props;
     const { selectedRows, isShowPriceSettingModal, isShowExportModal, prices } = this.state;
     const data = good.list;
-    const menu = (
-      <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove">删除</Menu.Item>
-        <Menu.Item key="approval">批量审批</Menu.Item>
-      </Menu>
-    );
 
     console.log('商品列表页', this.state);
 

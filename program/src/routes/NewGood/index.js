@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Modal, Button, Input, Table, message, Form, Select, Row, Col, Cascader } from 'antd';
+import { Card, Modal, Button, Input, Form, message, Select, Row, Col, Cascader } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import SectionHeader from '../../components/PageHeader/SectionHeader';
 import ProductList from '../../components/CustomTable/ProductList';
@@ -11,6 +11,10 @@ import styles from './index.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
+const formItemLayout2 = {
+  labelCol: { span: 2 },
+  wrapperCol: { span: 6 },
+};
 
 @connect(({ loading, product, good }) => ({
   product,
@@ -33,7 +37,7 @@ export default class NewGood extends Component {
         prices: [ // 价格
           {
             id: -100,
-            min_quantity: 2, // 最小数量
+            min_quantity: 10, // 最小数量
             max_quantity: 100, // 最大数量
             price: '1000', // 价格
             lead_time: '1天', // 货期
@@ -57,14 +61,14 @@ export default class NewGood extends Component {
     const { args } = this.state;
     // 获取产品列表
     dispatch({
-      type: 'product/fetch',
+      type: 'good/fetchAassociatedProduct',
       offset: 0,
       limit: 8,
     });
-    if (args.origin_prdId) {
+    if (args.mno) {
       dispatch({
-        type: 'product/fetchDetail',
-        productId: args.origin_prdId,
+        type: 'good/fetchAassociatedProductDetail',
+        mno: args.mno,
       });
     }
     window.onhashchange = this.hashChangeFire;
@@ -94,7 +98,6 @@ export default class NewGood extends Component {
           },
         ],
       });
-      console.log('提交新属性', newFiled);
     }
   }
 
@@ -103,10 +106,10 @@ export default class NewGood extends Component {
     const { dispatch } = this.props;
     const args = queryString.parse(this.props.location.search);
     this.setState({ args });
-    if (args.origin_prdId) {
+    if (args.mno) {
       dispatch({
-        type: 'product/fetchDetail',
-        productId: args.origin_prdId,
+        type: 'good/fetchAassociatedProductDetail',
+        mno: args.mno,
       });
     }
   }
@@ -122,14 +125,14 @@ export default class NewGood extends Component {
 
   /**
   * 点击关联后事件
-  * @param {string=} prdId 产品ID
+  * @param {string=} mno 产品型号ID
   *
   * */
-  handleAssociate = (prdId) => {
+  handleAssociate = (mno) => {
     const { history } = this.props;
     const { fields } = this.state;
-    history.push(`/goods/new?origin_prdId=${prdId}`);
-    this.setState({ isShowModal: false, fields: { ...fields, product_id: prdId } });
+    history.push(`/goods/new?mno=${mno}`);
+    this.setState({ isShowModal: false, fields: { ...fields, product_id: mno } });
   }
 
   // 当表单输入框被修改事件
@@ -174,15 +177,15 @@ export default class NewGood extends Component {
   */
   handleSubmitProduct = () => {
     const { fields, args } = this.state;
-    console.log('url参数', args);
     const { dispatch } = this.props;
+    console.log('新建商品信息', { ...fields, mno: args.mno });
     dispatch({
       type: 'good/add',
       data: {
         ...fields,
-        product_id: args.origin_prdId,
+        mno: args.mno,
       },
-      success: () => { this.props.history.push('/goods/list'); },
+      success: () => { this.props.history.goBack(); },
       error: (res) => { message.error(res.msg, 2.5); },
     });
   }
@@ -195,7 +198,7 @@ export default class NewGood extends Component {
           <p>搜索功能还没有提供接口</p>
         </div>
       ),
-      onOk() {},
+      onOk() { },
     });
   }
 
@@ -270,19 +273,9 @@ export default class NewGood extends Component {
 
   render() {
     const { isShowModal, fields, args } = this.state;
-    const { product, loading } = this.props;
+    const { good, product, loading } = this.props;
     const { total } = product;
-
-    // 其他属性列
-    const attrClomns = [{
-      title: '属性名',
-      dataIndex: 'attr_name',
-      key: 'attr_name',
-    }, {
-      title: '属性值',
-      dataIndex: 'attr_value',
-      key: 'attr_value',
-    }];
+    const { getFieldDecorator } = this.props.form;
 
     console.log('新建props和state', this.props.product, this.state);
 
@@ -303,8 +296,8 @@ export default class NewGood extends Component {
               {this.renderSimpleForm()}
             </div>
             <ProductList
-              loading={loading.models.product}
-              data={product.list}
+              loading={loading.models.good}
+              data={good.products}
               onAssociate={this.handleAssociate}
               onChange={this.handleProductTableChange}
               total={total}
@@ -313,7 +306,7 @@ export default class NewGood extends Component {
           <NewGoodForm
             showModal={this.showModal}
             loading={loading.models.good}
-            data={{ ...product.detail, ...fields }}
+            data={{ ...good.productDetail, ...fields }}
             onChange={this.handleFormChange}
             onAttrChange={this.handleGoodAttr}
             args={args}
@@ -321,18 +314,30 @@ export default class NewGood extends Component {
           <SectionHeader
             title="商品其他属性"
           />
-          <div style={{ width: '50%', maxWidth: 500 }}>
-            <Table
-              className="attr-table"
-              bordered
-              pagination={false}
-              columns={attrClomns}
-              dataSource={product.detail.other_attrs}
-            />
+          <div className="spec-wrap" style={{ width: 200 }}>
+            <Form>
+              {
+                (good.productDetail.specs && good.productDetail.specs.length > 0) ?
+                  good.productDetail.specs.map(val => (
+                    <FormItem
+                      label={val.spec_name}
+                      {...formItemLayout2}
+                      key={val.id}
+                    >
+                      {getFieldDecorator(`spec_${val.spec_name}`, {
+                      })(
+                        <span>{val.spec_value}{val.spec_unit}</span>
+                      )}
+                    </FormItem>
+                  ))
+                  :
+                  '无'
+              }
+            </Form>
           </div>
           <div className={styles['submit-btn-wrap']}>
             <Button type="primary" onClick={this.handleSubmitProduct}>提交审核</Button>
-            <Button onClick={() => { this.props.history.push('/goods/list'); }}>取消</Button>
+            <Button onClick={() => { this.props.history.goBack(); }}>取消</Button>
           </div>
         </Card>
       </PageHeaderLayout>

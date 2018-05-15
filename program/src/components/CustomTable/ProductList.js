@@ -9,31 +9,35 @@ class ProductList extends React.Component {
     this.columns = [
       {
         title: '序号',
-        dataIndex: 'id',
-        key: 'id',
+        dataIndex: 'idx',
+        key: 'idx',
         width: 60,
         fixed: 'left',
+        render: (text, record, idx) => (<span>{idx + 1}</span>),
       },
       {
-        title: '产品ID编号',
-        dataIndex: 'pno',
+        title: '产品ID',
+        dataIndex: 'product',
         key: 'pno',
         width: 120,
         fixed: 'left',
+        render: val => (<span>{val.pno}</span>),
       },
       {
         title: '产品图片',
-        dataIndex: 'pics',
-        render: val => val.map((item, idx) =>
+        dataIndex: 'product',
+        key: 'pics',
+        render: val => val.pics.map((item, idx) =>
           (<img alt="缩略图" width={10} height={10} style={{ display: 'inline' }} key={`key${idx}`} src={item.img_url} />)
         ),
         width: 100,
       },
       {
         title: '产品名称',
-        dataIndex: 'product_name',
+        dataIndex: 'product',
         key: 'product_name',
         width: 300,
+        render: val => (<span>{val.product_name}</span>),
       },
       {
         title: '型号',
@@ -43,46 +47,48 @@ class ProductList extends React.Component {
       },
       {
         title: '一级类目',
-        dataIndex: 'category',
-        render: val => (val.category_name),
+        dataIndex: 'product',
         key: 'menu1',
+        render: val => (val.category.category_name),
         width: 100,
       },
       {
         title: '二级类目',
-        dataIndex: 'category',
-        render: val => (val.children.category_name),
+        dataIndex: 'product',
+        render: val => (val.category.children.category_name),
         key: 'menu2',
         width: 100,
       },
       {
         title: '三级类目',
-        dataIndex: 'category',
-        render: val => (val.children.children.category_name),
+        dataIndex: 'product',
         key: 'menu3',
         width: 100,
+        render: val => (val.category.children.children.category_name),
 
       },
       {
         title: '品牌',
-        dataIndex: 'brand_name',
+        dataIndex: 'product',
+        key: 'brand_name',
         width: 100,
+        render: val => (<span>{val.brand.brand_name}</span>),
       },
       {
         title: '是否已关联',
-        dataIndex: 'is_has_goods',
-        render: text => (<span>{mapHasGoods[text >> 0]}</span>),
+        dataIndex: 'has_goods',
         width: 120,
         fixed: 'right',
+        render: text => (<span>{mapHasGoods[text >> 0]}</span>),
       },
       {
         title: '操作',
         key: 'action',
         render: (text, record) => (
-          <Fragment disabled={!record.is_has_goods}>
+          <Fragment>
             <a
-              onClick={() => { this.props.onAssociate(record.id); }}
-              disabled={record.is_has_goods}
+              onClick={() => { this.props.onAssociate(record.mno); }}
+              disabled={record.has_goods}
             >关联
             </a>
           </Fragment>

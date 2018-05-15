@@ -136,8 +136,8 @@ export default class NewGoodForm extends Component {
             onAttrChange({ pics: [...pics, { id: pics.length - 100, img_type: '侧面', img_url: file.response.key }] });
           } else if (key.substr(0, 1) === 'd') {
             const idx = key.substr(1, 1);
-            this.setState({ pics: replaceObjFromArr({ id: pics.length - 100, img_type: '包装图' + idx, img_url: file.response.key }, pics, 'img_type') });
-            onAttrChange({ pics: [...pics, { id: pics.length - 100, img_type: '包装图' + idx, img_url: file.response.key }] });
+            this.setState({ pics: replaceObjFromArr({ id: pics.length - 100, img_type: `包装图${idx}`, img_url: file.response.key }, pics, 'img_type') });
+            onAttrChange({ pics: [...pics, { id: pics.length - 100, img_type: `包装图${idx}`, img_url: file.response.key }] });
           }
         } else if (file.status === 'error') {
           message.error(`${file.name} 文件上传失败`);
@@ -156,21 +156,21 @@ export default class NewGoodForm extends Component {
     };
     const { getFieldDecorator } = this.props.form;
     const { data, loading, args } = this.props;
-    const { category } = data;
-    const slectedCatagory = category ? [
-      category.category_name,
-      category.children.category_name,
-      category.children.children.category_name,
-      category.children.children.children.category_name,
+    const { product } = data;
+    const slectedCatagory = product ? [
+      product.category.category_name,
+      product.category.children.category_name,
+      product.category.children.children.category_name,
+      product.category.children.children.children.category_name,
     ] : [];
     const { previewVisible, previewImage, a, b, c, d1, d2, d3, file } = this.state;
 
-    let uploaders = []; // 商品图片   
-    let uploaderCAD = []; // 商品cad文件 
+    let uploaders = []; // 商品图片
+    let uploaderCAD = []; // 商品cad文件
 
-    if (data.pics) {
+    if (data.product) {
       // 商品图片集合
-      uploaders = data.pics.map(val => (
+      uploaders = data.product.pics.map(val => (
         <Col span={8} key={val.id}>
           <Upload
             action="//jsonplaceholder.typicode.com/posts/"
@@ -187,8 +187,8 @@ export default class NewGoodForm extends Component {
         </Col>
       ));
       // 商品cad集合
-      if (data.cad_url) {
-        uploaderCAD = data.cad_url.map((val, idx) => (
+      if (data.product) {
+        uploaderCAD = data.product.cad_urls.map((val, idx) => (
           <Col span={8} key={idx}>
             <Upload
               action="//jsonplaceholder.typicode.com/posts/"
@@ -218,18 +218,18 @@ export default class NewGoodForm extends Component {
               label="选择产品"
               {...formItemLayout}
             >
-              <Button type="primary" onClick={this.props.showModal}>{args.origin_prdId ? '重选产品' : '选择产品'}</Button>
+              <Button type="primary" onClick={this.props.showModal}>{args.mno ? '重选产品' : '选择产品'}</Button>
             </FormItem>
-            <FormItem
-              label="产品ID"
+            {/* <FormItem
+              label="产品型号ID"
               {...formItemLayout}
             >
               {getFieldDecorator('pno', {
-                initialValue: data.pno,
+                initialValue: data.mno,
               })(
                 <Input disabled />
               )}
-            </FormItem>
+            </FormItem> */}
             <FormItem
               label="所属分类"
               {...formItemLayout}
@@ -241,7 +241,7 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('product_name', {
-                initialValue: data.product_name,
+                initialValue: product ? product.product_name : '',
               })(
                 <Input disabled />
               )}
@@ -261,7 +261,7 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('brand_name', {
-                initialValue: data.brand_name,
+                initialValue: product ? product.brand.brand_name : '',
               })(
                 <Input disabled />
               )}
@@ -271,7 +271,7 @@ export default class NewGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('english_name', {
-                initialValue: data.english_name,
+                initialValue: product ? product.brand.english_name : '',
               })(
                 <Input disabled />
               )}
@@ -280,8 +280,8 @@ export default class NewGoodForm extends Component {
               label="产地"
               {...formItemLayout}
             >
-              {getFieldDecorator('prodution_place', {
-                initialValue: data.prodution_place,
+              {getFieldDecorator('registration_place', {
+                initialValue: product ? product.brand.registration_place : '',
               })(
                 <Input disabled />
               )}
@@ -387,21 +387,21 @@ export default class NewGoodForm extends Component {
         {/* 商品描述、详情 */}
         <div style={{ clear: 'both' }} />
         <div className="good-desc">
-          <Tabs defaultActiveKey="1" onChange={(key) => { console.log(key); }}>
-            <TabPane tab="商品概述" key="1">
-              <RichEditorShow
-                content={data.summary}
-              />
+          <Tabs defaultActiveKey="1">
+            <TabPane tab="产品概述" key="1">
+              <RichEditorShow content={data.product ? data.product.summary : '无'} />
             </TabPane>
-            <TabPane tab="商品详情" key="2">
-              <RichEditorShow
-                content={data.description}
-              />
+            <TabPane tab="产品详情" key="2">
+              <RichEditorShow content={data.product ? data.product.description : '无'} />
             </TabPane>
-            <TabPane tab="常见问题FAQ" key="3" >
-              <RichEditorShow
-                content={data.faq}
-              />
+            <TabPane tab="学堂" key="3">
+              <RichEditorShow content={data.product ? data.product.course : '无'} />
+            </TabPane>
+            <TabPane tab="视频详解" key="4">
+              <RichEditorShow content={data.product ? data.product.video : '无'} />
+            </TabPane>
+            <TabPane tab="常见问题FAQ" key="5" >
+              <RichEditorShow content={data.product ? data.product.faq : '无'} />
             </TabPane>
           </Tabs>
         </div>

@@ -1,4 +1,13 @@
-import { queryGoods, queryGoodDetail, modifyGoodStatus, modifyGoodInfo, modifyGoodPrice, addGood, queryOperationLog, exportGood } from '../services/good';
+import { queryGoods,
+  queryGoodDetail,
+  modifyGoodStatus,
+  modifyGoodInfo,
+  modifyGoodPrice,
+  addGood,
+  queryAssociatedProduct,
+  queryOperationLog,
+  exportGood,
+  queryAssociatedProductDetail } from '../services/good';
 import { SUCCESS_STATUS } from '../constant/config.js';
 
 
@@ -10,6 +19,8 @@ export default {
     detail: {},
     logs: [],
     total: 0,
+    products: [],
+    productDetail: {},
   },
 
   effects: {
@@ -19,15 +30,15 @@ export default {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); return; }
 
-      const { headers } = res;      
+      const { headers } = res;
       yield put({
         type: 'save',
         payload: res.data,
         headers,
       });
     },
-    *fetchDetail({ goodId, success, error }, { call, put }) {
-      const res = yield call(queryGoodDetail, { goodId });
+    *fetchDetail({ gno, success, error }, { call, put }) {
+      const res = yield call(queryGoodDetail, { gno });
       if (res.rescode >> 0 === SUCCESS_STATUS) {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); return; }
@@ -37,20 +48,38 @@ export default {
         payload: res.data,
       });
     },
-    *add({ data, success, error }, { call, put }) {
+    *fetchAassociatedProduct({ params, offset, limit, success, error }, { call, put }) {
+      const res = yield call(queryAssociatedProduct, { params, offset, limit });
+      if (res.rescode >> 0 === SUCCESS_STATUS) {
+        if (typeof success === 'function') { success(res); }
+      } else if (typeof error === 'function') { error(res); return; }
+
+      const { headers } = res;
+      yield put({
+        type: 'saveProduct',
+        payload: res.data,
+        headers,
+      });
+    },
+    *fetchAassociatedProductDetail({ mno, success, error }, { call, put }) {
+      const res = yield call(queryAssociatedProductDetail, { mno });
+      if (res.rescode >> 0 === SUCCESS_STATUS) {
+        if (typeof success === 'function') { success(res); }
+      } else if (typeof error === 'function') { error(res); return; }
+
+      yield put({
+        type: 'saveProductDetail',
+        payload: res.data,
+      });
+    },
+    *add({ data, success, error }, { call }) {
       const res = yield call(addGood, { data });
       if (res.rescode >> 0 === SUCCESS_STATUS) {
         if (typeof success === 'function') { success(res); }
-      } else if (typeof error === 'function') { error(res); return; }
-
-      const response = yield call(queryGoods);
-      yield put({
-        type: 'saveOne',
-        payload: response.data,
-      });
+      } else if (typeof error === 'function') { error(res); }
     },
-    *modifyInfo({ goodId, data, success, error }, { call, put }) {
-      const res = yield call(modifyGoodInfo, { goodId, data });
+    *modifyInfo({ gno, data, success, error }, { call, put }) {
+      const res = yield call(modifyGoodInfo, { gno, data });
       if (res.rescode >> 0 === SUCCESS_STATUS) {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); return; }
@@ -61,32 +90,20 @@ export default {
         payload: response.data,
       });
     },
-    *modifyGoodStatus({ goodId, goodStatus, publishType, desc, success, error }, { call, put }) {
-      const res = yield call(modifyGoodStatus, { goodId, goodStatus, publishType, desc });
+    *modifyGoodStatus({ gno, goodStatus, publishType, desc, success, error }, { call }) {
+      const res = yield call(modifyGoodStatus, { gno, goodStatus, publishType, desc });
       if (res.rescode >> 0 === SUCCESS_STATUS) {
         if (typeof success === 'function') { success(res); }
-      } else if (typeof error === 'function') { error(res); return; }
-
-      const response = yield call(queryGoods);
-      yield put({
-        type: 'modify',
-        payload: response.data,
-      });
+      } else if (typeof error === 'function') { error(res); }
     },
-    *modifyPrice({ goodId, data, success, error }, { call, put }) {
-      const res = yield call(modifyGoodPrice, { goodId, data });
+    *modifyPrice({ gno, data, success, error }, { call }) {
+      const res = yield call(modifyGoodPrice, { gno, data });
       if (res.rescode >> 0 === SUCCESS_STATUS) {
         if (typeof success === 'function') { success(res); }
-      } else if (typeof error === 'function') { error(res); return; }
-
-      const response = yield call(queryGoods);
-      yield put({
-        type: 'modify',
-        payload: response.data,
-      });
+      } else if (typeof error === 'function') { error(res); }
     },
-    *queryLogs({ module, goodId, success, error }, { call, put }) {
-      const res = yield call(queryOperationLog, { module, goodId });
+    *queryLogs({ module, gno, success, error }, { call, put }) {
+      const res = yield call(queryOperationLog, { module, gno });
       if (res.rescode >> 0 === SUCCESS_STATUS) {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); return; }
@@ -114,13 +131,26 @@ export default {
       return {
         ...state,
         list: action.payload,
-        total: action.headers['x-content-total'] >> 0,        
+        total: action.headers['x-content-total'] >> 0,
       };
     },
     saveDetail(state, action) {
       return {
         ...state,
         detail: action.payload,
+      };
+    },
+    saveProduct(state, action) {
+      return {
+        ...state,
+        products: action.payload,
+        total: action.headers['x-content-total'] >> 0,
+      };
+    },
+    saveProductDetail(state, action) {
+      return {
+        ...state,
+        productDetail: action.payload,
       };
     },
     saveOne(state, action) {
@@ -152,6 +182,18 @@ export default {
         ...state,
         export: action.payload,
       };
+    },
+  },
+  subscriptions: {
+    setup({ dispatch, history }) {
+      return history.listen(({ pathname, search }) => {
+        if (pathname === '/goods/new' && !(/mno/.test(search))) {
+          dispatch({
+            type: 'saveProductDetail',
+            payload: {},
+          });
+        }
+      });
     },
   },
 };

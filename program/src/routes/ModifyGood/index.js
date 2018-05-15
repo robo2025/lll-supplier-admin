@@ -1,56 +1,55 @@
 import React, { Component } from 'react';
 import moment from 'moment';
+import qs from 'qs';
 import { connect } from 'dva';
-import { Card, Button, Input, message, Table } from 'antd';
+import { Card, Button, message, Table, Form } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import SectionHeader from '../../components/PageHeader/SectionHeader';
 import ModifyGoodForm from '../../components/CustomeForm/ModifyGoodForm';
-import { queryString, handleServerMsg } from '../../utils/tools';
+import { ACTION_FLAG } from '../../constant/statusList';
+import { handleServerMsg } from '../../utils/tools';
 
 import styles from './index.less';
 
-const actionFlag = ['新增', '修改', '删除']; // 操作类型 (1:新增 2:修改 3:删除)
-const operationTabList = [{
-  key: 'tab1',
-  tab: '商品操作记录',
-}];
+const FormItem = Form.Item;
 // 操作记录列
-const columns = [{
+const actionColumns = [{
   title: '操作类型',
   dataIndex: 'action_flag',
   key: 'action_flag',
-  render: val => <span>{actionFlag[val - 1]}</span>,
-}, {
-  title: '操作员',
-  dataIndex: 'username',
-  key: 'username',
-}, {
-  title: '执行结果',
-  dataIndex: 'status',
-  key: 'status',
-  render: () => (<span>成功</span>),
-}, {
-  title: '操作时间',
-  dataIndex: 'action_time',
-  key: 'action_time',
-  render: val => <span>{moment(val * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>,
+  render: val => <span>{ACTION_FLAG[val]}</span>,
 }, {
   title: '说明',
   dataIndex: 'change_message',
   key: 'change_message',
+}, {
+  title: '操作员',
+  dataIndex: 'creator',
+  key: 'creator',
+  render: (text, record) => (<span>{`${text}(${record.creator_id})`}</span>),
+}, {
+  title: '操作时间',
+  dataIndex: 'created_time',
+  key: 'created_time',
+  render: val => <span>{moment(val * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>,
 }];
+const formItemLayout2 = {
+  labelCol: { span: 2 },
+  wrapperCol: { span: 6 },
+};
 
-@connect(({ loading, good }) => ({
+@connect(({ logs, loading, good }) => ({
   good,
+  logs,
   loading,
 }))
+@Form.create()
 export default class ModifyGood extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      args: queryString.parse(this.props.location.search),
       fields: {},
-      operationkey: 'tab1',
+      args: qs.parse(props.location.search, { ignoreQueryPrefix: true }),
     };
   }
 
@@ -60,14 +59,14 @@ export default class ModifyGood extends Component {
     // 获取商品详情
     dispatch({
       type: 'good/fetchDetail',
-      goodId: args.goodId,
+      gno: args.gno,
       success: (res) => { this.setState({ fields: res.data }); },
     });
-    // 获取商品日志
+    // 获取商品操作日志
     dispatch({
-      type: 'good/queryLogs',
+      type: 'logs/fetch',
       module: 'goods',
-      goodId: args.goodId,
+      objectId: args.gno,
     });
   }
 
@@ -77,7 +76,7 @@ export default class ModifyGood extends Component {
   }
 
 
-  // 显示添加其他属性modal  
+  // 显示添加其他属性modal
   ShowAttrModal = () => {
     this.setState({ isShowAttrMOdal: true });
   }
@@ -93,9 +92,9 @@ export default class ModifyGood extends Component {
 
   /**
 * 当商品其他属性被修改事件[产品概述、详情、FAQ,其他属性，图片]
-* 
+*
 * @param {object} obj json对象，产品属性key=>value
-* 
+*
 */
   handleGoodAttr = (obj) => {
     console.log('母·组件收到：', obj);
@@ -108,7 +107,7 @@ export default class ModifyGood extends Component {
 
   /**
   * 提交修改商品信息
-  * 
+  *
   */
   handleSubmitProduct = () => {
     const { fields } = this.state;
@@ -122,13 +121,14 @@ export default class ModifyGood extends Component {
         shelf_life, sales_unit, stock, min_buy, prices,
       },
       success: () => { this.props.history.push('/goods/list'); },
-      error: (res) => { message.error(handleServerMsg(res.msg)); },  
+      error: (res) => { message.error(handleServerMsg(res.msg)); },
     });
   }
 
   render() {
     const { isShowAttrMOdal, fields } = this.state;
-    const { good, loading } = this.props;
+    const { good, logs, loading } = this.props;
+    const { getFieldDecorator } = this.props.form;
     const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
@@ -140,17 +140,6 @@ export default class ModifyGood extends Component {
       },
     };
 
-    const contentList = {
-      tab1: <Table
-        pagination={{
-          defaultPageSize: 6,
-          pageSize: 6,
-        }}
-        loading={loading.models.good}
-        dataSource={good.logs}
-        columns={columns}
-      />,
-    };
     // 其他属性列
     const attrClomns = [{
       title: '属性名',
@@ -176,32 +165,36 @@ export default class ModifyGood extends Component {
           <SectionHeader
             title="产品其他属性"
           />
-          <div style={{ width: '50%', maxWidth: 500 }}>
-            <Table
-              className="attr-table"
-              bordered
-              pagination={false}
-              columns={attrClomns}
-              dataSource={good.detail.product ? good.detail.product.other_attrs : []}
-              locale={{
-                emptyText: '该产品没有其它属性',
-              }}
-            />
+          <div className="spec-wrap" style={{ width: 200 }}>
+            <Form>
+              {
+                good.detail.product_model && good.detail.product_model.specs.map(val => (
+                  <FormItem
+                    label={val.spec_name}
+                    {...formItemLayout2}
+                    key={val.id}
+                  >
+                    {getFieldDecorator(`spec_${val.spec_name}`, {
+                    })(
+                      <span>{val.spec_value}{val.spec_unit}</span>
+                    )}
+                  </FormItem>
+                ))
+              }
+            </Form>
           </div>
           <div className={styles['section-header']}>
             <h2>操作日志</h2>
           </div>
-          <Card
-            className={styles.tabsCard}
-            bordered={false}
-            tabList={operationTabList}
-            onTabChange={this.onOperationTabChange}
-          >
-            {contentList[this.state.operationkey]}
-          </Card>
+          <Table
+            loading={loading.models.logs}
+            rowKey="id"
+            columns={actionColumns}
+            dataSource={logs.list}
+          />
           <div className={styles['submit-btn-wrap']}>
             <Button type="primary" onClick={this.handleSubmitProduct}>提交审核</Button>
-            <Button onClick={() => { this.props.history.push('/goods/list'); }}>取消</Button>
+            <Button onClick={() => { this.props.history.goBack(); }}>取消</Button>
           </div>
         </Card>
       </PageHeaderLayout>

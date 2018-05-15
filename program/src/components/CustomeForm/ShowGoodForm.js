@@ -159,8 +159,8 @@ export default class ShowGoodForm extends Component {
             onAttrChange({ pics: [...pics, { id: pics.length - 100, img_type: '侧面', img_url: file.response.key }] });
           } else if (key.substr(0, 1) === 'd') {
             const idx = key.substr(1, 1);
-            this.setState({ pics: replaceObjFromArr({ id: pics.length - 100, img_type: '包装图' + idx, img_url: file.response.key }, pics, 'img_type') });
-            onAttrChange({ pics: [...pics, { id: pics.length - 100, img_type: '包装图' + idx, img_url: file.response.key }] });
+            this.setState({ pics: replaceObjFromArr({ id: pics.length - 100, img_type: `包装图${idx}`, img_url: file.response.key }, pics, 'img_type') });
+            onAttrChange({ pics: [...pics, { id: pics.length - 100, img_type: `包装图${idx}`, img_url: file.response.key }] });
           }
         } else if (file.status === 'error') {
           message.error(`${file.name} 文件上传失败`);
@@ -189,7 +189,7 @@ export default class ShowGoodForm extends Component {
     const { previewVisible, previewImage, a, b, c, d1, d2, d3, file } = this.state;
 
     let uploaders = []; // 商品图片
-    let uploaderCAD = []; // 商品cad图   
+    let uploaderCAD = []; // 商品cad图
     if (product) {
       // 商品图片集合
       uploaders = product.pics.map(val => (
@@ -205,7 +205,7 @@ export default class ShowGoodForm extends Component {
             onPreview={this.handlePreview}
             onChange={({ fileList }) => { this.handleUploaderChange('b', fileList); }}
           />
-          <p className="upload-pic-desc">{mapImageType[val.img_type - 1] }</p>
+          <p className="upload-pic-desc">{mapImageType[val.img_type - 1]}</p>
         </Col>
       ));
       // 商品cad图
@@ -274,9 +274,8 @@ export default class ShowGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('partnumber', {
-                initialValue: data.product ? data.product.partnumber : '',
               })(
-                <span>{data.product ? data.product.partnumber : ''}</span>
+                <span>{data.product ? data.product_model.partnumber : ''}</span>
               )}
             </FormItem>
             <FormItem
@@ -284,9 +283,8 @@ export default class ShowGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('brand_name', {
-                initialValue: data.product ? data.product.brand_name : '',
               })(
-                <span>{data.product ? data.product.brand_name : ''}</span>
+                <span>{data.product ? data.product.brand.brand_name : ''}</span>
               )}
             </FormItem>
             <FormItem
@@ -294,9 +292,8 @@ export default class ShowGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('english_name', {
-                initialValue: data.product ? data.product.english_name : '',
               })(
-                <span>{data.product ? data.product.english_name : ''}</span>
+                <span>{data.product ? data.product.brand.english_name : ''}</span>
               )}
             </FormItem>
             <FormItem
@@ -304,9 +301,8 @@ export default class ShowGoodForm extends Component {
               {...formItemLayout}
             >
               {getFieldDecorator('prodution_place', {
-                initialValue: data.product ? data.product.prodution_place : '',
               })(
-                <span>{data.product ? data.product.prodution_place : ''}</span>
+                <span>{data.product ? data.product.brand.registration_place : ''}</span>
               )}
             </FormItem>
             <FormItem
@@ -395,15 +391,21 @@ export default class ShowGoodForm extends Component {
         {/* 商品描述、详情 */}
         <div style={{ clear: 'both' }} />
         <div className="good-desc">
-          <Tabs defaultActiveKey="1" onChange={(key) => { console.log(key); }}>
-            <TabPane tab="商品概述" key="1">
-              <RichEditorShow content={data.product ? data.product.summary : ''} />
+          <Tabs defaultActiveKey="1">
+            <TabPane tab="产品概述" key="1">
+              <RichEditorShow content={data.product ? data.product.summary : '无'} />
             </TabPane>
-            <TabPane tab="商品详情" key="2">
-              <RichEditorShow content={data.product ? data.product.description : ''} />
+            <TabPane tab="产品详情" key="2">
+              <RichEditorShow content={data.product ? data.product.description : '无'} />
             </TabPane>
-            <TabPane tab="常见问题FAQ" key="3" >
-              <RichEditorShow content={data.product ? data.product.faq : ''} />            
+            <TabPane tab="学堂" key="3">
+              <RichEditorShow content={data.product ? data.product.course : '无'} />
+            </TabPane>
+            <TabPane tab="视频详解" key="4">
+              <RichEditorShow content={data.product ? data.product.video : '无'} />
+            </TabPane>
+            <TabPane tab="常见问题FAQ" key="5" >
+              <RichEditorShow content={data.product ? data.product.faq : '无'} />
             </TabPane>
           </Tabs>
         </div>

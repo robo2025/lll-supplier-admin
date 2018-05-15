@@ -9,14 +9,13 @@ import { queryString } from '../utils/tools';
  *
 */
 export async function queryGoods({ params = '', offset = 0, limit = 10 }) {
-  const acess_token = Cookies.get('access_token');
-  return lyRequest(`${API_URL}/goods?offset=${offset}&limit=${limit}&${queryString.toQueryString(params)}`, {
+  const acessToken = Cookies.get('access_token');
+  return lyRequest(`${API_URL}/supplier/goods?offset=${offset}&limit=${limit}&${queryString.toQueryString(params)}`, {
     headers: {
-      Authorization: acess_token,
+      Authorization: acessToken,
     },
   });
 }
-
 
 /**
  * 添加商品信息
@@ -24,11 +23,11 @@ export async function queryGoods({ params = '', offset = 0, limit = 10 }) {
  * @param {object} data 商品数据
 */
 export async function addGood({ data }) {
-  const acess_token = Cookies.get('access_token');
-  return lyRequest(`${API_URL}/goods`, {
+  const acessToken = Cookies.get('access_token');
+  return lyRequest(`${API_URL}/supplier/goods`, {
     method: 'post',
     headers: {
-      Authorization: acess_token,
+      Authorization: acessToken,
     },
     data: {
       ...data,
@@ -40,18 +39,17 @@ export async function addGood({ data }) {
  * 商品上上下架
  * @param {string=} goodId 商品ID
  * @param {string=} GoodStatus 商品状态 [0,下架，1,上架]
- * 
+ *
  */
-export async function modifyGoodStatus({ goodId, goodStatus, publishType, desc }) {
-  console.log('下架service', publishType, desc);
-  const acess_token = Cookies.get('access_token');
-  return lyRequest(`${API_URL}/goods/${goodId}/publish_status`, {
+export async function modifyGoodStatus({ gno, goodStatus, publishType, desc }) {
+  const acessToken = Cookies.get('access_token');
+  return lyRequest(`${API_URL}/supplier/goods/${gno}/publish_status`, {
     method: 'put',
     headers: {
-      Authorization: acess_token,
+      Authorization: acessToken,
     },
     data: {
-      is_publish: goodStatus,
+      apply_publish_status: goodStatus,
       publish_type: publishType,
       desc,
     },
@@ -66,12 +64,12 @@ export async function modifyGoodStatus({ goodId, goodStatus, publishType, desc }
  * @param {object} data 商品数据
  *
 */
-export async function modifyGoodInfo({ goodId, data }) {
-  const acess_token = Cookies.get('access_token');
-  return lyRequest(`${API_URL}/goods/${goodId}`, {
+export async function modifyGoodInfo({ gno, data }) {
+  const acessToken = Cookies.get('access_token');
+  return lyRequest(`${API_URL}/supplier/goods/${gno}`, {
     method: 'put',
     headers: {
-      Authorization: acess_token,
+      Authorization: acessToken,
     },
     data: {
       ...data,
@@ -82,16 +80,16 @@ export async function modifyGoodInfo({ goodId, data }) {
 /**
  * 修改商品价格
  *
- * @param {string} goodId 商品唯一ID
+ * @param {string} gno 商品唯一ID
  * @param {object} data 商品价格区间
  *
 */
-export async function modifyGoodPrice({ goodId, data }) {
-  const acess_token = Cookies.get('access_token');
-  return lyRequest(`${API_URL}/goods/${goodId}/price`, {
+export async function modifyGoodPrice({ gno, data }) {
+  const acessToken = Cookies.get('access_token');
+  return lyRequest(`${API_URL}/supplier/goods/${gno}/price`, {
     method: 'put',
     headers: {
-      Authorization: acess_token,
+      Authorization: acessToken,
     },
     data: {
       ...data,
@@ -104,12 +102,12 @@ export async function modifyGoodPrice({ goodId, data }) {
  *
  * @param {number} productId 商品id
 */
-export async function queryGoodDetail({ goodId }) {
-  const acess_token = Cookies.get('access_token');
-  return lyRequest(`${API_URL}/goods/${goodId}`, {
+export async function queryGoodDetail({ gno }) {
+  const acessToken = Cookies.get('access_token');
+  return lyRequest(`${API_URL}/supplier/goods/${gno}`, {
     method: 'get',
     headers: {
-      Authorization: acess_token,
+      Authorization: acessToken,
     },
   });
 }
@@ -121,11 +119,11 @@ export async function queryGoodDetail({ goodId }) {
  * @param {array} ids 商品id数组
 */
 export async function removeProducts({ ids }) {
-  const acess_token = Cookies.get('access_token');
+  const acessToken = Cookies.get('access_token');
   return lyRequest(`${API_URL}/goods`, {
     method: 'delete',
     headers: {
-      Authorization: acess_token,
+      Authorization: acessToken,
     },
     data: {
       ids,
@@ -139,22 +137,43 @@ export async function removeProducts({ ids }) {
  * @param {array} ids 商品id数组
 */
 export async function queryOperationLog({ module, goodId }) {
-  const acess_token = Cookies.get('access_token');
+  const acessToken = Cookies.get('access_token');
   return lyRequest(`${API_URL}/operationlogs?module=${module}&object_id=${goodId}`, {
     method: 'get',
     headers: {
-      Authorization: acess_token,
+      Authorization: acessToken,
+    },
+  });
+}
+
+// 获取关联产品列表
+export async function queryAssociatedProduct({ params = '', offset = 0, limit = 10 }) {
+  const acessToken = Cookies.get('access_token');
+  return lyRequest(`${API_URL}/supplier/product_models?offset=${offset}&limit=${limit}&${queryString.toQueryString(params)}`, {
+    headers: {
+      Authorization: acessToken,
+    },
+  });
+}
+
+// 获取关联产品详情
+export async function queryAssociatedProductDetail({ mno }) {
+  const acessToken = Cookies.get('access_token');
+  return lyRequest(`${API_URL}/supplier/product_models/${mno}`, {
+    method: 'get',
+    headers: {
+      Authorization: acessToken,
     },
   });
 }
 
 // 导出数据
 export async function exportGood({ fields }) {
-  const acess_token = Cookies.get('access_token');
+  const acessToken = Cookies.get('access_token');
   return lyRequest(`${API_URL}/goods/goods_reports`, {
     method: 'post',
     headers: {
-      Authorization: acess_token,
+      Authorization: acessToken,
     },
     data: {
       fields,
