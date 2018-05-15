@@ -1,6 +1,6 @@
-import { Modal, notification } from 'antd';
 import axios from 'axios';
-import { login, logout, jumpToLogin } from '../services/user';
+import { Modal, notification } from 'antd';
+import { login, jumpToLogin } from '../services/user';
 
 
 const codeMessage = {
@@ -22,7 +22,7 @@ const codeMessage = {
 };
 // Create an instance using the config defaults provided by the library
 // At this point the timeout config value is `0` as is the default for the library
-const instance = axios.create();
+const instance = axios.create({ timeout: 1000 });
 
 // Override timeout default for the library
 // Now all requests will wait 2.5 seconds before timing out
@@ -36,7 +36,6 @@ axios.interceptors.request.use((config) => {
   return config;
 }, (error) => {
   // Do something with request error
-  // console.log("--每次请求配置错误：", error);
   return Promise.reject(error);
 });
 
@@ -47,7 +46,16 @@ axios.interceptors.response.use((response) => {
   return response;
 }, (error) => {
   // 请求错误服务器返回的信息
-  const response = error.response;
+  if (!error.response) {
+    if (error.code === 'ECONNABORTED') {
+      Modal.warning({
+        title: '提示',
+        content: '请求超时，请稍后刷新页面再试...',
+      });
+    }
+    return Promise.reject(error);
+  }
+  const { response } = error;
   /*
    * 如果响应头是以200开头，则是登录验证出了问题，跳转到登录页面
    *   20001  token不存在
@@ -58,8 +66,7 @@ axios.interceptors.response.use((response) => {
    * */
   if ((response.data.rescode >> 0) === 30001) {
     // 没有权限
-    alert(response.data.msg);
-    // logout();
+    alert('非管理员账号,没有此系统权限');
     jumpToLogin();
     return;
   }
@@ -80,6 +87,6 @@ axios.interceptors.response.use((response) => {
     message: `${response.status}错误`,
     description: codeMessage[response.status],
   });
-  console.log('服务器错误:', error.response);
+
   return Promise.reject(error);
 });

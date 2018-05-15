@@ -1,3 +1,6 @@
+import { isUrl } from '../utils/utils';
+
+
 const menuData = [{
   name: '商品管理',
   icon: 'shop',
@@ -44,23 +47,22 @@ const menuData = [{
   ],
 }];
 
-function formatter(data, parentPath = '') {
-  const list = [];
-  data.forEach((item) => {
-    if (item.children) {
-      list.push({
-        ...item,
-        path: `${parentPath}${item.path}`,
-        children: formatter(item.children, `${parentPath}${item.path}/`),
-      });
-    } else {
-      list.push({
-        ...item,
-        path: `${parentPath}${item.path}`,
-      });
+function formatter(data, parentPath = '/', parentAuthority) {
+  return data.map((item) => {
+    let { path } = item;
+    if (!isUrl(path)) {
+      path = parentPath + item.path;
     }
+    const result = {
+      ...item,
+      path,
+      authority: item.authority || parentAuthority,
+    };
+    if (item.children) {
+      result.children = formatter(item.children, `${parentPath}${item.path}/`, item.authority);
+    }
+    return result;
   });
-  return list;
 }
 
 export const getMenuData = () => formatter(menuData);

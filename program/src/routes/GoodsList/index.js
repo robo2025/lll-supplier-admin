@@ -206,7 +206,6 @@ export default class GoodsList extends Component {
   * @param {object} obj json对象，产品属性key=>value
   */
   handleGoodPrice = (obj) => {
-    console.log('价格改变', obj);
     this.setState({
       prices: obj.prices,
     });

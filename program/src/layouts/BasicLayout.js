@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Layout, Icon, message } from 'antd';
 import DocumentTitle from 'react-document-title';
 import { connect } from 'dva';
-import { Route, Redirect, Switch } from 'dva/router';
+import { Route, Redirect, Switch, routerRedux } from 'dva/router';
 import { ContainerQuery } from 'react-container-query';
 import classNames from 'classnames';
 import { enquireScreen } from 'enquire-js';
@@ -14,8 +14,12 @@ import SiderMenu from '../components/SiderMenu';
 import NotFound from '../routes/Exception/404';
 import { getRoutes } from '../utils/utils';
 import { getMenuData } from '../common/menu';
+import Authorized from '../utils/Authorized';
 import logo from '../assets/logo.svg';
 import { logout } from '../services/user';
+
+const { AuthorizedRoute, check } = Authorized;
+
 
 /**
  * 根据菜单取得重定向地址.
@@ -86,19 +90,39 @@ class BasicLayout extends React.PureComponent {
     });
 
     /*  this.props.dispatch({
-      type: 'user/fetch',
-    }); */
-    // console.log("基础也渲染好了")
+       type: 'user/fetch',
+     }); */
+    // console.log('基础也渲染好了', Cookies.get('userinfo'));
   }
   getPageTitle() {
     const { routerData, location } = this.props;
     const { pathname } = location;
-    let title = '孚中数据';
+    let title = '工业魔方';
     if (routerData[pathname] && routerData[pathname].name) {
-      title = `${routerData[pathname].name} - Ant Design Pro`;
+      title = `${routerData[pathname].name} - 工业魔方`;
     }
     return title;
   }
+  getBashRedirect = () => {
+    // According to the url parameter to redirect
+    // 这里是重定向的,重定向到 url 的 redirect 参数所示地址
+    const urlParams = new URL(window.location.href);
+
+    const redirect = urlParams.searchParams.get('redirect');
+    // Remove the parameters in the url
+    if (redirect) {
+      urlParams.searchParams.delete('redirect');
+      window.history.replaceState(null, 'redirect', urlParams.href);
+    } else {
+      const { routerData } = this.props;
+      // get the first authorized route path in routerData
+      const authorizedPath = Object.keys(routerData).find(
+        item => check(routerData[item].authority, item) && item !== '/'
+      );
+      return authorizedPath;
+    }
+    return redirect;
+  };
   handleMenuCollapse = (collapsed) => {
     this.props.dispatch({
       type: 'global/changeLayoutCollapsed',
@@ -113,8 +137,15 @@ class BasicLayout extends React.PureComponent {
     });
   }
   handleMenuClick = ({ key }) => {
-    // 退出登录
-    logout();
+    console.log('退出登录');
+    if (key === 'triggerError') {
+      this.props.dispatch(routerRedux.push('/exception/trigger'));
+      return;
+    }
+    if (key === 'logout') {
+      // 退出登录
+      logout();
+    }
   }
   handleNoticeVisibleChange = (visible) => {
     if (visible) {
@@ -128,11 +159,17 @@ class BasicLayout extends React.PureComponent {
       collapsed, fetchingNotices, notices, routerData, match, location,
     } = this.props;
     const currentUser = Cookies.get('userinfo') ? JSON.parse(Cookies.get('userinfo')) : {};
+    const bashRedirect = this.getBashRedirect();
 
-    // console.log('baseLayout', this.props);
     const layout = (
       <Layout>
         <SiderMenu
+          logo={logo}
+          // 不带Authorized参数的情况下如果没有权限,会强制跳到403界面
+          // If you do not have the Authorized parameter
+          // you will be forced to jump to the 403 interface without permission
+          Authorized={Authorized}
+          menuData={getMenuData()}
           collapsed={collapsed}
           location={location}
           isMobile={this.state.isMobile}
@@ -154,21 +191,19 @@ class BasicLayout extends React.PureComponent {
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
             <div style={{ minHeight: 'calc(100vh - 260px)' }}>
               <Switch>
-                {
-                  redirectData.map(item =>
-                    <Redirect key={item.from} exact from={item.from} to={item.to} />
-                  )
-                }
-                {
-                  getRoutes(match.path, routerData).map(item => (
-                    <Route
-                      key={item.key}
-                      path={item.path}
-                      component={item.component}
-                      exact={item.exact}
-                    />
-                  ))
-                }
+                {redirectData.map(item => (
+                  <Redirect key={item.from} exact from={item.from} to={item.to} />
+                ))}
+                {getRoutes(match.path, routerData).map(item => (
+                  <AuthorizedRoute
+                    key={item.key}
+                    path={item.path}
+                    component={item.component}
+                    exact={item.exact}
+                    authority={item.authority}
+                    redirectPath="/exception/403"
+                  />
+                ))}
                 <Redirect exact from="/" to="/test" />
                 <Route render={NotFound} />
               </Switch>

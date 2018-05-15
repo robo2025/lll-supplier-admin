@@ -1,20 +1,15 @@
 import Cookies from 'js-cookie';
-import { LOGIN_URL, NEXT_URL, HOME_PAGE, VERIFY_PAGE } from '../constant/config';
-import { getUserInfo } from '../services/user';
+import { LOGIN_URL, VERIFY_PAGE } from '../constant/config';
 
 // 验证是否登录
 export function verifyLogin() {
-  console.log('下面进入验证程序');
-  const href = window.location.href;
-  console.log('页面地址:', href);
+  const { href } = window.location;
   const paramas = queryString.parse(href);
   /* 判断url是否有access_token,如果有则将其存储到cookie */
   if (paramas.access_token) {
-    const access_token = paramas.access_token.split('#/')[0];
-    console.log('token:', access_token);
-    Cookies.set('access_token', access_token, { expires: 7 });
+    const accessToken = paramas.access_token.split('#/')[0];
+    Cookies.set('access_token', accessToken, { expires: 7 });
   } else {
-    console.log('不存在token');
     window.location.href = `${LOGIN_URL}?next=${VERIFY_PAGE}`;
   }
   // 读取cookie，如果没有access_token,则跳转到登录页面
@@ -69,14 +64,14 @@ export const queryString = {
 };
 
 
-// 验证文件类型
-export function checkFile(filename, filelist) {
-  const postfix = filename.split('.')[1];
-  for (let i = 0, fileLen = filelist.length; i < fileLen; i++) {
-    if (postfix === filelist[i]) {
-      return true;
-    }
-  }
+/**
+ * 验证文件后缀是否符合要求
+ * @param {string} fileName 文件名
+ * @param {array} fileNameArr 包含文件名的数组
+ */
+export function checkFile(fileName, fileNameArr) {
+  const partter = '(\\.' + fileNameArr.join('|\\.') + ')$';
+  return new RegExp(partter, 'i').test(fileName);
 }
 
 
@@ -141,15 +136,14 @@ export function replaceObjFromArr(obj, arr, key) {
   return isExist ? newArr : [...newArr, obj];
 }
 
-
-/**
- * 给一个json数组中的每一个元素增加key-value
- * 
- */
-export function addKeyValToArr(arr, obj) {
-  return arr.map((val) => {
-    return { ...val, ...obj };
-  });
+// 根据指定的Key删除对象数组中的某一个对象
+export function removeObjFromArr(obj, arr, key) {
+  if (!Array.isArray(arr)) {
+    throw new Error('传参必须是数组');
+  }
+  return arr.filter(val => (
+    obj[key] !== val[key]
+  ));
 }
 
 
@@ -170,5 +164,23 @@ export function handleServerMsgObj(obj) {
     return obj[objKeys[0]];
   } else if (typeof obj === 'string') {
     return handleServerMsg(obj);
+  }
+}
+
+// 将以秒为单位的时间转换成人性化的字符串
+export function transformSecondsToHuman(seconds) {
+  const data = {
+    h: '', // 时
+    m: '', // 分
+    s: '', // 秒
+    str: '',
+  };
+  if (seconds < 60) {
+    data.h = 0;
+    data.m = 0;
+    data.s = seconds;
+    data.str = seconds + 's';
+  } else if (seconds > 216000) {
+    data.h = seconds / 360;
   }
 }
