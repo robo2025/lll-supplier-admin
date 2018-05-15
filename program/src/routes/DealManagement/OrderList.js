@@ -385,6 +385,7 @@ export default class OrderList extends Component {
       showQuickJumper: true,
       defaultCurrent: this.state.args.page >> 0 || 1,
       defaultPageSize: this.state.limit || 10,
+
       total,
     };
 
