@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import { Row, Col, Card, Form, Input, Select, Icon, Button, DatePicker, Modal, message, Pagination, Spin } from 'antd';
 import { connect } from 'dva';
+import qs from 'qs';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import List from '../../components/List/List';
 import InvoiceContent from '../../components/ModalContent/InvoiceContent';
 import OpenReceiptContent from '../../components/ModalContent/OpenReceiptContent';
 import ExceptionContent from '../../components/ModalContent/ExceptionContent';
+import { PAGE_SIZE } from '../../constant/config';
 import { handleServerMsgObj } from '../../utils/tools';
 
 import styles from './OrderList.less';
@@ -35,14 +37,17 @@ export default class OrderList extends Component {
       exceptionInfo: {}, // 异常Form信息
       openReceipt: [], // 开票信息
       data: {},
-      currentPage: 1,
+      args: qs.parse(props.location.search, { ignoreQueryPrefix: true }),
     };
   }
 
   componentDidMount() {
     const { dispatch } = this.props;
+    const { args } = this.state;
     dispatch({
       type: 'orders/fetch',
+      offset: (args.page - 1) * PAGE_SIZE,
+      limit: PAGE_SIZE,
     });
     dispatch({
       type: 'upload/fetch',
@@ -166,11 +171,7 @@ export default class OrderList extends Component {
 
   // 校验表单：传入的是this.props.form对象
   validateForm = (formObj) => {
-    console.log('我被调用了');
     this.formObj = formObj;
-    // formObj.validateFields((error, values) => {
-    //   console.log('校验出错', error, values);
-    // });
   }
 
   toggleForm = () => {
@@ -206,14 +207,21 @@ export default class OrderList extends Component {
 
   // 处理表单改变
   handlePaginationChange = (page, pageSize) => {
+    const { dispatch, history } = this.props;
+
     const params = {
       currentPage: page,
       offset: (page - 1) * pageSize,
       limit: pageSize,
     };
     this.setState(params);
-    const { dispatch } = this.props;
-    console.log('分页改变', params);
+
+    // 分页：将页数提取到url上
+    history.push({
+      pathname: '/deal/orders',
+      search: `?page=${params.currentPage}`,
+    });
+
     dispatch({
       type: 'orders/fetch',
       supplierId: 100,
@@ -363,21 +371,19 @@ export default class OrderList extends Component {
   render() {
     const { orders, loading, upload } = this.props;
     const { total } = orders;
-    console.log('订单总量', total);
     const {
       isShowDeliveryModal,
       isShowOpenModal,
       isShowExceptionModal,
       openReceipt,
       data,
-      currentPage,
     } = this.state;
     const uploadToken = upload.upload_token;
 
     const paginationOptions = {
       showSizeChanger: true,
       showQuickJumper: true,
-      current: currentPage,
+      defaultCurrent: this.state.args.page >> 0 || 1,
       defaultPageSize: this.state.limit || 10,
       total,
     };
