@@ -193,7 +193,8 @@ export default class NewGood extends Component {
           <p>搜索功能还没有提供接口</p>
         </div>
       ),
-      onOk() { },
+      onOk() {
+      },
     });
   }
 
