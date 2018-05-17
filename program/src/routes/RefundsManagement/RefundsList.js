@@ -21,9 +21,11 @@ const { RangePicker } = DatePicker;
 export default class RefundsList extends Component {
   constructor(props) {
     super(props);
+    const args = qs.parse(props.location.search, { ignoreQueryPrefix: true });
     this.state = {
       expandForm: false,
-      args: qs.parse(props.location.search, { ignoreQueryPrefix: true }),
+      currentPage: args.page ? args.page >> 0 : 1,
+      args,
     };
   }
 
@@ -33,7 +35,7 @@ export default class RefundsList extends Component {
 
     dispatch({
       type: 'orders/fetchRefunds',
-      offset: (args.page - 1) * PAGE_SIZE,
+      offset: args.page ? (args.page - 1) * PAGE_SIZE : 0,
       limit: PAGE_SIZE,
     });
   }
@@ -71,30 +73,28 @@ export default class RefundsList extends Component {
     });
   }
 
-    // 处理表单改变
-    handlePaginationChange = (page, pageSize) => {
-      const { dispatch, history } = this.props;
+  // 处理表单改变
+  handlePaginationChange = (page, pageSize) => {
+    const { dispatch, history } = this.props;
 
-      const params = {
-        currentPage: page,
-        offset: (page - 1) * pageSize,
-        limit: pageSize,
-      };
-      this.setState(params);
+    const params = {
+      currentPage: page,
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+    };
+    this.setState(params);
 
-      // 分页：将页数提取到url上
-      history.push({
-        pathname: '/refunds/list',
-        search: `?page=${params.currentPage}`,
-      });
+    // 分页：将页数提取到url上
+    history.push({
+      search: `?page=${params.currentPage}`,
+    });
 
-      dispatch({
-        type: 'orders/fetch',
-        supplierId: 100,
-        offset: params.offset,
-        limit: params.limit,
-      });
-    }
+    dispatch({
+      type: 'orders/fetchRefunds',
+      offset: params.offset,
+      limit: params.limit,
+    });
+  }
 
   // 确认收货
   handleConfirmReturn = ({ orderId, status }) => {
@@ -232,11 +232,11 @@ export default class RefundsList extends Component {
   render() {
     const { orders, loading } = this.props;
     const { total } = orders;
-    const { args } = this.state;
+    const { args, currentPage } = this.state;
     const paginationOptions = {
       showSizeChanger: true,
       showQuickJumper: true,
-      defaultCurrent: args.page ? args.page >> 0 : 1,
+      current: currentPage,
       defaultPageSize: this.state.limit || 10,
       total,
     };

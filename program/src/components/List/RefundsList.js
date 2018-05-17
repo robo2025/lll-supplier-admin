@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Row, Col } from 'antd';
+import { REFUND_STATUS } from '../../constant/statusList';
 import styles from './List.less';
 
 const mapRefundStatus = ['等待退款', '退款完成'];
@@ -7,7 +8,6 @@ const mapRefundProgress = [{ color: '#2395FF' }, { color: '#52C41A' }];
 
 class RefundsList extends Component {
   render() {
-    console.log('-------------------');
     const { header, data, onConfirmReturn } = this.props;
     return (
       <div className={styles.list}>
@@ -16,7 +16,7 @@ class RefundsList extends Component {
       </div>
     );
   }
-};
+}
 
 
 const ListItem = ({ data, onConfirmReturn }) => (
@@ -44,7 +44,7 @@ const ListItem = ({ data, onConfirmReturn }) => (
       <span className="delivery">（含运费：0元）</span>
     </Col>
     <Col span={2} className="item vertical" style={mapRefundProgress[data.status - 1]}>
-      {mapRefundStatus[data.status - 1]}
+      {REFUND_STATUS[data.refund_status]}
     </Col>
     <Col span={3} className="extra item vertical">
       {/* <span
