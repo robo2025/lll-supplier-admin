@@ -26,7 +26,7 @@ const instance = axios.create({ timeout: 1000 });
 
 // Override timeout default for the library
 // Now all requests will wait 2.5 seconds before timing out
-instance.defaults.timeout = 1000;
+instance.defaults.timeout = 5000;
 
 // Add a request interceptor
 axios.interceptors.request.use((config) => {
