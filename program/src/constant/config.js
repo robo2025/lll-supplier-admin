@@ -18,7 +18,7 @@ export const UPLOAD_URL = '//api-common-service.robo2025.com';
 export const USERS_URL = '//api-user.robo2025.com';
 
 // 订单系统接口
-export const ORDERS_URL = '//api-order.robo2025.com';
+export const ORDERS_URL = '//testapi.robo2025.com/order';
 
 // 验证登录接口URL
 export const LOGIN_URL = `${URL}/server/authorize`;
