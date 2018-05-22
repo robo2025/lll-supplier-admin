@@ -40,6 +40,7 @@ export default class NewGood extends Component {
             min_quantity: 10, // 最小数量
             max_quantity: 100, // 最大数量
             price: '1000', // 价格
+            shipping_fee_type: 0, // 包邮
             lead_time: '1天', // 货期
           },
         ],
@@ -167,6 +168,62 @@ export default class NewGood extends Component {
     });
   }
 
+  handleFormReset = () => {
+    const { form, dispatch } = this.props;
+    form.resetFields();
+    this.setState({
+      formValues: {},
+    });
+    dispatch({
+      type: 'good/fetchAassociatedProduct',
+    });
+  }
+
+  // 搜索
+  handleSearch = (e) => {
+    e.preventDefault();
+
+    const { dispatch, form } = this.props;
+
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+
+      const createTime = {};
+      if (fieldsValue.create_time) {
+        createTime.created_start = fieldsValue.create_time[0].format('YYYY-MM-DD');
+        createTime.created_end = fieldsValue.create_time[1].format('YYYY-MM-DD');
+      }
+      const values = {
+        ...fieldsValue,
+        ...createTime,
+      };
+
+      const {
+        gno,
+        pno,
+        mno,
+        partnumber,
+        created_start,
+        created_end,
+      } = values;
+      this.setState({
+        formValues: values,
+      });
+
+      dispatch({
+        type: 'good/fetchAassociatedProduct',
+        params: {
+          gno,
+          pno,
+          mno,
+          partnumber,
+          created_start,
+          created_end,
+        },
+      });
+    });
+  }
+
   /**
   * 提交商品信息
   *
@@ -174,6 +231,10 @@ export default class NewGood extends Component {
   handleSubmitProduct = () => {
     const { fields, args } = this.state;
     const { dispatch, history } = this.props;
+    if (!args.mno) {
+      message.error('你还没有选择产品');
+      return;
+    }
     dispatch({
       type: 'good/add',
       data: {
@@ -182,19 +243,6 @@ export default class NewGood extends Component {
       },
       success: () => { history.push('/goods/list'); },
       error: (res) => { message.error(res.msg, 2.5); },
-    });
-  }
-
-  handleSearch = () => {
-    Modal.info({
-      title: '提示',
-      content: (
-        <div>
-          <p>搜索功能还没有提供接口</p>
-        </div>
-      ),
-      onOk() {
-      },
     });
   }
 
@@ -215,14 +263,14 @@ export default class NewGood extends Component {
           </Col>
           <Col xll={6} md={8} sm={24}>
             <FormItem label="型号">
-              {getFieldDecorator('type')(
+              {getFieldDecorator('mno')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={6} md={8} sm={24}>
             <FormItem label="品牌">
-              {getFieldDecorator('brand')(
+              {getFieldDecorator('brand_name')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
@@ -238,7 +286,7 @@ export default class NewGood extends Component {
           </Col>
           <Col xll={8} md={8} sm={24}>
             <FormItem label="产品名称">
-              {getFieldDecorator('catalog')(
+              {getFieldDecorator('product_name')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>

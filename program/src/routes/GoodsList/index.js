@@ -212,7 +212,7 @@ export default class GoodsList extends Component {
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
-    const { dispatch } = this.props;
+    const { dispatch, history } = this.props;
     const params = {
       currentPage: pagination.current,
       pageSize: pagination.pageSize,
@@ -221,7 +221,6 @@ export default class GoodsList extends Component {
 
     // 分页：将页数提取到url上
     history.push({
-      pathname: '/goods/list',
       search: `?page=${params.currentPage}`,
     });
 
@@ -239,8 +238,7 @@ export default class GoodsList extends Component {
       formValues: {},
     });
     dispatch({
-      type: 'rule/fetch',
-      payload: {},
+      type: 'good/fetch',
     });
   }
 

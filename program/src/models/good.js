@@ -82,13 +82,7 @@ export default {
       const res = yield call(modifyGoodInfo, { gno, data });
       if (res.rescode >> 0 === SUCCESS_STATUS) {
         if (typeof success === 'function') { success(res); }
-      } else if (typeof error === 'function') { error(res); return; }
-
-      const response = yield call(queryGoods);
-      yield put({
-        type: 'modify',
-        payload: response.data,
-      });
+      } else if (typeof error === 'function') { error(res); }
     },
     *modifyGoodStatus({ gno, goodStatus, publishType, desc, success, error }, { call }) {
       const res = yield call(modifyGoodStatus, { gno, goodStatus, publishType, desc });

@@ -32,7 +32,7 @@ const EditableCell = ({ editable, value, onChange, minVal }) => (
 );
 
 const RadioGroupCell = ({ value, onChange }) => (
-  <RadioGroup onChange={onChange} value={value}>
+  <RadioGroup onChange={onChange} value={value} defaultValue={0}>
     <Radio value={0}>包邮</Radio>
     <Radio value={1}>到付</Radio>
   </RadioGroup>
@@ -91,7 +91,7 @@ export default class EditableTable extends Component {
     const nextPropsData = nextProps.data;
     if (Array.isArray(nextPropsData)) {
       this.setState({
-        data: addKeyValToArr(nextPropsData, { shipping_fee_type: 0, editable: true }),
+        data: addKeyValToArr(nextPropsData, { editable: true }),
       });
     }
   }
@@ -100,9 +100,12 @@ export default class EditableTable extends Component {
     console.log('价格设置handleChange', value, key, column);
     const { onChange } = this.props;
     const newData = [...this.state.data];
-    const target = newData.filter(item => key === item.id)[0];
+    let targetIdx = 0;
+    const target = newData.filter((item, idx) => { targetIdx = idx; return key === item.id; })[0];
     if (target) {
       target[column] = value;
+      newData[targetIdx] = target;
+      console.log('目标', targetIdx, newData);
       this.setState({ data: newData });
       // 把改变数据传给母组件
       onChange({ prices: newData });
@@ -190,6 +193,7 @@ export default class EditableTable extends Component {
 
 
   render() {
+    console.log('价格表格', this.state);
     return (
       <Table
         bordered

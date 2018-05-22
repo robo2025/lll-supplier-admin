@@ -8,7 +8,7 @@ import { queryString } from '../utils/tools';
  *  获取服务器商品列表
  *
 */
-export async function queryGoods({ params = '', offset = 0, limit = 10 }) {
+export async function queryGoods({ params = {}, offset = 0, limit = 10 }) {
   const acessToken = Cookies.get('access_token');
   return lyRequest(`${API_URL}/supplier/goods?offset=${offset}&limit=${limit}&${queryString.toQueryString(params)}`, {
     headers: {
@@ -147,7 +147,7 @@ export async function queryOperationLog({ module, goodId }) {
 }
 
 // 获取关联产品列表
-export async function queryAssociatedProduct({ params = '', offset = 0, limit = 10 }) {
+export async function queryAssociatedProduct({ params = {}, offset = 0, limit = 10 }) {
   const acessToken = Cookies.get('access_token');
   return lyRequest(`${API_URL}/supplier/product_models?offset=${offset}&limit=${limit}&${queryString.toQueryString(params)}`, {
     headers: {
