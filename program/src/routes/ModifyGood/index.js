@@ -110,13 +110,13 @@ export default class ModifyGood extends Component {
   *
   */
   handleSubmitProduct = () => {
-    const { fields } = this.state;
+    const { fields, args } = this.state;
     const { id, shelf_life, sales_unit, stock, min_buy, prices } = fields;
     const { dispatch } = this.props;
     console.log('修改产品信息', fields);
     dispatch({
       type: 'good/modifyInfo',
-      goodId: id,
+      gno: args.gno,
       data: {
         shelf_life, sales_unit, stock, min_buy, prices,
       },
