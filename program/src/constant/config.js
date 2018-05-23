@@ -17,7 +17,6 @@ export const UPLOAD_URL = '//api-common-service.robo2025.com';
 // 用户管理系统API URL
 export const USERS_URL = 'https://testapi.robo2025.com/user/service';
 
-
 // 订单系统接口
 export const ORDERS_URL = '//testapi.robo2025.com/order';
 

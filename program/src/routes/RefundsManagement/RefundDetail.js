@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Card, Icon, Table, Badge, Spin } from 'antd';
+import { Card, Icon, Table, Badge, Spin, Button } from 'antd';
 import { connect } from 'dva';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import DescriptionList from '../../components/DescriptionList';
 import { queryString } from '../../utils/tools';
+import { REFUND_STATUS } from '../../constant/statusList';
 import styles from './RefundDetail.less';
 
 const { Description } = DescriptionList;
@@ -113,7 +114,7 @@ export default class RefundDetail extends Component {
     super(props);
     this.state = {
       args: queryString.parse(window.location.href),
-      operationkey: 'tab1',      
+      operationkey: 'tab1',
     };
   }
 
@@ -155,22 +156,22 @@ export default class RefundDetail extends Component {
 
     const descriptionContent = (
       <DescriptionList className={styles.headerList} size="small" col="2">
-        <Description term="状态"><span><Badge status={mapOrderProgress[refundInfo.status - 1]} />{mapOrderStatus[refundInfo.status - 1]}</span></Description>
+        <Description term="状态"><span><Badge status={mapOrderProgress[refundInfo.status - 1]} />{REFUND_STATUS[refundInfo.status]}</span></Description>
         <Description term="退货金额"><span style={{ color: 'red' }}>￥{refundInfo.amount}元</span></Description>
         <Description term="客户订单号">{refundInfo.order_sn}</Description>
-        <Description term="运费">包邮</Description>
-        <Description term="退货单号">{refundInfo.refund_sn}</Description>
+        <Description term="运费">{refundInfo.freight}元</Description>
+        <Description term="退货单号">{refundInfo.returns_sn}</Description>
       </DescriptionList>
     );
     return (
       <PageHeaderLayout
-        title="退货单号：TH1611060005"
+        title={`退款单号：${refundInfo.refund_sn}`}
         logo={<img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />}
         content={descriptionContent}
       >
-        <Card title="退款说明" style={{ marginBottom: 24 }} bordered>
+        {/* <Card title="退款说明" style={{ marginBottom: 24 }} bordered>
           <div>{orderInfo.remarks}</div>
-        </Card>
+        </Card> */}
         {/* <Card title="退货商品明细" style={{ marginBottom: 24 }} bordered>
           <Table
             style={{ marginBottom: 24 }}
@@ -196,7 +197,7 @@ export default class RefundDetail extends Component {
           style={{ marginBottom: 24 }}
           onTabChange={this.onOperationTabChange}
         >
-         {
+          {
             operations.length > 0 ?
               (
                 contentList[this.state.operationkey]
@@ -207,6 +208,9 @@ export default class RefundDetail extends Component {
                 </div>
               )
           }
+          <div className={styles['submit-btn-wrap']}>
+            <Button type="primary" onClick={() => { this.props.history.goBack(); }}>返回列表</Button>
+          </div>
         </Card>
       </PageHeaderLayout>
     );

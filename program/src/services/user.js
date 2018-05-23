@@ -12,10 +12,10 @@ export async function queryCurrent() {
 
 // 获取用户信息
 export async function getUserInfo() {
-  const access_token = Cookies.get('access_token');
+  const accessToken = Cookies.get('access_token');
   return lyRequest(`${URL}/server/verify`, {
     headers: {
-      Authorization: access_token,
+      Authorization: accessToken,
     },
   });
 }
@@ -26,11 +26,11 @@ export function register() {
 }
 // 登出
 export function logout() {
-  const access_token = Cookies.get('access_token');
-  if (access_token) {
+  const accessToken = Cookies.get('access_tokT');
+  if (accessToken) {
     Cookies.remove('access_token');
     Cookies.remove('userinfo');
-    window.location.href = `${LOGOUT_URL}?access_token=${access_token}&next=${HOME_PAGE}`;
+    window.location.href = `${LOGOUT_URL}?access_token=${accessToken}&next=${HOME_PAGE}`;
   } else {
     window.location.href = `${LOGOUT_URL}`;
   }
@@ -43,7 +43,6 @@ export function login() {
 }
 
 
-// 纯跳转到首页，不带next参数
 export function jumpToLogin() {
-  window.location.href = `${LOGIN_URL}?next=${encodeURIComponent(HOME_PAGE)}&disable_redirect=1`;
+  window.location.href = `${LOGIN_URL}?next=${encodeURIComponent(VERIFY_PAGE)}&disable_redirect=1`;
 }

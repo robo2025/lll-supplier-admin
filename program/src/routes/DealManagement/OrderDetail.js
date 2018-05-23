@@ -114,8 +114,8 @@ const columns = [{
 // 发票列
 const receiptColumns = [{
   title: '发票编号',
-  dataIndex: 'order_sn',
-  key: 'order_sn',
+  dataIndex: 'receipt_sn',
+  key: 'receipt_sn',
 }, {
   title: '发票照片',
   dataIndex: 'images',
