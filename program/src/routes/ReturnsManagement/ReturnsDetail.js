@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Icon, Table, Badge, Spin } from 'antd';
+import { Card, Table, Badge, Spin, Button } from 'antd';
 import { connect } from 'dva';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
@@ -42,67 +42,15 @@ const goodsColumns = [{
   key: 'univalent',
 }, {
   title: '单价优惠',
-  key: 'yh',
+  dataIndex: 'price_discount',
+  key: 'price_discount',
   rener: () => (<span>无</span>),
 }, {
   title: '商品销售单价',
   key: 'sold_price',
   render: text => (<span>{text.univalent - 0}</span>),
 }];
-// 发货记录列
-const logisticsColumns = [{
-  title: '商品ID',
-  dataIndex: 'good_sn',
-  key: 'good_sn',
-}, {
-  title: '商品名称',
-  dataIndex: 'good_name',
-  key: 'good_name',
-}, {
-  title: '型号',
-  dataIndex: 'model',
-  key: 'model',
-}, {
-  title: '品牌',
-  dataIndex: 'brand',
-  key: 'brand',
-}, {
-  title: '发货日期',
-  dataIndex: 'delivery',
-  key: 'delivery',
-}, {
-  title: '送货人',
-  dataIndex: 'delivery_man',
-  key: 'delivery_man',
-}, {
-  title: '联系号码',
-  dataIndex: 'mobile',
-  key: 'mobile',
-}, {
-  title: '物流公司',
-  dataIndex: 'delivery_company',
-  key: 'delivery_company',
-}, {
-  title: '物流单号',
-  dataIndex: 'delivery_id',
-  key: 'delivery_id',
-}];
-// 操作记录列
-const columns = [{
-  title: '操作时间',
-  dataIndex: 'add_time',
-  key: 'add_time',
-  render: text => (<span>{moment(text * 1000).format('YYYY-MM-DD hh:mm:ss')}</span>),
-}, {
-  title: '操作记录',
-  dataIndex: 'execution_detail',
-  key: 'execution_detail',
-  render: val => <span>{val}</span>,
-}, {
-  title: '进程',
-  dataIndex: 'progress',
-  key: 'progress',
-}];
+
 const mapOrderProgress = ['processing', 'processing', 'error', 'success'];
 
 @connect(({ orders, loading }) => ({
@@ -114,7 +62,6 @@ export default class ReturnsDetail extends Component {
     super(props);
     this.state = {
       args: queryString.parse(window.location.href),
-      operationkey: 'tab1',      
     };
   }
 
@@ -140,19 +87,6 @@ export default class ReturnsDetail extends Component {
       return <Spin />;
     }
 
-    const contentList = {
-      tab1: <Table
-        pagination={{
-          defaultPageSize: 6,
-          pageSize: 6,
-        }}
-        loading={loading}
-        dataSource={operationRecord}
-        columns={columns}
-        rowKey="add_time"
-      />,
-    };
-
     const descriptionContent = (
       <DescriptionList className={styles.headerList} size="small" col="2">
         <Description term="状态"><span><Badge status={mapOrderProgress[returnInfo.status - 1]} />{RETURNS_STATUS[returnInfo.status]}</span></Description>
@@ -169,7 +103,7 @@ export default class ReturnsDetail extends Component {
         content={descriptionContent}
       >
         <Card title="退货说明" style={{ marginBottom: 24 }} bordered>
-          <div>{orderInfo.remarks || '无'}</div>
+          <div>{returnInfo.remarks || '无'}</div>
         </Card>
         <Card title="退货商品明细" style={{ marginBottom: 24 }} bordered>
           <Table
@@ -199,7 +133,7 @@ export default class ReturnsDetail extends Component {
          {
             operationRecord.length > 0 ?
               (
-                contentList[this.state.operationkey]               
+                contentList[this.state.operationkey]
               ) :
               (
                 <div className={styles.noData}>
@@ -208,6 +142,9 @@ export default class ReturnsDetail extends Component {
               )
           }
         </Card> */}
+        <div className={styles['submit-btn-wrap']}>
+          <Button type="primary" onClick={() => { this.props.history.goBack(); }}>返回列表</Button>
+        </div>
       </PageHeaderLayout>
     );
   }

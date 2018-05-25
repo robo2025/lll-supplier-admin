@@ -103,6 +103,14 @@ export default class ReturnsList extends Component {
       type: 'orders/fetchConfirmReturn',
       orderId,
       status,
+      success: () => {
+        const args = qs.parse(this.props.location.search, { ignoreQueryPrefix: true });
+        dispatch({
+          type: 'orders/fetchReturns',
+          offset: args.page ? (args.page - 1) * PAGE_SIZE : 0,
+          limit: PAGE_SIZE,
+        });
+      },
     });
   }
 

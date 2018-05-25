@@ -14,7 +14,7 @@ class ReturnsList extends Component {
       </div>
     );
   }
-};
+}
 
 const ListItem = ({ data, onConfirmReturn }) => (
   <Row gutter={16} className="list-item">

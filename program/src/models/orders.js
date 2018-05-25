@@ -108,8 +108,8 @@ export default {
         headers,
       });
     },
-    *fetchReturns({ offset, limit,params, success, error }, { call, put }) {
-      const res = yield call(getReturnsOrders, { offset, limit,params });
+    *fetchReturns({ offset, limit, params, success, error }, { call, put }) {
+      const res = yield call(getReturnsOrders, { offset, limit, params });
       if (res.rescode >> 0 === SUCCESS_STATUS) {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); }
@@ -138,12 +138,6 @@ export default {
       if (res.rescode >> 0 === SUCCESS_STATUS) {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); }
-
-      const response = yield call(getReturnsOrders);
-      yield put({
-        type: 'saveReturns',
-        payload: response.data,
-      });
     },
     *fetchReturnDetail({ orderId, success, error }, { call, put }) {
       const res = yield call(getReturnOrderDetail, { orderId });
