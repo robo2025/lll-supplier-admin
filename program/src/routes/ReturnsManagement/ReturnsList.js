@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
+import qs from 'qs';
 import moment from 'moment';
-import { Row, Col, Card, Form, Input, Select, Icon, Button, DatePicker } from 'antd';
+import { Row, Col, Card, Form, Input, Select, Icon, Button, Pagination, DatePicker } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import { PAGE_SIZE } from '../../constant/config';
 import List from '../../components/List/ReturnsList';
 
 import styles from './ReturnsList.less';
@@ -19,15 +21,21 @@ const { RangePicker } = DatePicker;
 export default class ReturnsList extends Component {
   constructor(props) {
     super(props);
+    const args = qs.parse(props.location.search, { ignoreQueryPrefix: true });
     this.state = {
       expandForm: false,
+      currentPage: args.page ? args.page >> 0 : 1,
+      args,
     };
   }
 
   componentDidMount() {
     const { dispatch } = this.props;
+    const { args } = this.state;
     dispatch({
       type: 'orders/fetchReturns',
+      offset: args.page ? (args.page - 1) * PAGE_SIZE : 0,
+      limit: PAGE_SIZE,
     });
   }
 
@@ -62,6 +70,29 @@ export default class ReturnsList extends Component {
         type: 'orders/fetchSearch',
         data: values,
       });
+    });
+  }
+
+  // 处理分页改变
+  handlePaginationChange = (page, pageSize) => {
+    const { dispatch, history } = this.props;
+
+    const params = {
+      currentPage: page,
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+    };
+    this.setState(params);
+
+    // 分页：将页数提取到url上
+    history.push({
+      search: `?page=${params.currentPage}`,
+    });
+
+    dispatch({
+      type: 'orders/fetchReturns',
+      offset: params.offset,
+      limit: params.limit,
     });
   }
 
@@ -200,6 +231,15 @@ export default class ReturnsList extends Component {
 
   render() {
     const { orders, loading } = this.props;
+    const { total } = orders;
+    const { currentPage } = this.state;
+    const paginationOptions = {
+      showSizeChanger: true,
+      showQuickJumper: true,
+      current: currentPage,
+      defaultPageSize: this.state.limit || 10,
+      total,
+    };
     console.log('退货单列表--', orders.returns);
 
     return (
@@ -230,7 +270,7 @@ export default class ReturnsList extends Component {
                     <div>
                       <b>退货单编号：</b>
                       <a href="#" className="order-sn">{val.returns_sn}</a>
-                      <span className="order-time">({moment(val.returns_time * 1000).format('YYYY-MM-DD hh:mm')})</span>
+                      <span className="order-time">({moment(val.return_order_time * 1000).format('YYYY-MM-DD hh:mm')})</span>
                     </div>
                   </div>
                 );
@@ -245,6 +285,11 @@ export default class ReturnsList extends Component {
               })
             }
           </div>
+          <Pagination
+            className="pull-right"
+            {...paginationOptions}
+            onChange={this.handlePaginationChange}
+          />
         </Card>
       </PageHeaderLayout>
     );

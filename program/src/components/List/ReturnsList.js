@@ -41,12 +41,12 @@ const ListItem = ({ data, onConfirmReturn }) => (
       <span className="delivery">（含运费：0元）</span>
     </Col>
     <Col span={2} className="item vertical">
-      {RETURNS_STATUS[data.status]}
+      {RETURNS_STATUS[data.return_status]}
     </Col>
     <Col span={3} className="extra item vertical">
       <Button
         onClick={() => { onConfirmReturn({ orderId: data.id, status: 3 }); }}
-        disabled={data.status !== 2}
+        disabled={data.return_status >> 0 !== 2}
         size="small"
       >确认收货
       </Button>
@@ -56,7 +56,7 @@ const ListItem = ({ data, onConfirmReturn }) => (
 );
 
 // 退换货Header
-const ListHeader = data => (
+const ListHeader = () => (
   <Row gutter={16} className={styles['list-header']}>
     <Col span={15} className="item" >
       退货商品商品明细

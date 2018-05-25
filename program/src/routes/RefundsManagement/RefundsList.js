@@ -73,7 +73,7 @@ export default class RefundsList extends Component {
     });
   }
 
-  // 处理表单改变
+  // 处理分页改变
   handlePaginationChange = (page, pageSize) => {
     const { dispatch, history } = this.props;
 
@@ -232,7 +232,7 @@ export default class RefundsList extends Component {
   render() {
     const { orders, loading } = this.props;
     const { total } = orders;
-    const { args, currentPage } = this.state;
+    const { currentPage } = this.state;
     const paginationOptions = {
       showSizeChanger: true,
       showQuickJumper: true,
