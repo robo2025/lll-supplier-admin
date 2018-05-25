@@ -10,16 +10,7 @@ const FormItem = Form.Item;
 const { TabPane } = Tabs;
 const FILE_TYPES = ['jpg', 'png', 'gif', 'jpeg']; // 支持上传的文件类型
 const mapImageType = ['正面', '侧面', '反面', '包装图一', '包装图二', '包装图三'];
-// 将服务器目录转换成需求目录
-function getStanrdCatalog(data) {
-  data.forEach((val) => {
-    val.value = val.id;
-    val.label = val.category_name;
-    if (val.children.length > 0) {
-      getStanrdCatalog(val.children);
-    }
-  });
-}
+
 // 拼凑单个商品图片数据
 function getPic(key, pics) {
   if (!Array.isArray(pics)) {
@@ -47,7 +38,6 @@ function getPic(key, pics) {
     };
   },
   onValuesChange(props, values) {
-    console.log('----', values);
     props.onChange(values);
   },
 })
@@ -74,11 +64,6 @@ export default class NewGoodForm extends Component {
       d3: getPic('包装图3', ['this.pics']),
     };
   }
-
-  componentWillReceiveProps(nextProps) {
-    console.log('will reiceve', nextProps);
-  }
-
 
   handleCancel = () => this.setState({ previewVisible: false })
   handlePreview = (file) => {

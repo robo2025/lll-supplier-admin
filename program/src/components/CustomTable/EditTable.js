@@ -32,9 +32,9 @@ const EditableCell = ({ editable, value, onChange, minVal }) => (
 );
 
 const RadioGroupCell = ({ value, onChange }) => (
-  <RadioGroup onChange={onChange} value={value} defaultValue={0}>
+  <RadioGroup onChange={onChange} value={value || 0}>
     <Radio value={0}>包邮</Radio>
-    <Radio value={1}>到付</Radio>
+    {/* <Radio value={1}>到付</Radio> */}
   </RadioGroup>
 );
 
@@ -96,23 +96,27 @@ export default class EditableTable extends Component {
     }
   }
 
-  handleChange(value, key, column) {
+  handleChange = (value, key, column) => {
     console.log('价格设置handleChange', value, key, column);
     const { onChange } = this.props;
     const newData = [...this.state.data];
     let targetIdx = 0;
-    const target = newData.filter((item, idx) => { targetIdx = idx; return key === item.id; })[0];
-    if (target) {
+    const targetArr = newData.filter((item, idx) => {
+      if (parseInt(key, 10) === parseInt(item.id, 10)) { targetIdx = idx; }
+      return parseInt(key, 10) === parseInt(item.id, 10);
+    });
+    if (targetArr.length > 0) {
+      const target = targetArr[0];
       target[column] = value;
       newData[targetIdx] = target;
-      console.log('目标', targetIdx, newData);
+      // console.log('目标', targetIdx, target, newData);
       this.setState({ data: newData });
       // 把改变数据传给母组件
       onChange({ prices: newData });
     }
   }
 
-  edit(key) {
+  edit = (key) => {
     const newData = [...this.state.data];
     const target = newData.filter(item => key === item.id)[0];
     if (target) {
@@ -121,7 +125,7 @@ export default class EditableTable extends Component {
     }
   }
 
-  save(key) {
+  save = (key) => {
     const newData = [...this.state.data];
     const target = newData.filter(item => key === item.id)[0];
     if (target) {
@@ -131,7 +135,7 @@ export default class EditableTable extends Component {
     }
   }
 
-  cancel(key) {
+  cancel = (key) => {
     const newData = [...this.state.data];
     const target = newData.filter(item => key === item.id)[0];
     if (target) {
