@@ -108,8 +108,8 @@ export default {
         headers,
       });
     },
-    *fetchReturns({ offset, limit, success, error }, { call, put }) {
-      const res = yield call(getReturnsOrders, { offset, limit });
+    *fetchReturns({ offset, limit,params, success, error }, { call, put }) {
+      const res = yield call(getReturnsOrders, { offset, limit,params });
       if (res.rescode >> 0 === SUCCESS_STATUS) {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); }

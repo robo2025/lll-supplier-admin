@@ -53,7 +53,6 @@ export default class ReturnsList extends Component {
   // 处理表单搜索
   handleSearch = (e) => {
     e.preventDefault();
-    e.preventDefault();
 
     const { dispatch, form } = this.props;
 
@@ -67,8 +66,8 @@ export default class ReturnsList extends Component {
 
       console.log('搜索字段', values);
       dispatch({
-        type: 'orders/fetchSearch',
-        data: values,
+        type: 'orders/fetchReturns',
+        params: values,
       });
     });
   }
@@ -114,14 +113,14 @@ export default class ReturnsList extends Component {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="退货单号">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('returns_sn')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="客户订单号">
-              {getFieldDecorator('brand')(
+              {getFieldDecorator('order_sn')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
@@ -165,14 +164,14 @@ export default class ReturnsList extends Component {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="退货单号">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('returns_sn')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="客户订单号">
-              {getFieldDecorator('brand')(
+              {getFieldDecorator('order_sn')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>

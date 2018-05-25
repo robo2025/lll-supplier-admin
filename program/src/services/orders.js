@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie';
+import qs from 'qs';
 import { ORDERS_URL } from '../constant/config';
 import lyRequest from '../utils/lyRequest';
 import { queryString } from '../utils/tools';
@@ -96,9 +97,9 @@ export async function submitException({ orderId, data }) {
 }
 
 // 退货单列表接口
-export async function getReturnsOrders({ offset = 0, limit = 10 }) {
+export async function getReturnsOrders({ offset = 0, limit = 10, params = {} }) {
   const accessToken = Cookies.get('access_token');
-  return lyRequest(`${SUPPLIER_SYS_URL}/order?offset=${offset}&limit=${limit}&is_type=1`, {
+  return lyRequest(`${SUPPLIER_SYS_URL}/order?offset=${offset}&limit=${limit}&is_type=1&${qs.stringify(params)}`, {
     method: 'get',
     headers: {
       Authorization: accessToken,
@@ -174,8 +175,8 @@ export async function querySearchResults({
   const accessToken = Cookies.get('access_token');
   return lyRequest(`${ORDER_URL}/order?
   guest_order_sn=${guestOrderSN}&pay_status=${payStatus}&order_status=${orderStatus}&supplier_name=${supplierName}&guest_company_name=${guestCompanyName}&start_time=${startTime}&end_time=${endTime}`, {
-    headers: {
-      Authorization: accessToken,
-    },
-  });
+      headers: {
+        Authorization: accessToken,
+      },
+    });
 }
