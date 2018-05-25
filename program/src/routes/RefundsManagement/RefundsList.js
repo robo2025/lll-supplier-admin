@@ -114,7 +114,7 @@ export default class RefundsList extends Component {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="退货单号">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('returns_sn')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
@@ -127,12 +127,12 @@ export default class RefundsList extends Component {
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
-            <FormItem label="退货状态">
-              {getFieldDecorator('status')(
+            <FormItem label="退款状态">
+              {getFieldDecorator('returns_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">全部</Option>
-                  <Option value="1">待收货</Option>
-                  <Option value="2">确认收货</Option>
+                  <Option value="">全部</Option>
+                  <Option value="1">等待退款</Option>
+                  <Option value="2">退款完成</Option>
                 </Select>
               )}
             </FormItem>
@@ -178,12 +178,12 @@ export default class RefundsList extends Component {
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
-            <FormItem label="退货状态">
-              {getFieldDecorator('status')(
+            <FormItem label="退款状态">
+              {getFieldDecorator('returns_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">全部</Option>
-                  <Option value="1">待收货</Option>
-                  <Option value="2">确认收货</Option>
+                  <Option value="">全部</Option>
+                  <Option value="1">等待退款</Option>
+                  <Option value="2">退款完成</Option>
                 </Select>
               )}
             </FormItem>
