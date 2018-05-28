@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Button } from 'antd';
+import { Row, Tooltip, Col, Button } from 'antd';
 import { RETURNS_STATUS } from '../../constant/statusList';
 import styles from './List.less';
 
@@ -19,7 +19,9 @@ class ReturnsList extends Component {
 const ListItem = ({ data, onConfirmReturn }) => (
   <Row gutter={16} className="list-item">
     <Col span={3} className="item">
-      {data.order_sn}
+      <Tooltip placement="top" title={data.goods_sn}>
+        {data.goods_sn}
+      </Tooltip>
     </Col>
     <Col span={4} className="item">
       {data.goods_name}

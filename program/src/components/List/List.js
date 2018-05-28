@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Badge } from 'antd';
+import { Row, Col, Tooltip, Badge } from 'antd';
 import { ORDER_STATUS, ABNORMAL_TYPE } from '../../constant/statusList';
 import styles from './List.less';
 
@@ -63,7 +63,9 @@ const action = ({
 const ListItem = ({ data, onSendClick, onTakingClick, onOpenReceiptClick, onExceptionClick }) => (
   <Row gutter={16} className="list-item">
     <Col span={3} className="item">
-      {data.son_order_sn}
+      <Tooltip placement="top" title={data.goods_sn}>
+        {data.goods_sn}
+      </Tooltip>
     </Col>
     <Col span={5} className="item">
       {data.goods_name}-{data.model}
@@ -103,7 +105,7 @@ const ListItem = ({ data, onSendClick, onTakingClick, onOpenReceiptClick, onExce
           onExceptionClick,
         })
       }
-      <a href={`#/deal/orders/detail?id=${  data.id}`}>订单详情</a>
+      <a href={`#/deal/orders/detail?id=${data.id}`}>订单详情</a>
     </Col>
   </Row >
 );
