@@ -128,18 +128,20 @@ export default class ReturnsList extends Component {
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="客户订单号">
-              {getFieldDecorator('order_sn')(
+              {getFieldDecorator('guest_order_sn')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="退货状态">
-              {getFieldDecorator('status')(
+              {getFieldDecorator('order_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">全部</Option>
-                  <Option value="1">待收货</Option>
-                  <Option value="2">确认收货</Option>
+                  <Option value="">全部</Option>
+                  <Option value="1">申请退货中</Option>
+                  <Option value="2">退货中</Option>
+                  <Option value="3">退货失败</Option>
+                  <Option value="4">退货完成</Option>
                 </Select>
               )}
             </FormItem>
@@ -179,18 +181,20 @@ export default class ReturnsList extends Component {
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="客户订单号">
-              {getFieldDecorator('order_sn')(
+              {getFieldDecorator('guest_order_sn')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="退货状态">
-              {getFieldDecorator('status')(
+              {getFieldDecorator('order_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">全部</Option>
-                  <Option value="1">待收货</Option>
-                  <Option value="2">确认收货</Option>
+                  <Option value="">全部</Option>
+                  <Option value="1">申请退货中</Option>
+                  <Option value="2">退货中</Option>
+                  <Option value="3">退货失败</Option>
+                  <Option value="4">退货完成</Option>
                 </Select>
               )}
             </FormItem>

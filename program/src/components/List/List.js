@@ -31,7 +31,7 @@ class List extends Component {
       </div>
     );
   }
-};
+}
 
 const action = ({
   status,
@@ -103,7 +103,7 @@ const ListItem = ({ data, onSendClick, onTakingClick, onOpenReceiptClick, onExce
           onExceptionClick,
         })
       }
-      <a href={'#/deal/orders/detail?id=' + data.id}>订单详情</a>
+      <a href={`#/deal/orders/detail?id=${  data.id}`}>订单详情</a>
     </Col>
   </Row >
 );
@@ -112,7 +112,7 @@ const ListItem = ({ data, onSendClick, onTakingClick, onOpenReceiptClick, onExce
 const ListHeader = () => (
   <Row gutter={16} className={styles['list-header']}>
     <Col span={3} className="item">
-      订单号
+      商品ID
     </Col>
     <Col span={5} className="item">
       商品名称
