@@ -127,7 +127,7 @@ export default class ReturnsList extends Component {
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
-            <FormItem label="客户订单号">
+            <FormItem label="商品订单号">
               {getFieldDecorator('guest_order_sn')(
                 <Input placeholder="请输入" />
               )}
@@ -180,7 +180,7 @@ export default class ReturnsList extends Component {
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
-            <FormItem label="客户订单号">
+            <FormItem label="商品订单号">
               {getFieldDecorator('guest_order_sn')(
                 <Input placeholder="请输入" />
               )}
@@ -275,7 +275,7 @@ export default class ReturnsList extends Component {
                 const orderListItemHeader = (
                   <div className={styles['returns-list-header']}>
                     <div>
-                      <b>客户订单编号：</b>
+                      <b>商品订单编号：</b>
                       <a href="#" className="order-sn">{val.order_sn}</a>
                     </div>
                     <div>

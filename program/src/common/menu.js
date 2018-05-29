@@ -20,7 +20,7 @@ const menuData = [{
   path: 'deal',
   children: [
     {
-      name: '客户订单列表',
+      name: '商品订单列表',
       path: 'orders',
     },
   ],

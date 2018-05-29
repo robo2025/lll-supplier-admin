@@ -158,7 +158,7 @@ export default class RefundDetail extends Component {
       <DescriptionList className={styles.headerList} size="small" col="2">
         <Description term="状态"><span><Badge status={mapOrderProgress[refundInfo.status - 1]} />{REFUND_STATUS[refundInfo.status]}</span></Description>
         <Description term="退货金额"><span style={{ color: 'red' }}>￥{refundInfo.amount}元</span></Description>
-        <Description term="客户订单号">{refundInfo.order_sn}</Description>
+        <Description term="商品订单号">{refundInfo.order_sn}</Description>
         <Description term="运费">{refundInfo.freight}元</Description>
         <Description term="退货单号">{refundInfo.returns_sn}</Description>
       </DescriptionList>
