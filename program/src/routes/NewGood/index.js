@@ -30,18 +30,18 @@ export default class NewGood extends Component {
       isShowAttrMOdal: false,
       args: queryString.parse(this.props.location.search),
       fields: {
-        shelf_life: '1年', // 质保期
-        sales_unit: '个', // 销售单位
-        stock: '20', // 库存
-        min_buy: '10', // 最小采购量 (可选)
+        shelf_life: '', // 质保期
+        sales_unit: '', // 销售单位
+        stock: '', // 库存
+        min_buy: '', // 最小采购量 (可选)
         prices: [ // 价格
           {
             id: -100,
-            min_quantity: 10, // 最小数量
-            max_quantity: 100, // 最大数量
-            price: '1000', // 价格
+            min_quantity: 1, // 最小数量
+            max_quantity: 1, // 最大数量
+            price: '0', // 价格
             shipping_fee_type: 0, // 包邮
-            lead_time: '1天', // 货期
+            lead_time: '0', // 货期
           },
         ],
       },
