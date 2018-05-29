@@ -200,7 +200,7 @@ export default class OrderDetail extends Component {
         <Card title={`支付方式：${PAY_STATUS[payInfo.pay_type]}`} style={{ marginBottom: 24 }} bordered>
           <div>支付状态：{mapPayStatus[payInfo.pay_status - 1]}</div>
         </Card>
-        <Card title="开票信息" style={{ marginBottom: 24 }} bordered loading={loading}>
+        {/* <Card title="开票信息" style={{ marginBottom: 24 }} bordered loading={loading}>
           <DescriptionList col={3}>
             <Description term="公司全称(抬头)">{receiptInfo.title}</Description>
             <Description term="公司账户">{receiptInfo.account}</Description>
@@ -209,7 +209,7 @@ export default class OrderDetail extends Component {
             <Description term="开户银行">{receiptInfo.bank}</Description>
             <Description term="公司地址">{receiptInfo.company_address}</Description>
           </DescriptionList>
-        </Card>
+        </Card> */}
         <Card title="商品明细" style={{ marginBottom: 24 }} bordered loading={loading}>
           <Table
             style={{ marginBottom: 24 }}
@@ -243,7 +243,7 @@ export default class OrderDetail extends Component {
             }}
           />
         </Card>
-        <Card title="发票信息" style={{ marginBottom: 24 }} bordered loading={loading}>
+        {/* <Card title="发票信息" style={{ marginBottom: 24 }} bordered loading={loading}>
           {
             receiptList.length > 0 ?
               (
@@ -263,9 +263,7 @@ export default class OrderDetail extends Component {
                 </div>
               )
           }
-
-
-        </Card>
+        </Card> */}
         <Card title="买方备注" style={{ marginBottom: 24 }} bordered loading={loading}>
           {
             orderInfo.remarks ? orderInfo.remarks : (

@@ -54,7 +54,14 @@ const action = ({
       <span className="btn send" onClick={() => { onSendClick('isShowDeliveryModal', orderSn, data); }}>发货</span>
     );
   } else if (status === 5) { // 已发货，配送中
-    return (<span className="open-receipt-btn" onClick={() => { onOpenReceiptClick('isShowOpenModal', orderSn, data); }}>开票</span>);
+    // return (
+    //   <span
+    //     className="open-receipt-btn"
+    //     onClick={() => { onOpenReceiptClick('isShowOpenModal', orderSn, data); }}
+
+    //   >开票
+    //   </span>
+    // );
   } else {
     return null;
   }
