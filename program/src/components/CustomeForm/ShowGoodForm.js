@@ -209,22 +209,11 @@ export default class ShowGoodForm extends Component {
         </Col>
       ));
       // 商品cad图
-      if (product.cad_url) {
-        uploaderCAD = product.cad_url.map((val, idx) => (
-          <Col span={8} key={idx}>
-            <Upload
-              action="//jsonplaceholder.typicode.com/posts/"
-              listType="picture-card"
-              fileList={[{
-                uid: -1,
-                name: 'CAD文件预览失败',
-                url: val,
-              }]}
-              onPreview={this.handlePreview}
-              onChange={({ fileList }) => { this.handleUploaderChange('b', fileList); }}
-            />
-            <p className="upload-pic-desc">cad图</p>
-          </Col>
+      if (product.cad_urls) {
+        uploaderCAD = product.cad_urls.map((val, idx) => (
+          <Row span={8} key={idx}>
+            <a href={val} target="_blank">{val}</a>
+          </Row>
         ));
       }
     }
