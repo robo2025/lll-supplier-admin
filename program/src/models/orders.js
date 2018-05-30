@@ -121,8 +121,8 @@ export default {
         headers,
       });
     },
-    *fetchRefunds({ offset, limit, success, error }, { call, put }) {
-      const res = yield call(getRefundOrders, { offset, limit });
+    *fetchRefunds({ offset, limit, params, success, error }, { call, put }) {
+      const res = yield call(getRefundOrders, { params, offset, limit });
       if (res.rescode >> 0 === SUCCESS_STATUS) {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); }

@@ -67,7 +67,7 @@ export default class RefundsList extends Component {
       };
 
       dispatch({
-        type: 'orders/fetchSearch',
+        type: 'orders/fetchRefunds',
         params: values,
       });
     });
@@ -113,6 +113,13 @@ export default class RefundsList extends Component {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col xll={4} md={6} sm={24}>
+            <FormItem label="退款单号">
+              {getFieldDecorator('refund_sn')(
+                <Input placeholder="请输入" />
+              )}
+            </FormItem>
+          </Col>
+          <Col xll={4} md={6} sm={24}>
             <FormItem label="退货单号">
               {getFieldDecorator('returns_sn')(
                 <Input placeholder="请输入" />
@@ -120,15 +127,8 @@ export default class RefundsList extends Component {
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
-            <FormItem label="商品订单号">
-              {getFieldDecorator('brand')(
-                <Input placeholder="请输入" />
-              )}
-            </FormItem>
-          </Col>
-          <Col xll={4} md={6} sm={24}>
             <FormItem label="退款状态">
-              {getFieldDecorator('returns_status')(
+              {getFieldDecorator('refund_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="">全部</Option>
                   <Option value="1">等待退款</Option>
@@ -164,22 +164,22 @@ export default class RefundsList extends Component {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col xll={4} md={6} sm={24}>
-            <FormItem label="退货单号">
-              {getFieldDecorator('no')(
+            <FormItem label="退款单号">
+              {getFieldDecorator('refund_sn')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
-            <FormItem label="商品订单号">
-              {getFieldDecorator('brand')(
+            <FormItem label="退货单号">
+              {getFieldDecorator('returns_sn')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="退款状态">
-              {getFieldDecorator('returns_status')(
+              {getFieldDecorator('refund_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="">全部</Option>
                   <Option value="1">等待退款</Option>
@@ -263,8 +263,8 @@ export default class RefundsList extends Component {
                 const orderListItemHeader = (
                   <div className={styles['returns-list-header']}>
                     <div>
-                      <b>商品订单编号：</b>
-                      <a className="order-sn">{val.order_sn}</a>
+                      <b>退款单编号：</b>
+                      <a className="order-sn">{val.refund_sn}</a>
                     </div>
                     <div>
                       <b>退货单编号：</b>

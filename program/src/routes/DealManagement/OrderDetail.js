@@ -54,8 +54,8 @@ const goodsColumns = [{
 // 发货记录列
 const logisticsColumns = [{
   title: '商品ID',
-  dataIndex: 'goods_id',
-  key: 'goods_id',
+  dataIndex: 'goods_sn',
+  key: 'goods_sn',
 }, {
   title: '商品名称',
   dataIndex: 'goods_name',

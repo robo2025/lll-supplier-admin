@@ -22,7 +22,6 @@ export async function queryOrders({ params, offset = 0, limit = 10 }) {
   });
 }
 
-
 /**
  * 获取服务器订单详情
  */
@@ -119,9 +118,9 @@ export async function getReturnOrderDetail({ orderId }) {
 }
 
 // 退款单列表接口
-export async function getRefundOrders({ offset = '0', limit = '10' }) {
+export async function getRefundOrders({ params = {}, offset = '0', limit = '10' }) {
   const accessToken = Cookies.get('access_token');
-  return lyRequest(`${SUPPLIER_SYS_URL}/order?offset=${offset}&limit=${limit}&is_type=2`, {
+  return lyRequest(`${SUPPLIER_SYS_URL}/order?offset=${offset}&limit=${limit}&is_type=2&${qs.stringify(params)}`, {
     method: 'get',
     headers: {
       Authorization: accessToken,
@@ -133,7 +132,7 @@ export async function getRefundOrders({ offset = '0', limit = '10' }) {
 export async function getRefundOrderDetail({ orderId }) {
   const accessToken = Cookies.get('access_token');
   const supplierId = TEST_SUPPLIER_ID;
-  return lyRequest(`${SUPPLIER_SYS_URL}/order/${orderId}?supplier_id=${supplierId}&is_type=2`, {
+  return lyRequest(`${SUPPLIER_SYS_URL} / order / ${orderId} ? supplier_id = ${supplierId} & is_type=2`, {
     method: 'get',
     headers: {
       Authorization: accessToken,
@@ -145,7 +144,7 @@ export async function getRefundOrderDetail({ orderId }) {
 export async function confirmReturn({ orderId, status }) {
   const accessToken = Cookies.get('access_token');
   const supplierId = TEST_SUPPLIER_ID;
-  return lyRequest(`${SUPPLIER_SYS_URL}/order/${orderId}?supplier_id=${supplierId}`, {
+  return lyRequest(`${SUPPLIER_SYS_URL} / order / ${orderId} ? supplier_id = ${supplierId}`, {
     method: 'put',
     headers: {
       Authorization: accessToken,
@@ -173,10 +172,10 @@ export async function querySearchResults({
   const endTime = end_time || '';
 
   const accessToken = Cookies.get('access_token');
-  return lyRequest(`${ORDER_URL}/order?
-  guest_order_sn=${guestOrderSN}&pay_status=${payStatus}&order_status=${orderStatus}&supplier_name=${supplierName}&guest_company_name=${guestCompanyName}&start_time=${startTime}&end_time=${endTime}`, {
-      headers: {
-        Authorization: accessToken,
-      },
-    });
+  return lyRequest(`${ORDER_URL} / order ?
+      guest_order_sn = ${guestOrderSN} & pay_status=${payStatus} & order_status=${orderStatus} & supplier_name=${supplierName} & guest_company_name=${guestCompanyName} & start_time=${startTime} & end_time=${endTime}`, {
+    headers: {
+      Authorization: accessToken,
+    },
+  });
 }
