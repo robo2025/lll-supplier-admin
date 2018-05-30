@@ -14,8 +14,8 @@ const { Description } = DescriptionList;
 // 订单商品明细列
 const goodsColumns = [{
   title: '商品编号',
-  dataIndex: 'goods_id',
-  key: 'goods_id',
+  dataIndex: 'goods_sn',
+  key: 'goods_sn',
 }, {
   title: '商品名称',
   dataIndex: 'goods_name',

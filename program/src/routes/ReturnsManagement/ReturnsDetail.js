@@ -91,7 +91,7 @@ export default class ReturnsDetail extends Component {
       <DescriptionList className={styles.headerList} size="small" col="2">
         <Description term="状态"><span><Badge status={mapOrderProgress[returnInfo.status - 1]} />{RETURNS_STATUS[returnInfo.status]}</span></Description>
         <Description term="退货金额"><span style={{ color: 'red' }}>￥{returnInfo.returns_money}元</span></Description>
-        <Description term="客户订单号">{returnInfo.order_sn}</Description>
+        <Description term="商品订单号">{returnInfo.order_sn}</Description>
         <Description term="运费">包邮</Description>
         <Description term="退货单号">{returnInfo.returns_sn}</Description>
       </DescriptionList>
@@ -117,10 +117,10 @@ export default class ReturnsDetail extends Component {
         </Card>
         <Card title="物流信息" style={{ marginBottom: 24 }} bordered>
           <DescriptionList className={styles.headerList} col="4">
-            <Description term="收货人">{returnLogistics.receiver}</Description>
-            <Description term="联系号码">{returnLogistics.mobile}</Description>
-            <Description term="物流公司">{returnLogistics.logistics_company}</Description>
-            <Description term="物流单号">{returnLogistics.logistics_number}</Description>
+            <Description term="收货人">{returnLogistics.length > 0 ? returnLogistics[0].receiver : ''}</Description>
+            <Description term="联系号码">{ returnLogistics.length > 0 ? returnLogistics[0].mobile : ''}</Description>
+            <Description term="物流公司">{returnLogistics.length > 0 ? returnLogistics[0].logistics_company : ''}</Description>
+            <Description term="物流单号">{returnLogistics.length > 0 ? returnLogistics[0].logistics_number : ''}</Description>
           </DescriptionList>
         </Card>
         {/* <Card
