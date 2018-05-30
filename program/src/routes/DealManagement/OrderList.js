@@ -412,7 +412,7 @@ export default class OrderList extends Component {
                 const orderListItemHeader = (
                   <div className={styles['order-list-header']}>
                     <b>商品订单编号：</b>
-                    <a href="#" className="order-sn">{val.order_sn}</a>
+                    <a className="order-sn">{val.order_sn}</a>
                     <span className="order-time">{moment(val.add_time * 1000).format('YYYY-MM-DD hh:mm:ss')}</span>
                   </div>
                 );

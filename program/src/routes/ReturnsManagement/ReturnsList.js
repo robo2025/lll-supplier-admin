@@ -138,9 +138,7 @@ export default class ReturnsList extends Component {
               {getFieldDecorator('order_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="">全部</Option>
-                  <Option value="1">申请退货中</Option>
                   <Option value="2">退货中</Option>
-                  <Option value="3">退货失败</Option>
                   <Option value="4">退货完成</Option>
                 </Select>
               )}
@@ -191,9 +189,7 @@ export default class ReturnsList extends Component {
               {getFieldDecorator('order_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="">全部</Option>
-                  <Option value="1">申请退货中</Option>
                   <Option value="2">退货中</Option>
-                  <Option value="3">退货失败</Option>
                   <Option value="4">退货完成</Option>
                 </Select>
               )}
@@ -276,11 +272,11 @@ export default class ReturnsList extends Component {
                   <div className={styles['returns-list-header']}>
                     <div>
                       <b>商品订单编号：</b>
-                      <a href="#" className="order-sn">{val.order_sn}</a>
+                      <a className="order-sn">{val.order_sn}</a>
                     </div>
                     <div>
                       <b>退货单编号：</b>
-                      <a href="#" className="order-sn">{val.returns_sn}</a>
+                      <a className="order-sn">{val.returns_sn}</a>
                       <span className="order-time">({moment(val.return_order_time * 1000).format('YYYY-MM-DD hh:mm')})</span>
                     </div>
                   </div>

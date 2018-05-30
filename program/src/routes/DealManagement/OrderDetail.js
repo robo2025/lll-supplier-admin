@@ -6,7 +6,7 @@ import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import DescriptionList from '../../components/DescriptionList';
 import { queryString } from '../../utils/tools';
-import { ORDER_STATUS, PAY_STATUS } from '../../constant/statusList';
+import { ORDER_STATUS, PAY_STATUS, ACTION_STATUS } from '../../constant/statusList';
 import styles from './OrderDetail.less';
 
 const mapPayStatus = ['未支付', '已支付'];
@@ -92,24 +92,33 @@ const logisticsColumns = [{
   key: 'logistics_number',
 }];
 // 操作记录列
-const columns = [{
+const actionColumns = [{
+  title: '操作记录',
+  dataIndex: 'status',
+  key: 'status',
+  render: text => (<span>{ACTION_STATUS[text]}</span>),
+}, {
   title: '操作员',
   dataIndex: 'operator',
   key: 'operator',
 }, {
-  title: '操作记录',
+  title: '执行明细(备注)',
   dataIndex: 'execution_detail',
   key: 'execution_detail',
-  render: val => <span>{val}</span>,
 }, {
-  title: '进程',
+  title: '当前进度',
   dataIndex: 'progress',
   key: 'progress',
 }, {
   title: '操作时间',
   dataIndex: 'add_time',
   key: 'add_time',
-  render: val => <span>{moment(val * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>,
+  render: text => (<span>{moment(text * 1000).format('YYYY-MM-DD h:mm:ss')}</span>),
+}, {
+  title: '耗时',
+  dataIndex: 'time_consuming',
+  key: 'time_consuming',
+  render: time => (<span>{time}秒</span>),
 }];
 // 发票列
 const receiptColumns = [{
@@ -273,7 +282,7 @@ export default class OrderDetail extends Component {
             )
           }
         </Card>
-        {/* <Card
+        <Card
           bordered
           title="操作记录"
           style={{ marginBottom: 24 }}
@@ -284,7 +293,16 @@ export default class OrderDetail extends Component {
           {
             operations.length > 0 ?
               (
-                contentList[this.state.operationkey]
+                <Table
+                  pagination={{
+                  defaultPageSize: 6,
+                  pageSize: 6,
+                }}
+                  loading={false}
+                  dataSource={operations}
+                  columns={actionColumns}
+                  rowKey="add_time"
+                />
               ) :
               (
                 <div className={styles.noData}>
@@ -292,7 +310,7 @@ export default class OrderDetail extends Component {
                 </div>
               )
           }
-        </Card> */}
+        </Card>
       </PageHeaderLayout>
     );
   }
