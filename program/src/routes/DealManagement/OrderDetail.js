@@ -181,7 +181,11 @@ export default class OrderDetail extends Component {
     const receiptList = detail.open_receipt || [];// 发票信息
     const logistics = detail.logistics || [orderInfo]; // 物流信息
     const operations = detail.operations || []; // 操作日志
-
+    const paginationProps = {
+      showSizeChanger: true,
+      showQuickJumper: true,
+      total: operations.total,
+    };
     // const subOrder
     console.log('hello --:', [{ ...logistics, ...orderInfo }]);
     const descriptionContent = (
@@ -294,10 +298,7 @@ export default class OrderDetail extends Component {
             operations.length > 0 ?
               (
                 <Table
-                  pagination={{
-                  defaultPageSize: 6,
-                  pageSize: 6,
-                }}
+                  pagination={paginationProps}
                   loading={false}
                   dataSource={operations}
                   columns={actionColumns}
