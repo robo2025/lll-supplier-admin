@@ -187,7 +187,6 @@ export default class OrderDetail extends Component {
       total: operations.total,
     };
     // const subOrder
-    console.log('hello --:', [{ ...logistics, ...orderInfo }]);
     const descriptionContent = (
       <DescriptionList className={styles.headerList} size="small" col="2">
         <Description term="状态"><span><Badge status="success" />{ORDER_STATUS[orderInfo.status]}</span></Description>
