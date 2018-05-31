@@ -66,7 +66,7 @@ axios.interceptors.response.use((response) => {
    * */
   if ((response.data.rescode >> 0) === 30001) {
     // 没有权限
-    alert('非管理员账号,没有此系统权限');
+    alert('非供应商账号,没有此系统权限');
     jumpToLogin();
     return;
   }

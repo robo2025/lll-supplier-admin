@@ -131,8 +131,7 @@ export async function getRefundOrders({ params = {}, offset = '0', limit = '10' 
 // 退货单详情接口
 export async function getRefundOrderDetail({ orderId }) {
   const accessToken = Cookies.get('access_token');
-  const supplierId = TEST_SUPPLIER_ID;
-  return lyRequest(`${SUPPLIER_SYS_URL} / order / ${orderId} ? supplier_id = ${supplierId} & is_type=2`, {
+  return lyRequest(`${SUPPLIER_SYS_URL}/order/${orderId}?is_type=2`, {
     method: 'get',
     headers: {
       Authorization: accessToken,
@@ -143,8 +142,7 @@ export async function getRefundOrderDetail({ orderId }) {
 // 确认退货接口
 export async function confirmReturn({ orderId, status }) {
   const accessToken = Cookies.get('access_token');
-  const supplierId = TEST_SUPPLIER_ID;
-  return lyRequest(`${SUPPLIER_SYS_URL} / order / ${orderId} ? supplier_id = ${supplierId}`, {
+  return lyRequest(`${SUPPLIER_SYS_URL}/order/${orderId}`, {
     method: 'put',
     headers: {
       Authorization: accessToken,
@@ -155,27 +153,3 @@ export async function confirmReturn({ orderId, status }) {
   });
 }
 
-
-/**
- * 搜索接口
- *
- */
-export async function querySearchResults({
-  guest_order_sn, pay_status, order_status, supplier_name, guest_company_name, start_time, end_time,
-}) {
-  const guestOrderSN = guest_order_sn || '';
-  const orderStatus = order_status || '';
-  const payStatus = pay_status || '';
-  const supplierName = supplier_name || '';
-  const guestCompanyName = guest_company_name || '';
-  const startTime = start_time || '';
-  const endTime = end_time || '';
-
-  const accessToken = Cookies.get('access_token');
-  return lyRequest(`${ORDER_URL} / order ?
-      guest_order_sn = ${guestOrderSN} & pay_status=${payStatus} & order_status=${orderStatus} & supplier_name=${supplierName} & guest_company_name=${guestCompanyName} & start_time=${startTime} & end_time=${endTime}`, {
-    headers: {
-      Authorization: accessToken,
-    },
-  });
-}

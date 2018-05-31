@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import lyRequest from '../utils/lyRequest';
-import { URL, LOGIN_URL, LOGOUT_URL, REGISTER_URL, VERIFY_PAGE, HOME_PAGE } from '../constant/config';
+import { URL, LOGIN_URL, LOGOUT_URL, REGISTER_URL, USERS_SERVER, VERIFY_PAGE, HOME_PAGE } from '../constant/config';
 
 export async function query() {
   return lyRequest('/api/users');
@@ -20,6 +20,17 @@ export async function getUserInfo() {
   });
 }
 
+// 注册用户
+export async function registerUser({ data }) {
+  const acessToken = Cookies.get('access_token');
+  return lyRequest(`${USERS_SERVER}/supplier/register`, {
+    method: 'post',
+    headers: {
+      Authorization: acessToken,
+    },
+    data,
+  });
+}
 // 注册操作
 export function register() {
   window.location.href = `${REGISTER_URL}?next=${LOGIN_URL}?next=${encodeURIComponent(VERIFY_PAGE)}`;

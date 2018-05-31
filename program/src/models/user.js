@@ -1,4 +1,4 @@
-import { queryCurrent, getUserInfo } from '../services/user';
+import { queryCurrent, getUserInfo, registerUser } from '../services/user';
 import { SUCCESS_STATUS } from '../constant/config.js';
 
 export default {
@@ -37,6 +37,12 @@ export default {
         type: 'saveCurrentUser',
         payload: response,
       });
+    },
+    *register({ data, success, error }, { call, put }) {
+      const response = yield call(registerUser, { data });
+      if (response.rescode >> 0 === SUCCESS_STATUS) {
+        if (typeof success === 'function') { success(response); }
+      } else if (typeof error === 'function') { error(response); }
     },
   },
 
