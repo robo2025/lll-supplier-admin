@@ -1991,6 +1991,10 @@ cheerio@^1.0.0-rc.2:
     lodash "^4.15.0"
     parse5 "^3.0.1"
 
+china-division@^2.0.0:
+  version "2.0.0"
+  resolved "http://registry.npm.taobao.org/china-division/download/china-division-2.0.0.tgz#4ca80236d34dbed6d96d92d185220ecca228ebe7"
+
 chokidar@^1.6.0, chokidar@^1.7.0:
   version "1.7.0"
   resolved "http://registry.npm.taobao.org/chokidar/download/chokidar-1.7.0.tgz#798e689778151c8076b4b360e5edd28cda2bb468"
@@ -5731,6 +5735,10 @@ js-base64@^2.1.9:
 js-cookie@^2.2.0:
   version "2.2.0"
   resolved "http://registry.npm.taobao.org/js-cookie/download/js-cookie-2.2.0.tgz#1b2c279a6eece380a12168b92485265b35b1effb"
+
+js-sha256@^0.9.0:
+  version "0.9.0"
+  resolved "http://registry.npm.taobao.org/js-sha256/download/js-sha256-0.9.0.tgz#0b89ac166583e91ef9123644bd3c5334ce9d0966"
 
 js-tokens@^3.0.0, js-tokens@^3.0.2:
   version "3.0.2"
