@@ -182,6 +182,7 @@ class BasicLayout extends React.PureComponent {
           <GlobalHeader
             logo={logo}
             currentUser={currentUser}
+            match={this.props.match}
             fetchingNotices={fetchingNotices}
             notices={notices}
             collapsed={collapsed}
