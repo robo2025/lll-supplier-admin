@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from 'dva';
+import { sha256 } from 'js-sha256';
 import {
   Form,
   Input,
@@ -11,22 +13,125 @@ import {
   Modal,
   message,
   Checkbox,
+  Popover,
+  Progress,
+  Cascader,
 } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import { QINIU_SERVER, IMAGE_TYPES } from '../../constant/config';
+import { checkFile, getFileSuffix, handleServerMsgObj } from '../../utils/tools';
+import options from '../../utils/cascader-address-options';
+import { jumpToLogin } from '../../services/user';
+
 import styles from './UserRegister.less';
 
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 
+const passwordStatusMap = {
+  ok: <div className={styles.success}>强度：强</div>,
+  pass: <div className={styles.warning}>强度：中</div>,
+  poor: <div className={styles.error}>强度：太短</div>,
+};
+
+const passwordProgressMap = {
+  ok: 'success',
+  pass: 'normal',
+  poor: 'exception',
+};
+
+@connect(({ upload, user }) => ({
+  upload,
+  user,
+}))
 @Form.create()
 export default class UserRegister extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      count: 0,
       loading: false,
+      visible: false,
       modalVisible: true,
+      previewVisible: false,
+      help: '6到16位数字、字母',
+      file: { uid: '', name: '' },
+      previewImage: '',
+      photos: [],
+      isFlag: false, // 是否立即上传产品资质
     };
   }
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'upload/fetch',
+    });
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  onGetCaptcha = () => {
+    const { form } = this.props;
+
+    let count = 59;
+
+    // 发送手机验证码
+    const mobile = form.getFieldValue('mobile');
+    if (mobile && mobile.length === 11) {
+      this.setState({ count });
+      this.interval = setInterval(() => {
+        count -= 1;
+        this.setState({ count });
+        if (count === 0) {
+          clearInterval(this.interval);
+        }
+      }, 1000);
+
+      this.dispatchSMSCode(mobile);
+    }
+  };
+
+  onCheckboxChange = (key, e) => {
+    this.setState({ [key]: e.target.checked });
+  }
+
+  getPasswordStatus = () => {
+    const { form } = this.props;
+    const value = form.getFieldValue('password');
+    if (value && value.length > 9) {
+      return 'ok';
+    }
+    if (value && value.length > 5) {
+      return 'pass';
+    }
+    return 'poor';
+  };
+
+  // 文件上传时处理
+  handleBeforeUpload = (key, file) => {
+    this.setState({ file });
+    if (!checkFile(file.name, IMAGE_TYPES)) {
+      message.error(`${file.name} 暂不支持上传`);
+      return false;
+    }
+  }
+
+  // 文件上传状态改变时处理
+  handleUploadChange = (key, fileList) => {
+    this.setState({ [key]: fileList });
+  }
+
+  // 图片预览
+  handlePreview = (file) => {
+    this.setState({
+      previewImage: file.url || file.thumbUrl,
+      previewVisible: true,
+    });
+  }
+  handleCancel = () => this.setState({ previewVisible: false })
 
   handleModalVisible = (modalVisible) => {
     this.setState({ modalVisible });
@@ -36,27 +141,192 @@ export default class UserRegister extends Component {
     message.warning('不同意就注册不了哦');
   }
 
+  // 提交注册
   handleSubmit = (e) => {
     e.preventDefault();
+    const { photos, production, certification, other, isFlag } = this.state;
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (err) {
-        console.log('校验出错', err);
+        console.log('校验出错:', err, values);
         return;
       }
-      console.log('校验通过', values);
+      const qualifications = []; // 资质证书
+      // 营业执照
+      const license = {
+        qualifi_name: 'license', //  //证书名称  (license:营业执照 production:生产许可证 certification:产品合格证 other:其他证书)
+        qualifi_code: values.qualifi_code, // 证书编码
+        qualifi_url: photos[0].status === 'done' ? photos[0].response.key : '', // url
+        effective_date: values.date[0].format('YYYY-MM-DD'), // 有效期 （格式：2018-04-02）
+        expire_date: values.date[0].format('YYYY-MM-DD'), // 失效期
+      };
+      const place = {
+        province_id: values.place[0],
+        city_id: values.place[1],
+        district_id: values.place[2], // 区 (可选)
+      };
+      qualifications.push(license);
+      if (isFlag) { // 如果立即上传产品资质
+        if (values.production) { // 生产许可证
+          const productionObj = {
+            qualifi_name: 'production', //  //证书名称  (license:营业执照 production:生产许可证 certification:产品合格证 other:其他证书)
+            qualifi_code: null, // 证书编码
+            qualifi_url: production[0].status === 'done' ? production[0].response.key : '', // url
+            effective_date: values.production_date[0].format('YYYY-MM-DD'), // 有效期 （格式：2018-04-02）
+            expire_date: values.production_date[1].format('YYYY-MM-DD'), // 失效期
+          };
+          qualifications.push(productionObj);
+        }
+        if (values.certification) { // 产品合格证
+          const certificationObj = {
+            qualifi_name: 'certification', //  //证书名称  (license:营业执照 production:生产许可证 certification:产品合格证 other:其他证书)
+            qualifi_code: null, // 证书编码
+            qualifi_url: certification[0].status === 'done' ? certification[0].response.key : '', // url
+            effective_date: values.certification_date[0].format('YYYY-MM-DD'), // 有效期 （格式：2018-04-02）
+            expire_date: values.certification_date[1].format('YYYY-MM-DD'), // 失效期
+          };
+          qualifications.push(certificationObj);
+        }
+        if (values.other) { // 其他证书
+          const otherObj = {
+            qualifi_name: 'other', //  //证书名称  (license:营业执照 production:生产许可证 certification:产品合格证 other:其他证书)
+            qualifi_code: null, // 证书编码
+            qualifi_url: other[0].status === 'done' ? other[0].response.key : '', // url
+            effective_date: null, // 有效期 （格式：2018-04-02）
+            expire_date: null, // 失效期
+          };
+          qualifications.push(otherObj);
+        }
+      }
+      console.log('校验通过:', {
+        ...values,
+        qualifications,
+        ...place,
+        password: sha256(values.password),
+        confirm: sha256(values.confirm),
+      }, qualifications);
+
+      this.dispatchRegister({ // 发起注册操作
+        ...values,
+        qualifications,
+        ...place,
+        password: sha256(values.password),
+        confirm: sha256(values.confirm),
+      });
     });
   };
 
+  // 发起注册操作
+  dispatchRegister = (data) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'user/register',
+      data,
+      success: () => { message.success('注册成功'); jumpToLogin(); },
+      error: (res) => { message.error(handleServerMsgObj(res.msg)); },
+    });
+  }
+
+  // 发起获取验证码操作
+  dispatchSMSCode = (mobile) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'user/fectchSMS',
+      mobile,
+      success: () => { message.success('验证码已发送'); },
+      error: (res) => { message.error(handleServerMsgObj(res.msg)); },
+    });
+  }
+
+  handleConfirmBlur = (e) => {
+    const { value } = e.target;
+    this.setState({ confirmDirty: this.state.confirmDirty || !!value });
+  };
+
+  handlePasswordBlur = () => {
+    this.setState({ visible: false });
+  }
+
+  checkConfirm = (rule, value, callback) => {
+    const { form } = this.props;
+    if (value && value !== form.getFieldValue('password')) {
+      callback('两次输入的密码不匹配!');
+    } else {
+      callback();
+    }
+  };
+
+  // 检验密码
+  checkPassword = (rule, value, callback) => {
+    if (!value) {
+      this.setState({
+        help: '请输入密码！',
+        visible: !!value,
+      });
+      callback('error');
+    } else {
+      this.setState({
+        help: '',
+      });
+      if (!this.state.visible) {
+        this.setState({
+          visible: !!value,
+        });
+      }
+      if (value.length < 6) {
+        callback('error');
+      } else {
+        const { form } = this.props;
+        if (value && this.state.confirmDirty) {
+          form.validateFields(['confirm'], { force: true });
+        }
+        callback();
+      }
+    }
+  };
+
+  renderPasswordProgress = () => {
+    const { form } = this.props;
+    const value = form.getFieldValue('password');
+    const passwordStatus = this.getPasswordStatus();
+    return value && value.length ? (
+      <div className={styles[`progress-${passwordStatus}`]}>
+        <Progress
+          status={passwordProgressMap[passwordStatus]}
+          className={styles.progress}
+          strokeWidth={6}
+          percent={value.length * 10 > 100 ? 100 : value.length * 10}
+          showInfo={false}
+        />
+      </div>
+    ) : null;
+  };
 
   render() {
     const { getFieldDecorator } = this.props.form;
+    const { upload } = this.props;
+    const {
+      count, previewVisible, previewImage, isFlag, file, photos, production, certification, other,
+    } = this.state;
 
     const uploadButton = (
       <div>
         <Icon type={this.state.loading ? 'loading' : 'plus'} />
-        <div className="ant-upload-text">Upload</div>
+        <div className="ant-upload-text">上传</div>
       </div>
     );
+
+    const sendCaptchaButton = (
+      <Button
+        disabled={count}
+        type="primary"
+        className={styles.getCaptcha}
+        onClick={this.onGetCaptcha}
+        style={{ width: 120 }}
+      >
+        {count ? `${count} s` : '获取验证码'}
+      </Button>
+    );
+
     const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
@@ -76,13 +346,11 @@ export default class UserRegister extends Component {
       },
     };
 
-
     return (
       <PageHeaderLayout
         title="企业用户注册"
-      // content="表单页用于向用户收集或验证信息，基础表单常见于数据项较少的表单场景。"
       >
-        <Card title="基本信息" bordered={false}>
+        <Card title="基本信息" bordered={false} className={styles['register-wrap']}>
           <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
             <FormItem {...formItemLayout} label="用户名">
               {
@@ -94,24 +362,42 @@ export default class UserRegister extends Component {
                 })(<Input placeholder="请输入用户名" />)
               }
             </FormItem>
-            <FormItem {...formItemLayout} label="密码" help="6到16位数字、字母">
-              {
-                getFieldDecorator('password', {
-                  rules: [{
-                    required: true,
-                    message: '密码',
-                  }],
-                })(<Input placeholder="输入密码" />)
-              }
+            <FormItem {...formItemLayout} label="密码" help={this.state.help}>
+              <Popover
+                content={
+                  <div style={{ padding: '4px 0' }}>
+                    {passwordStatusMap[this.getPasswordStatus()]}
+                    {this.renderPasswordProgress()}
+                    <div style={{ marginTop: 10 }}>
+                      请至少输入 6 个字符。请不要使用容易被猜到的密码。
+                    </div>
+                  </div>
+                }
+                visible={this.state.visible}
+              >
+                {
+                  getFieldDecorator('password', {
+                    rules: [{
+                      required: true,
+                      message: '密码',
+                    }, {
+                      validator: this.checkPassword,
+                    }],
+                  })(<Input type="password" placeholder="输入密码" onBlur={this.handlePasswordBlur} />)
+                }
+              </Popover>
+
             </FormItem>
-            <FormItem {...formItemLayout} label="确认密码" help="6到16位数字、字母">
+            <FormItem {...formItemLayout} label="确认密码">
               {
-                getFieldDecorator('password2', {
+                getFieldDecorator('confirm', {
                   rules: [{
                     required: true,
-                    message: '请输入标题',
+                    message: '请确认密码',
+                  }, {
+                    validator: this.checkConfirm,
                   }],
-                })(<Input placeholder="重复输入密码" />)
+                })(<Input type="password" placeholder="重复输入密码" onBlur={this.handleConfirmBlur} />)
               }
             </FormItem>
             <FormItem {...formItemLayout} label="联系邮箱">
@@ -120,6 +406,9 @@ export default class UserRegister extends Component {
                   rules: [{
                     required: true,
                     message: '请输入联系邮箱',
+                  }, {
+                    type: 'email',
+                    message: '邮箱地址格式错误！',
                   }],
                 })(<Input />)
               }
@@ -130,6 +419,12 @@ export default class UserRegister extends Component {
                   rules: [{
                     required: true,
                     message: '请输入手机号',
+                  }, {
+                    pattern: /^1\d{10}$/,
+                    message: '手机号格式错误！',
+                  }, {
+                    len: 11,
+                    message: '请输入正确的手机号码',
                   }],
                 })(<Input />)
               }
@@ -141,7 +436,11 @@ export default class UserRegister extends Component {
                     required: true,
                     message: '请输入短信验证码',
                   }],
-                })(<Input />)
+                })(
+                  <Input
+                    size="large"
+                    addonAfter={sendCaptchaButton}
+                  />)
               }
             </FormItem>
             <FormItem {...formItemLayout} label="企业名称" help="请填写与企业营业执照或三证合一证件保持一致">
@@ -155,13 +454,28 @@ export default class UserRegister extends Component {
               }
             </FormItem>
             <FormItem {...formItemLayout} label="企业地址">
+
+              {
+                getFieldDecorator('place', {
+                  rules: [{ required: true, message: '请选择省市区' }],
+                })(
+                  <Cascader
+                    options={options}
+                    changeOnSelect
+                    style={{ width: '100%' }}
+                    placeholder="请选择省市区"
+                  />
+                )
+              }
+            </FormItem>
+            <FormItem {...formItemLayout} label="详细地址">
               {
                 getFieldDecorator('address', {
                   rules: [{
                     required: true,
                     message: '请输入企业地址',
                   }],
-                })(<Input />)
+                })(<Input placeholder="请填写详细地址" />)
               }
             </FormItem>
             <FormItem {...formItemLayout} label="法人" help="请填写与企业营业执照或三证合一证件保持一致">
@@ -208,14 +522,21 @@ export default class UserRegister extends Component {
                 })(
                   <div>
                     <Upload
-                      name="avatar"
+                      name="file"
+                      action={QINIU_SERVER}
                       listType="picture-card"
                       className="avatar-uploader"
-                      showUploadList={false}
-                      action="//jsonplaceholder.typicode.com/posts/"
-                      onChange={this.handleChange}
+                      beforeUpload={currFile => (this.handleBeforeUpload('photos', currFile))}
+                      onChange={({ fileList }) => { this.handleUploadChange('photos', fileList); }}
+                      onPreview={this.handlePreview}
+                      data={
+                        {
+                          token: upload.upload_token,
+                          key: `supplier/qualification/images/${file.uid}.${getFileSuffix(file.name)}`,
+                        }
+                      }
                     >
-                      {uploadButton}
+                      {(photos && photos.length >= 1) ? null : uploadButton}
                     </Upload>
                     <FormItem label="有效期">
                       {getFieldDecorator('date', {
@@ -260,9 +581,122 @@ export default class UserRegister extends Component {
                 initialValue: false,
                 valuePropName: 'checked',
               })(
-                <Checkbox>立即上传</Checkbox>
+                <Checkbox onChange={(e) => { this.onCheckboxChange('isFlag', e); }}>立即上传</Checkbox>
               )}
             </FormItem>
+            {
+              isFlag ?
+                (
+                  <div>
+                    <FormItem {...formItemLayout} label="产品生产许可证" help="证书照片(图片小于1M，支持格式jpg\png)">
+                      {
+                        getFieldDecorator('production', {
+                          rules: [{
+                            required: false,
+                            message: '请上传产品生产许可证照片',
+                          }],
+                        })(
+                          <div>
+                            <Upload
+                              name="file"
+                              action={QINIU_SERVER}
+                              listType="picture-card"
+                              className="avatar-uploader"
+                              beforeUpload={currFile => (this.handleBeforeUpload('production', currFile))}
+                              onChange={({ fileList }) => { this.handleUploadChange('production', fileList); }}
+                              onPreview={this.handlePreview}
+                              data={
+                                {
+                                  token: upload.upload_token,
+                                  key: `supplier/qualification/images/${file.uid}.${getFileSuffix(file.name)}`,
+                                }
+                              }
+                            >
+                              {(production && production.length >= 1) ? null : uploadButton}
+                            </Upload>
+                            <FormItem label="有效期">
+                              {getFieldDecorator('production_date', {
+                                rules: [{
+                                  required: production && production.length > 0,
+                                  message: '请选择起止日期',
+                                }],
+                              })(<RangePicker style={{ width: '350px' }} placeholder={['开始日期', '结束日期']} />)}
+                            </FormItem>
+                          </div>
+                        )
+                      }
+                    </FormItem>
+                    <FormItem {...formItemLayout} label="产品合格证" help="证书照片(图片小于1M，支持格式jpg\png)">
+                      {
+                        getFieldDecorator('certification', {
+                          rules: [{
+                            required: false,
+                            message: '请上传产品合格证照片',
+                          }],
+                        })(
+                          <div>
+                            <Upload
+                              name="file"
+                              action={QINIU_SERVER}
+                              listType="picture-card"
+                              className="avatar-uploader"
+                              beforeUpload={currFile => (this.handleBeforeUpload('certification', currFile))}
+                              onChange={({ fileList }) => { this.handleUploadChange('certification', fileList); }}
+                              onPreview={this.handlePreview}
+                              data={
+                                {
+                                  token: upload.upload_token,
+                                  key: `supplier/qualification/images/${file.uid}.${getFileSuffix(file.name)}`,
+                                }
+                              }
+                            >
+                              {(certification && certification.length >= 1) ? null : uploadButton}
+                            </Upload>
+                            <FormItem label="有效期">
+                              {getFieldDecorator('certification_date', {
+                                rules: [{
+                                  required: certification && certification.length > 0,
+                                  message: '请选择起止日期',
+                                }],
+                              })(<RangePicker style={{ width: '350px' }} placeholder={['开始日期', '结束日期']} />)}
+                            </FormItem>
+                          </div>
+                        )
+                      }
+                    </FormItem>
+                    <FormItem {...formItemLayout} label="其他证书" help="证书照片(图片小于1M，支持格式jpg\png)">
+                      {
+                        getFieldDecorator('other', {
+                          rules: [{
+                            required: false,
+                            message: '请上传营业执照照片',
+                          }],
+                        })(
+                          <div>
+                            <Upload
+                              name="file"
+                              action={QINIU_SERVER}
+                              listType="picture-card"
+                              className="avatar-uploader"
+                              beforeUpload={currFile => (this.handleBeforeUpload('other', currFile))}
+                              onChange={({ fileList }) => { this.handleUploadChange('other', fileList); }}
+                              onPreview={this.handlePreview}
+                              data={
+                                {
+                                  token: upload.upload_token,
+                                  key: `supplier/qualification/images/${file.uid}.${getFileSuffix(file.name)}`,
+                                }
+                              }
+                            >
+                              {(other && other.length >= 3) ? null : uploadButton}
+                            </Upload>
+                          </div>
+                        )
+                      }
+                    </FormItem>
+                  </div>
+                ) : null
+            }
             <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
               <Button type="primary" htmlType="submit" loading={false}>
                 提交
@@ -291,8 +725,12 @@ export default class UserRegister extends Component {
               <a>《隐私政策》</a><br />
             </p>
           </Modal>
+          {/* 图片预览 */}
+          <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+            <img alt="example" style={{ width: '100%' }} src={previewImage} />
+          </Modal>
         </Card>
-      </PageHeaderLayout>
+      </PageHeaderLayout >
     );
   }
 }

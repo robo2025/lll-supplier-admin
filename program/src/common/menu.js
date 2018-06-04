@@ -4,6 +4,7 @@ const menuData = [{
   name: '商品管理',
   icon: 'shop',
   path: 'goods',
+  authority: '2',
   children: [
     {
       name: '商品列表',
@@ -18,6 +19,7 @@ const menuData = [{
   name: '交易管理',
   icon: 'credit-card',
   path: 'deal',
+  authority: '2',
   children: [
     {
       name: '商品订单列表',
@@ -28,6 +30,7 @@ const menuData = [{
   name: '退货管理',
   icon: 'check-square-o',
   path: 'returns',
+  authority: '2',
   children: [
     {
       name: '退货单列表',
@@ -38,6 +41,7 @@ const menuData = [{
   name: '退款管理',
   icon: 'check-square',
   path: 'refunds',
+  authority: '2',
   children: [
     {
       name: '退款单列表',

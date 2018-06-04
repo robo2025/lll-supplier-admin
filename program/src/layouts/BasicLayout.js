@@ -16,7 +16,7 @@ import { getRoutes } from '../utils/utils';
 import { getMenuData } from '../common/menu';
 import Authorized from '../utils/Authorized';
 import logo from '../assets/logo.svg';
-import { logout } from '../services/user';
+import { logout, login } from '../services/user';
 
 const { AuthorizedRoute, check } = Authorized;
 
@@ -145,6 +145,9 @@ class BasicLayout extends React.PureComponent {
     if (key === 'logout') {
       // 退出登录
       logout();
+    }
+    if (key === 'login') {
+      login();
     }
   }
   handleNoticeVisibleChange = (visible) => {

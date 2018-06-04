@@ -1,5 +1,18 @@
 @import '~antd/lib/style/themes/default.less';
 
+.register-wrap{
+  :global{
+    .ant-input-group-addon{
+      padding: 0;
+    }
+    .ant-btn{
+      border-radius: 0;
+      height: 38px;
+      border: none;
+    }
+  }
+}
+
 .card {
   margin-bottom: 24px;
 }
@@ -87,4 +100,60 @@
 .optional {
   color: @text-color-secondary;
   font-style: normal;
+}
+
+.main {
+  width: 368px;
+  margin: 0 auto;
+
+  :global {
+    .ant-form-item {
+      margin-bottom: 24px;
+    }
+  }
+
+  h3 {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .getCaptcha {
+    display: block;
+    width: 100%;
+  }
+
+  .submit {
+    width: 50%;
+  }
+
+  .login {
+    float: right;
+    line-height: @btn-height-lg;
+  }
+}
+
+.success,
+.warning,
+.error {
+  transition: color 0.3s;
+}
+
+.success {
+  color: @success-color;
+}
+
+.warning {
+  color: @warning-color;
+}
+
+.error {
+  color: @error-color;
+}
+
+.progress-pass > .progress {
+  :global {
+    .ant-progress-bg {
+      background-color: @warning-color;
+    }
+  }
 }

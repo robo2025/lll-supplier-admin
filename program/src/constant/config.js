@@ -12,7 +12,10 @@ export const API_URL = '//testapi.robo2025.com/scm';
 export const OPERATION_URL = '//testapi.robo2025.com/scm';
 
 // 上传文件获取token URL
-export const UPLOAD_URL = '//api-common-service.robo2025.com';
+export const UPLOAD_URL = 'https://testapi.robo2025.com/common';
+
+// 接口主域名
+export const MAIN_URL = 'https://testapi.robo2025.com';
 
 // 用户管理系统API URL
 export const USERS_URL = 'https://testapi.robo2025.com/user/service';
@@ -47,6 +50,13 @@ export const VERIFY_PAGE = `${myHost}/#/test`;
 
 // 文件服务器URL
 export const FILE_SERVER = '//imgcdn.robo2025.com/';
+
+// 七牛云上传地址
+export const QINIU_SERVER = '//upload.qiniup.com';
+
+// 支持上传的图片文件类型
+export const IMAGE_TYPES = ['jpg', 'png', 'gif', 'jpeg'];
+
 
 // 分页：每页显示多少记录
 export const PAGE_SIZE = 10;
