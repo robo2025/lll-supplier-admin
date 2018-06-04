@@ -162,13 +162,13 @@ class PRSPLayout extends React.PureComponent {
     } = this.props;
     const currentUser = Cookies.get('userinfo') ? JSON.parse(Cookies.get('userinfo')) : {};
     const bashRedirect = this.getBashRedirect();
-
     const layout = (
       <Layout>
         <Layout>
           <GlobalHeader
             logo={logo}
             currentUser={currentUser}
+            match={this.props.match}
             fetchingNotices={fetchingNotices}
             notices={notices}
             collapsed={collapsed}
@@ -177,6 +177,7 @@ class PRSPLayout extends React.PureComponent {
             onCollapse={this.handleMenuCollapse}
             onMenuClick={this.handleMenuClick}
             onNoticeVisibleChange={this.handleNoticeVisibleChange}
+
           />
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
             <div style={{ minHeight: 'calc(100vh - 260px)' }}>

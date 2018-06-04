@@ -55,8 +55,9 @@ export default class GlobalHeader extends PureComponent {
   render() {
     const {
       currentUser, collapsed, fetchingNotices, isMobile, logo,
-      onNoticeVisibleChange, onMenuClick, onNoticeClear,
+      onNoticeVisibleChange, onMenuClick, onNoticeClear, match,
     } = this.props;
+    console.log('全局头部', this.props);
     const menu = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
         <Menu.Item disabled><Icon type="user" />个人中心</Menu.Item>
@@ -64,9 +65,9 @@ export default class GlobalHeader extends PureComponent {
         <Menu.Divider />
         {
           currentUser.username ?
-          (<Menu.Item key="logout"><Icon type="logout" />退出登录</Menu.Item>)
-          :
-          (<Menu.Item key="login"><Icon type="login" />登录</Menu.Item>)
+            (<Menu.Item key="logout"><Icon type="logout" />退出登录</Menu.Item>)
+            :
+            (<Menu.Item key="login"><Icon type="login" />登录</Menu.Item>)
         }
 
       </Menu>
@@ -84,11 +85,18 @@ export default class GlobalHeader extends PureComponent {
             <Divider type="vertical" key="line" />,
           ]
         )}
-        <Icon
-          className={styles.trigger}
-          type={collapsed ? 'menu-unfold' : 'menu-fold'}
-          onClick={this.toggle}
-        />
+        {
+          match.path === '/prsp' ?
+            <span style={{ paddingLeft: 32, color: '#ccc' }}>供应商管理系统</span> :
+            (
+              <Icon
+                className={styles.trigger}
+                type={collapsed ? 'menu-unfold' : 'menu-fold'}
+                onClick={this.toggle}
+              />
+            )
+        }
+
         <div className={styles.right}>
           <HeaderSearch
             className={`${styles.action} ${styles.search}`}
