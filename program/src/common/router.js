@@ -87,6 +87,9 @@ export const getRouterData = (app) => {
     '/user': {
       component: dynamicWrapper(app, [], () => import('../layouts/UserLayout')),
     },
+    '/prsp': {
+      component: dynamicWrapper(app, [], () => import('../layouts/PRSPLayout')),
+    },
     '/prsp/register': {
       component: dynamicWrapper(app, ['upload', 'user'], () => import('../routes/User/UserRegister')),
     },

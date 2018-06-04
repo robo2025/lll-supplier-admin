@@ -44,7 +44,6 @@ export function logout() {
   if (accessToken) {
     Cookies.remove('access_token');
     Cookies.remove('userinfo');
-    setAuthority(-1);
     window.location.href = `${LOGOUT_URL}?access_token=${accessToken}&next=${HOME_PAGE}`;
   } else {
     window.location.href = `${LOGOUT_URL}`;
@@ -53,7 +52,6 @@ export function logout() {
 
 // 登录操作
 export function login() {
-  // console.log("登录URL--------------",LOGIN_URL + `?next=${encodeURIComponent(VERIFY_PAGE)}`);
   window.location.href = `${LOGIN_URL}?next=${encodeURIComponent(VERIFY_PAGE)}`;
 }
 

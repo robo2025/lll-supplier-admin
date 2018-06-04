@@ -53,7 +53,6 @@ export default class GlobalHeader extends PureComponent {
     window.dispatchEvent(event);
   }
   render() {
-    console.log('全局头部props', this.props);
     const {
       currentUser, collapsed, fetchingNotices, isMobile, logo,
       onNoticeVisibleChange, onMenuClick, onNoticeClear,
