@@ -57,7 +57,6 @@ export default class GlobalHeader extends PureComponent {
       currentUser, collapsed, fetchingNotices, isMobile, logo,
       onNoticeVisibleChange, onMenuClick, onNoticeClear, match,
     } = this.props;
-    console.log('全局头部', this.props);
     const menu = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
         <Menu.Item disabled><Icon type="user" />个人中心</Menu.Item>
