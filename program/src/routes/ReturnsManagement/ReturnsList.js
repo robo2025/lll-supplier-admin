@@ -271,7 +271,7 @@ export default class ReturnsList extends Component {
                 const orderListItemHeader = (
                   <div className={styles['returns-list-header']}>
                     <div>
-                      <b>商品订单编号：</b>
+                      <b>商品订单号：</b>
                       <a className="order-sn">{val.order_sn}</a>
                     </div>
                     <div>

@@ -198,7 +198,7 @@ export default class OrderDetail extends Component {
     );
     return (
       <PageHeaderLayout
-        title={`订单编号：${orderInfo.son_order_sn}`}
+        title={`商品订单号：${orderInfo.son_order_sn}`}
         logo={<img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />}
         content={descriptionContent}
       >
