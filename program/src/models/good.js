@@ -19,6 +19,7 @@ export default {
     detail: {},
     logs: [],
     total: 0,
+    productTotal: 0,
     products: [],
     productDetail: {},
   },
@@ -138,7 +139,7 @@ export default {
       return {
         ...state,
         products: action.payload,
-        total: action.headers['x-content-total'] >> 0,
+        productTotal: action.headers['x-content-total'] >> 0,
       };
     },
     saveProductDetail(state, action) {

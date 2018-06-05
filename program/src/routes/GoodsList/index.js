@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import qs from 'qs';
-import { Row, Col, Card, Form, Input, Checkbox, Select, Icon, Button, DatePicker, Modal, message } from 'antd';
+import Cookies from 'js-cookie';
+import { Row, Upload, Col, Card, Form, Input, Checkbox, Select, Icon, Button, DatePicker, Modal, message } from 'antd';
 import GoodsTable from '../../components/StandardTable/GoodsTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import GoodCheckboxGroup from '../../components/Checkbox/GoodCheckboxGroup';
 import EditableTable from '../../components/CustomTable/EditTable';
+import ModelContent from './ModelContent';
 import { handleServerMsg, handleServerMsgObj } from '../../utils/tools';
-import { PAGE_SIZE } from '../../constant/config';
+import { PAGE_SIZE, SUCCESS_STATUS } from '../../constant/config';
 import styles from './index.less';
 
 const FormItem = Form.Item;
@@ -20,7 +22,7 @@ const { TextArea } = Input;
 // 商品列表
 @connect(({ loading, good }) => ({
   good,
-  loading: loading.models.good,
+  loading,
 }))
 @Form.create()
 export default class GoodsList extends Component {
@@ -42,6 +44,7 @@ export default class GoodsList extends Component {
       unpublishReason: {
         publish_type: 1,
       }, // 下架原因
+      isImportModal: false,
       prices: [], // 商品价格区间数组
       args: qs.parse(props.location.search, { ignoreQueryPrefix: true }),
     };
@@ -50,6 +53,7 @@ export default class GoodsList extends Component {
 
   componentDidMount() {
     this.dispatchDefaultList();
+    this.dispatchProductModelList({});
   }
 
 
@@ -59,7 +63,6 @@ export default class GoodsList extends Component {
 
   // 导出数据复选框改变
   onExportFieldsChange = (fields) => {
-    console.log('exportFiles', fields);
     this.setState({
       exportFields: fields,
       isCheckAll: fields.length === plainOptions.length,
@@ -116,11 +119,11 @@ export default class GoodsList extends Component {
   showExportModal() {
     this.setState({ isShowExportModal: true });
   }
-
   // 取消导出数据
   handleCancel() {
     this.setState({ isShowExportModal: false });
   }
+
   // 确定导出数据
   handleOk() {
     this.setState({ isShowExportModal: false });
@@ -132,6 +135,52 @@ export default class GoodsList extends Component {
         window.open(`http://139.199.96.235:9005/api/goods/goods_reports?filename=${res.filename}`);
       },
     });
+  }
+
+  // 获取产品型号列表
+  dispatchProductModelList = ({ offset = 0, limit = 6, params = {} }) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'good/fetchAassociatedProduct',
+      offset,
+      limit,
+      params,
+    });
+  }
+
+  // bindState
+  bindModelThis = ($this) => {
+    this.$ModelThis = $this;
+  }
+
+  // 处理下载模板产品列表改变
+  handleModelTableChange = (pagination, filtersArg, sorter) => {
+    const params = {
+      currentPage: pagination.current,
+      pageSize: pagination.pageSize,
+      offset: (pagination.current - 1) * (pagination.pageSize),
+    };
+    this.dispatchProductModelList({ offset: params.offset, limit: params.pageSize });
+  }
+
+  // 是否显示modal
+  toggleModal = (key, visible) => {
+    this.setState({ [key]: visible });
+  }
+
+  handleModelUploadChange = ({ file }) => {
+    const DOWNLOAD_URL = 'https://testapi.robo2025.com/scm-service/download';
+    if (file.status === 'done' && file.response) {
+      const { data, msg, rescode } = file.response;
+      if (rescode >> 0 === SUCCESS_STATUS) {
+        message.success(msg);
+      } else {
+        Modal.error({
+          title: '导入失败',
+          content: <div><p>失败文件下载：</p><a href={`${DOWNLOAD_URL}?filename=${data.filename}`}>{data.filename}</a></div>,
+        });
+      }
+    }
   }
 
   // 上下架商品
@@ -502,10 +551,9 @@ export default class GoodsList extends Component {
   }
 
   render() {
-    const { loading, good } = this.props;
-    const { selectedRows, isShowPriceSettingModal, isShowExportModal, prices } = this.state;
+    const { loading, good, productModel } = this.props;
+    const { selectedRows, isShowPriceSettingModal, isShowExportModal, prices, isImportModal } = this.state;
     const data = good.list;
-
     console.log('商品列表页', this.state);
 
     return (
@@ -521,6 +569,23 @@ export default class GoodsList extends Component {
               <Button type="primary" icon="plus" onClick={this.jumpToPage.bind(this, 'new')}>新建</Button>
 
               {/* <Button onClick={this.showExportModal}>导出数据</Button> */}
+              <div style={{ display: 'inline-block', marginLeft: 32 }}>
+                <Upload
+                  className={styles.upload}
+                  name="file"
+                  action="https://testapi.robo2025.com/scm-service/models/template"
+                  headers={{
+                    Authorization: Cookies.get('access_token') || 'null',
+                  }}
+                  showUploadList={false}
+                  onChange={this.handleModelUploadChange}
+                >
+                  <Button type="primary">
+                    <Icon type="upload" />批量导入商品数据
+                  </Button>
+                </Upload>
+                <Button onClick={() => { this.toggleModal('isImportModal', true); }}>下载数据模板</Button>
+              </div>
             </div>
             {/* 导出数据Modal */}
             <Modal
@@ -579,7 +644,7 @@ export default class GoodsList extends Component {
             </Modal>
             <GoodsTable
               selectedRows={selectedRows}
-              loading={loading}
+              loading={loading.models.good}
               data={data}
               total={good.total}
               onSelectRow={this.handleSelectRows}
@@ -588,6 +653,25 @@ export default class GoodsList extends Component {
               onPriceSetting={this.handleClickPriceSettingBtn}
             />
           </div>
+          {/* 下载数据模板Modal */}
+          <Modal
+            width="60%"
+            visible={isImportModal}
+            title="下载模板选择"
+            okText=""
+            cancelText=""
+            onCancel={() => { this.toggleModal('isImportModal', false); }}
+            onOk={this.handleModelOk}
+          >
+            <ModelContent
+              dataSource={good.products}
+              total={good.productTotal}
+              loading={loading.models.product}
+              onModelTableChange={this.handleModelTableChange}
+              bindModelThis={this.bindModelThis}
+              onSearch={this.dispatchProductList}
+            />
+          </Modal>
         </Card>
       </PageHeaderLayout>
     );
