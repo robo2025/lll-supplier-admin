@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import Cookies from 'js-cookie';
 import { connect } from 'dva';
-import { Card, Form } from 'antd';
+import { Card, Form, Steps } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
 const FormItem = Form.Item;
+const { Step } = Steps;
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
@@ -46,13 +47,27 @@ export default class SupplierInfo extends Component {
     const { supplierInfo } = this.props.user;
     const qualifies = supplierInfo.profile ? supplierInfo.profile.qualifies : [];
     const license = qualifies.find(val => (val.qualifi_name === 'license'));
-    console.log('证书', license);
 
     return (
       <PageHeaderLayout
         title="企业信息"
       >
-        <Card title="基本信息" bordered style={{ marginTop: 35 }}>
+        <Card
+          bordered
+          hoverable
+          title={(
+            <div>
+              审核进度<a style={{ fontSize: 14, marginLeft: 10 }}>您的资料正在审核中，我们将来1-3个工作日内完成审核。</a>
+            </div>)}
+          style={{ marginTop: 35 }}
+        >
+          <Steps current={supplierInfo.profile ? supplierInfo.profile.audit_status + 1 : 0}>
+            <Step key={-1} title="创建账号" />
+            <Step key={0} title="平台审核" />
+            <Step key={1} title="审核通过" />
+          </Steps>
+        </Card>
+        <Card title="基本信息" bordered style={{ marginTop: 35 }} hoverable>
           <FormItem {...formItemLayout} label="用户名" style={style}>
             <span>{supplierInfo.username}</span>
           </FormItem>
@@ -75,17 +90,18 @@ export default class SupplierInfo extends Component {
             <span>{supplierInfo.profile && supplierInfo.profile.telphone}</span>
           </FormItem>
         </Card>
-        <Card title="资质信息" bordered={false} style={{ marginTop: 35 }}>
+        <Card title="资质信息" bordered={false} style={{ marginTop: 35 }} hoverable>
           <FormItem {...formItemLayout} label="营业执照号" style={style}>
             <span>{license && license.qualifi_code}</span>
+          </FormItem>
+          <FormItem {...formItemLayout} label="企业性质" style={style}>
+            <span>{supplierInfo.profile && COMPANY_TYPE[supplierInfo.profile.company_type]}</span>
           </FormItem>
           <FormItem {...formItemLayout} label="营业执照照片" style={style}>
             <div>
               <img src={license ? license.qualifi_url : ''} alt="营业执照" />
+              <div>有效期：{license.effective_date}~{license.expire_date}</div>
             </div>
-          </FormItem>
-          <FormItem {...formItemLayout} label="企业性质" style={style}>
-            <span>{supplierInfo.profile && COMPANY_TYPE[supplierInfo.profile.company_type]}</span>
           </FormItem>
           <FormItem {...formItemLayout} label="代理商证书" style={style}>
             <span>稍后</span>
