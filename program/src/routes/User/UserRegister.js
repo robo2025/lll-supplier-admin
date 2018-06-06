@@ -18,6 +18,7 @@ import {
   Cascader,
 } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import Agreement from './Agreement';
 import { QINIU_SERVER, IMAGE_TYPES } from '../../constant/config';
 import { checkFile, getFileSuffix, handleServerMsgObj } from '../../utils/tools';
 import options from '../../utils/cascader-address-options';
@@ -59,6 +60,7 @@ export default class UserRegister extends Component {
       previewImage: '',
       photos: [],
       isFlag: false, // 是否立即上传产品资质
+      isShowAgreement: false,
     };
   }
 
@@ -283,6 +285,11 @@ export default class UserRegister extends Component {
       }
     }
   };
+
+  showAgreement = () => {
+    const { isShowAgreement } = this.state;
+    this.setState({ isShowAgreement: !isShowAgreement });
+  }
 
   renderPasswordProgress = () => {
     const { form } = this.props;
@@ -712,6 +719,7 @@ export default class UserRegister extends Component {
             visible={this.state.modalVisible}
             okText="同意协议"
             cancelText="不同意"
+            className={styles['register-modal']}
           >
             <p style={{ lineHeight: 2 }}>
               <b>【审慎阅读】</b>您在申请注册流程中点击同意前，应当认真阅读以下协议。请您务必审慎阅读、充分理解协议中相关条款内容，其中包括：<br />
@@ -721,8 +729,12 @@ export default class UserRegister extends Component {
               如您对协议有任何疑问，可向工业魔方服务中心咨询<br />
               <b>【特别提示】 </b>您已充分理解，当您按照注册页面提示填写信息、阅读并同意协议且完成全部注册程序后，即表示您已充分阅读、理解并接受协议的全部内容。
               阅读协议的过程中，如果您不同意相关协议或其中任何条款约定，您应立即停止注册程序。<br />
-              <a>《工业魔方服务条款》</a><br />
-              <a>《隐私政策》</a><br />
+              <a onClick={this.showAgreement}>《工业魔方服务条款》</a><br />
+              {/* <a>《隐私政策》</a><br /> */}
+              {
+                this.state.isShowAgreement ? <Agreement /> : null
+              }
+
             </p>
           </Modal>
           {/* 图片预览 */}
