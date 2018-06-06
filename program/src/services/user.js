@@ -21,6 +21,16 @@ export async function getUserInfo() {
   });
 }
 
+// 获取供应商详细信息
+export async function getSupplierInfo({ supplierId }) {
+  const accessToken = Cookies.get('access_token');
+  return lyRequest(`${USERS_SERVER}/supplier/profiles/${supplierId}`, {
+    headers: {
+      Authorization: accessToken,
+    },
+  });
+}
+
 // 注册用户
 export async function registerUser({ data }) {
   return lyRequest(`${USERS_SERVER}/supplier/register`, {
