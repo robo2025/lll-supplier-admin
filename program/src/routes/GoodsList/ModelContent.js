@@ -73,8 +73,8 @@ export default class ModelContent extends Component {
           </Col>
           <Col xll={4} md={6} sm={24}>
             <FormItem >
-              {getFieldDecorator('product_name')(
-                <Input placeholder="产品名称" />
+              {getFieldDecorator('partnumber')(
+                <Input placeholder="产品型号" />
               )}
             </FormItem>
           </Col>
@@ -182,7 +182,7 @@ export default class ModelContent extends Component {
 
     return (
       <div>
-        <h3>可选产品列表</h3>
+        <h3>可选产品型号列表</h3>
         <div className={styles.tableListForm}>
           {this.renderSimpleForm()}
         </div>
@@ -201,7 +201,7 @@ export default class ModelContent extends Component {
             pageSizeOptions: ['6', '12', '18', '24'],
           }}
         />
-        <h3>已选产品列表</h3>
+        <h3>已选产品型号列表</h3>
         <Table
           bordered
           dataSource={modelList}

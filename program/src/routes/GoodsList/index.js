@@ -8,8 +8,8 @@ import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import GoodCheckboxGroup from '../../components/Checkbox/GoodCheckboxGroup';
 import EditableTable from '../../components/CustomTable/EditTable';
 import ModelContent from './ModelContent';
-import { handleServerMsg, handleServerMsgObj } from '../../utils/tools';
-import { PAGE_SIZE, SUCCESS_STATUS } from '../../constant/config';
+import { handleServerMsg, handleServerMsgObj, checkFile } from '../../utils/tools';
+import { PAGE_SIZE, SUCCESS_STATUS, FAIL_STATUS } from '../../constant/config';
 import styles from './index.less';
 
 const FormItem = Form.Item;
@@ -49,7 +49,6 @@ export default class GoodsList extends Component {
       args: qs.parse(props.location.search, { ignoreQueryPrefix: true }),
     };
   }
-
 
   componentDidMount() {
     this.dispatchDefaultList();
@@ -168,18 +167,40 @@ export default class GoodsList extends Component {
     this.setState({ [key]: visible });
   }
 
+  // 图片上传前处理：验证文件类型
+  handleBeforeUpload = (file) => {
+    if (!checkFile(file.name, ['xls', 'xlsx'])) {
+      message.error(`${file.name}的文件格式暂不支持上传`);
+      return false;
+    }
+  }
+
   handleModelUploadChange = ({ file }) => {
     const DOWNLOAD_URL = 'https://testapi.robo2025.com/scm-service/download';
     if (file.status === 'done' && file.response) {
       const { data, msg, rescode } = file.response;
       if (rescode >> 0 === SUCCESS_STATUS) {
         message.success(msg);
-      } else {
+      } else if (rescode >> 0 === FAIL_STATUS) {
         Modal.error({
           title: '导入失败',
           content: <div><p>失败文件下载：</p><a href={`${DOWNLOAD_URL}?filename=${data.filename}`}>{data.filename}</a></div>,
         });
+      } else {
+        message.error(msg);
       }
+    }
+  }
+
+  handleModelOk = () => {
+    console.log('$ModelThis', this.$ModelThis, this.$ModelThis.state);
+    const { modelList } = this.$ModelThis.state;
+    const mnos = modelList.map(val => val.mno);
+    if (mnos.length > 0) {
+      this.setState({ isImportModal: false });
+      window.open(`https://testapi.robo2025.com/scm-service/goods/template?${qs.stringify({ mnos }, { indices: false })}`);
+    } else {
+      this.setState({ isImportModal: false });
     }
   }
 
@@ -573,12 +594,13 @@ export default class GoodsList extends Component {
                 <Upload
                   className={styles.upload}
                   name="file"
-                  action="https://testapi.robo2025.com/scm-service/models/template"
+                  action="https://testapi.robo2025.com/scm-service/goods/template"
                   headers={{
                     Authorization: Cookies.get('access_token') || 'null',
                   }}
                   showUploadList={false}
                   onChange={this.handleModelUploadChange}
+                  beforeUpload={this.handleBeforeUpload}
                 >
                   <Button type="primary">
                     <Icon type="upload" />批量导入商品数据
@@ -666,10 +688,10 @@ export default class GoodsList extends Component {
             <ModelContent
               dataSource={good.products}
               total={good.productTotal}
-              loading={loading.models.product}
+              loading={loading.models.good}
               onModelTableChange={this.handleModelTableChange}
               bindModelThis={this.bindModelThis}
-              onSearch={this.dispatchProductList}
+              onSearch={this.dispatchProductModelList}
             />
           </Modal>
         </Card>
