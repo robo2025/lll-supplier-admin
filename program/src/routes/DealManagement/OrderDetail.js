@@ -72,7 +72,7 @@ const logisticsColumns = [{
   title: '发货日期',
   dataIndex: 'add_time',
   key: 'add_time',
-  render: val => (<span>{moment(val * 1000).format('YYYY-MM-DD h:mm:ss')}</span>),
+  render: val => (<span>{moment(val * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>),
 }, {
   title: '送货人',
   dataIndex: 'sender',

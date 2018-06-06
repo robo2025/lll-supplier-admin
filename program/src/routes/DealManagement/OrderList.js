@@ -413,7 +413,7 @@ export default class OrderList extends Component {
                   <div className={styles['order-list-header']}>
                     <b>商品订单号：</b>
                     <a className="order-sn">{val.sub_order[0].son_order_sn}</a>
-                    <span className="order-time">{moment(val.add_time * 1000).format('YYYY-MM-DD hh:mm:ss')}</span>
+                    <span className="order-time">{moment(val.add_time * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
                   </div>
                 );
                 return (
