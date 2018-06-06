@@ -48,6 +48,17 @@ const menuData = [{
       path: 'list',
     },
   ],
+}, {
+  name: '方案询价管理',
+  icon: 'solution',
+  path: 'solution',
+  authority: '2',
+  children: [
+    {
+      name: '询价单列表',
+      path: 'list',
+    },
+  ],
 }];
 
 function formatter(data, parentPath = '/', parentAuthority) {
