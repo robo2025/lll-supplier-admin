@@ -46,7 +46,11 @@ export default class SupplierInfo extends Component {
   render() {
     const { supplierInfo } = this.props.user;
     const qualifies = supplierInfo.profile ? supplierInfo.profile.qualifies : [];
+    const companyType = supplierInfo.profile ? supplierInfo.profile.company_type : '';
     const license = qualifies.find(val => (val.qualifi_name === 'license'));
+    const companyTypeLicense = companyType ?
+      qualifies.find(val => (val.qualifi_name === companyType)) : {};
+    // console.log('公司性质证书', companyTypeLicense);
 
     return (
       <PageHeaderLayout
@@ -94,17 +98,25 @@ export default class SupplierInfo extends Component {
           <FormItem {...formItemLayout} label="营业执照号" style={style}>
             <span>{license && license.qualifi_code}</span>
           </FormItem>
-          <FormItem {...formItemLayout} label="企业性质" style={style}>
-            <span>{supplierInfo.profile && COMPANY_TYPE[supplierInfo.profile.company_type]}</span>
-          </FormItem>
           <FormItem {...formItemLayout} label="营业执照照片" style={style}>
             <div>
-              <img src={license ? license.qualifi_url : ''} alt="营业执照" />
-              <div>有效期：{license.effective_date}~{license.expire_date}</div>
+              <img width={500} src={license ? license.qualifi_url : ''} alt="营业执照" />
+              <div>有效期：{license && license.effective_date}~{license && license.expire_date}</div>
             </div>
           </FormItem>
-          <FormItem {...formItemLayout} label="代理商证书" style={style}>
-            <span>稍后</span>
+          <FormItem {...formItemLayout} label="企业性质" style={style}>
+            <span>{supplierInfo.profile && COMPANY_TYPE[companyType]}</span>
+          </FormItem>
+          <FormItem {...formItemLayout} label={`${COMPANY_TYPE[companyType]}证书`} style={style}>
+            <div>
+              <img width={500} src={companyTypeLicense ? companyTypeLicense.qualifi_url : ''} alt={`${COMPANY_TYPE[companyType]}证书`} />
+              <div>
+                有效期：
+                {companyTypeLicense && companyTypeLicense.effective_date}
+                ~
+                {companyTypeLicense && companyTypeLicense.expire_date}
+              </div>
+            </div>
           </FormItem>
         </Card>
       </PageHeaderLayout>

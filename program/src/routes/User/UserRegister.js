@@ -149,7 +149,7 @@ export default class UserRegister extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
     const {
-      photos, production, certification, other, agency, integrator, taxpayer, isFlag
+      photos, production, certification, other, agency, integrator, taxpayer, isFlag,
     } = this.state;
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (err) {
@@ -171,6 +171,36 @@ export default class UserRegister extends Component {
         district_id: values.place[2], // 区 (可选)
       };
       qualifications.push(license);
+      if (values.agency) { // 代理商相关证明
+        const agencyObj = {
+          qualifi_name: 'agency',
+          qualifi_code: null, // 证书编码
+          qualifi_url: agency[0].status === 'done' ? agency[0].response.key : '', // url
+          effective_date: values.agency_date[0].format('YYYY-MM-DD'), // 有效期 （格式：2018-04-02）
+          expire_date: values.agency_date[1].format('YYYY-MM-DD'), // 失效期
+        };
+        qualifications.push(agencyObj);
+      }
+      if (values.integrator) { // 集成商相关证明
+        const integratorObj = {
+          qualifi_name: 'integrator',
+          qualifi_code: null, // 证书编码
+          qualifi_url: integrator[0].status === 'done' ? integrator[0].response.key : '', // url
+          effective_date: values.integrator_date[0].format('YYYY-MM-DD'), // 有效期 （格式：2018-04-02）
+          expire_date: values.integrator_date[1].format('YYYY-MM-DD'), // 失效期
+        };
+        qualifications.push(integratorObj);
+      }
+      if (values.taxpayer) { // 一般纳税人相关证明
+        const taxpayerObj = {
+          qualifi_name: 'taxpayer',
+          qualifi_code: null, // 证书编码
+          qualifi_url: taxpayer[0].status === 'done' ? taxpayer[0].response.key : '', // url
+          effective_date: values.taxpayer_date[0].format('YYYY-MM-DD'), // 有效期 （格式：2018-04-02）
+          expire_date: values.taxpayer_date[1].format('YYYY-MM-DD'), // 失效期
+        };
+        qualifications.push(taxpayerObj);
+      }
       if (isFlag) { // 如果立即上传产品资质
         if (values.production) { // 生产许可证
           const productionObj = {
@@ -202,36 +232,6 @@ export default class UserRegister extends Component {
           };
           qualifications.push(otherObj);
         }
-        if (values.agency) { // 代理商相关证明
-          const agencyObj = {
-            qualifi_name: 'agency',
-            qualifi_code: null, // 证书编码
-            qualifi_url: agency[0].status === 'done' ? agency[0].response.key : '', // url
-            effective_date: values.agency_date[0].format('YYYY-MM-DD'), // 有效期 （格式：2018-04-02）
-            expire_date: values.agency_date[1].format('YYYY-MM-DD'), // 失效期
-          };
-          qualifications.push(agencyObj);
-        }
-        if (values.integrator) { // 集成商相关证明
-          const integratorObj = {
-            qualifi_name: 'integrator',
-            qualifi_code: null, // 证书编码
-            qualifi_url: integrator[0].status === 'done' ? integrator[0].response.key : '', // url
-            effective_date: values.integrator_date[0].format('YYYY-MM-DD'), // 有效期 （格式：2018-04-02）
-            expire_date: values.integrator_date[1].format('YYYY-MM-DD'), // 失效期
-          };
-          qualifications.push(integratorObj);
-        }
-        if (values.taxpayer) { // 一般纳税人相关证明
-          const taxpayerObj = {
-            qualifi_name: 'taxpayer',
-            qualifi_code: null, // 证书编码
-            qualifi_url: taxpayer[0].status === 'done' ? taxpayer[0].response.key : '', // url
-            effective_date: values.taxpayer_date[0].format('YYYY-MM-DD'), // 有效期 （格式：2018-04-02）
-            expire_date: values.taxpayer_date[1].format('YYYY-MM-DD'), // 失效期
-          };
-          qualifications.push(taxpayerObj);
-        }
       }
       console.log('校验通过:', {
         ...values,
@@ -257,7 +257,10 @@ export default class UserRegister extends Component {
     dispatch({
       type: 'user/register',
       data,
-      success: () => { message.success('注册成功'); jumpToLogin(); },
+      success: () => {
+        message.success('注册成功');
+        // jumpToLogin();
+      },
       error: (res) => { message.error(handleServerMsgObj(res.msg)); },
     });
   }
@@ -360,6 +363,7 @@ export default class UserRegister extends Component {
       photos, production, certification, other, agency, integrator, taxpayer,
       companyType, isGeneralTaxpayer,
     } = this.state;
+    // console.log('用户注册state', this.state);
 
     const uploadButton = (
       <div>
