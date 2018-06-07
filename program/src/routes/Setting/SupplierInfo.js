@@ -64,7 +64,7 @@ export default class SupplierInfo extends Component {
             <div>
               审核进度<a style={{ fontSize: 14, marginLeft: 10 }}>您的资料正在审核中，我们将来1-3个工作日内完成审核。</a>
             </div>)}
-          style={{ marginTop: 35 }}
+          style={{ marginTop: 35, display: 'none' }}
         >
           <Steps current={supplierInfo.profile ? supplierInfo.profile.audit_status + 1 : 0}>
             <Step key={-1} title="创建账号" />
@@ -108,17 +108,22 @@ export default class SupplierInfo extends Component {
           <FormItem {...formItemLayout} label="企业性质" style={style}>
             <span>{supplierInfo.profile && COMPANY_TYPE[companyType]}</span>
           </FormItem>
-          <FormItem {...formItemLayout} label={`${COMPANY_TYPE[companyType]}证书`} style={style}>
-            <div>
-              <img width={500} src={companyTypeLicense ? companyTypeLicense.qualifi_url : ''} alt={`${COMPANY_TYPE[companyType]}证书`} />
-              <div>
-                有效期：
-                {companyTypeLicense && companyTypeLicense.effective_date}
-                ~
-                {companyTypeLicense && companyTypeLicense.expire_date}
-              </div>
-            </div>
-          </FormItem>
+          {
+            companyTypeLicense && Object.keys(companyTypeLicense).length > 0 ? (
+              <FormItem {...formItemLayout} label={`${COMPANY_TYPE[companyType]}证书`} style={style}>
+                <div>
+                  <img width={500} src={companyTypeLicense ? companyTypeLicense.qualifi_url : ''} alt={`${COMPANY_TYPE[companyType]}证书`} />
+                  <div>
+                    有效期：
+                    {companyTypeLicense && companyTypeLicense.effective_date}
+                    ~
+                    {companyTypeLicense && companyTypeLicense.expire_date}
+                  </div>
+                </div>
+              </FormItem>
+            )
+              : null
+          }
         </Card>
       </PageHeaderLayout>
     );

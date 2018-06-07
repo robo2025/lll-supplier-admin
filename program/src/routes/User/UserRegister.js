@@ -62,7 +62,7 @@ export default class UserRegister extends Component {
       isFlag: false, // 是否立即上传产品资质
       isShowAgreement: false,
       companyType: '', // 公司性质
-      isGeneralTaxpayer: true,
+      isGeneralTaxpayer: false,
     };
   }
 
@@ -709,7 +709,7 @@ export default class UserRegister extends Component {
             }
             <FormItem {...formItemLayout} label="一般纳税人">
               {getFieldDecorator('is_general_taxpayer', {
-                initialValue: 1,
+                initialValue: 0,
               })(
                 <Radio.Group onChange={this.handleTaxpayerChange}>
                   <Radio value={0}>否</Radio>
@@ -771,7 +771,7 @@ export default class UserRegister extends Component {
               isFlag ?
                 (
                   <div>
-                    <FormItem {...formItemLayout} label="产品生产许可证" help="证书照片(图片小于1M，支持格式jpg\png)">
+                    <FormItem style={{ marginBottom: 30 }} {...formItemLayout} label="产品生产许可证" help="证书照片(图片小于1M，支持格式jpg\png)">
                       {
                         getFieldDecorator('production', {
                           rules: [{
@@ -809,7 +809,7 @@ export default class UserRegister extends Component {
                         )
                       }
                     </FormItem>
-                    <FormItem {...formItemLayout} label="产品合格证" help="证书照片(图片小于1M，支持格式jpg\png)">
+                    <FormItem {...formItemLayout} style={{ marginBottom: 30 }} label="产品合格证" help="证书照片(图片小于1M，支持格式jpg\png)">
                       {
                         getFieldDecorator('certification', {
                           rules: [{
@@ -847,7 +847,7 @@ export default class UserRegister extends Component {
                         )
                       }
                     </FormItem>
-                    <FormItem {...formItemLayout} label="其他证书" help="证书照片(图片小于1M，支持格式jpg\png)">
+                    <FormItem {...formItemLayout} style={{ marginBottom: 30 }} label="其他证书" help="证书照片(图片小于1M，支持格式jpg\png)">
                       {
                         getFieldDecorator('other', {
                           rules: [{
