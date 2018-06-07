@@ -91,7 +91,7 @@ const columns = [{
   title: '操作时间',
   dataIndex: 'add_time',
   key: 'add_time',
-  render: text => (<span>{moment(text * 1000).format('YYYY-MM-DD hh:mm:ss')}</span>),
+  render: text => (<span>{moment(text * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>),
 }, {
   title: '操作记录',
   dataIndex: 'execution_detail',

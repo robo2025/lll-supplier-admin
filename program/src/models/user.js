@@ -1,4 +1,4 @@
-import { queryCurrent, getUserInfo, registerUser, getSMSCode } from '../services/user';
+import { queryCurrent, getUserInfo, registerUser, getSMSCode, getSupplierInfo } from '../services/user';
 import { setAuthority } from '../utils/authority';
 import { SUCCESS_STATUS } from '../constant/config.js';
 
@@ -10,6 +10,7 @@ export default {
     info: {},
     loading: false,
     currentUser: {},
+    supplierInfo: {},
   },
 
   effects: {
@@ -51,6 +52,16 @@ export default {
         if (typeof success === 'function') { success(response); }
       } else if (typeof error === 'function') { error(response); }
     },
+    *fetchSupplierInfo({ supplierId, success, error }, { call, put }) {
+      const response = yield call(getSupplierInfo, { supplierId });
+      if (response.rescode >> 0 === SUCCESS_STATUS) {
+        if (typeof success === 'function') { success(response); }
+      } else if (typeof error === 'function') { error(response); return; }
+      yield put({
+        type: 'saveSupplier',
+        payload: response.data,
+      });
+    },
   },
 
   reducers: {
@@ -80,6 +91,12 @@ export default {
           ...state.currentUser,
           notifyCount: action.payload,
         },
+      };
+    },
+    saveSupplier(state, action) {
+      return {
+        ...state,
+        supplierInfo: action.payload,
       };
     },
   },

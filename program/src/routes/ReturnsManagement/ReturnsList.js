@@ -277,7 +277,7 @@ export default class ReturnsList extends Component {
                     <div>
                       <b>退货单编号：</b>
                       <a className="order-sn">{val.returns_sn}</a>
-                      <span className="order-time">({moment(val.return_order_time * 1000).format('YYYY-MM-DD hh:mm')})</span>
+                      <span className="order-time">({moment(val.return_order_time * 1000).format('YYYY-MM-DD HH:mm')})</span>
                     </div>
                   </div>
                 );

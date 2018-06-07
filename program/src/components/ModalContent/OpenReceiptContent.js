@@ -22,7 +22,7 @@ const receiptColumns = [{
   title: '更新日期',
   dataIndex: 'add_time',
   key: 'add_time',
-  render: text => (<span>{moment(text * 1000).format('YYYY-MM-DD hh:mm')}</span>),
+  render: text => (<span>{moment(text * 1000).format('YYYY-MM-DD HH:mm')}</span>),
 }, {
   title: '操作人员',
   dataIndex: 'operator',

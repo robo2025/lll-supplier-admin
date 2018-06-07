@@ -72,7 +72,7 @@ const logisticsColumns = [{
   title: '发货日期',
   dataIndex: 'add_time',
   key: 'add_time',
-  render: val => (<span>{moment(val * 1000).format('YYYY-MM-DD h:mm:ss')}</span>),
+  render: val => (<span>{moment(val * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>),
 }, {
   title: '送货人',
   dataIndex: 'sender',
@@ -113,7 +113,7 @@ const actionColumns = [{
   title: '操作时间',
   dataIndex: 'add_time',
   key: 'add_time',
-  render: text => (<span>{moment(text * 1000).format('YYYY-MM-DD h:mm:ss')}</span>),
+  render: text => (<span>{moment(text * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>),
 }, {
   title: '耗时',
   dataIndex: 'time_consuming',
@@ -193,7 +193,7 @@ export default class OrderDetail extends Component {
         <Description term="订单总金额">￥{orderInfo.subtotal_money}元</Description>
         <Description term="运费">包邮</Description>
         <Description term="实收总金额"><span style={{ color: 'red' }}>￥{orderInfo.subtotal_money}元</span></Description>
-        <Description term="生效日期">{moment(orderInfo.add_time * 1000).format('YYYY-MM-DD h:mm:ss')}</Description>
+        <Description term="生效日期">{moment(orderInfo.add_time * 1000).format('YYYY-MM-DD HH:mm:ss')}</Description>
       </DescriptionList>
     );
     return (

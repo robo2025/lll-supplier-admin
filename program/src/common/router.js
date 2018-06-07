@@ -93,8 +93,12 @@ export const getRouterData = (app) => {
     '/prsp/register': {
       component: dynamicWrapper(app, ['upload', 'user'], () => import('../routes/User/UserRegister')),
     },
+    '/setting/userinfo': {
+      component: dynamicWrapper(app, ['upload', 'user'], () => import('../routes/Setting/SupplierInfo')),
+      name: '企业信息审核',
+    },
     '/goods/list': {
-      component: dynamicWrapper(app, ['good'], () => import('../routes/GoodsList')),
+      component: dynamicWrapper(app, ['good', 'product'], () => import('../routes/GoodsList')),
     },
     '/goods/new': {
       component: dynamicWrapper(app, ['product', 'good'], () => import('../routes/NewGood')),

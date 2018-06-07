@@ -18,6 +18,7 @@ import {
   Cascader,
 } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import Agreement from './Agreement';
 import { QINIU_SERVER, IMAGE_TYPES } from '../../constant/config';
 import { checkFile, getFileSuffix, handleServerMsgObj } from '../../utils/tools';
 import options from '../../utils/cascader-address-options';
@@ -59,6 +60,9 @@ export default class UserRegister extends Component {
       previewImage: '',
       photos: [],
       isFlag: false, // 是否立即上传产品资质
+      isShowAgreement: false,
+      companyType: '', // 公司性质
+      isGeneralTaxpayer: false,
     };
   }
 
@@ -144,7 +148,9 @@ export default class UserRegister extends Component {
   // 提交注册
   handleSubmit = (e) => {
     e.preventDefault();
-    const { photos, production, certification, other, isFlag } = this.state;
+    const {
+      photos, production, certification, other, agency, integrator, taxpayer, isFlag,
+    } = this.state;
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (err) {
         console.log('校验出错:', err, values);
@@ -165,6 +171,36 @@ export default class UserRegister extends Component {
         district_id: values.place[2], // 区 (可选)
       };
       qualifications.push(license);
+      if (values.agency) { // 代理商相关证明
+        const agencyObj = {
+          qualifi_name: 'agency',
+          qualifi_code: null, // 证书编码
+          qualifi_url: agency[0].status === 'done' ? agency[0].response.key : '', // url
+          effective_date: values.agency_date[0].format('YYYY-MM-DD'), // 有效期 （格式：2018-04-02）
+          expire_date: values.agency_date[1].format('YYYY-MM-DD'), // 失效期
+        };
+        qualifications.push(agencyObj);
+      }
+      if (values.integrator) { // 集成商相关证明
+        const integratorObj = {
+          qualifi_name: 'integrator',
+          qualifi_code: null, // 证书编码
+          qualifi_url: integrator[0].status === 'done' ? integrator[0].response.key : '', // url
+          effective_date: values.integrator_date[0].format('YYYY-MM-DD'), // 有效期 （格式：2018-04-02）
+          expire_date: values.integrator_date[1].format('YYYY-MM-DD'), // 失效期
+        };
+        qualifications.push(integratorObj);
+      }
+      if (values.taxpayer) { // 一般纳税人相关证明
+        const taxpayerObj = {
+          qualifi_name: 'taxpayer',
+          qualifi_code: null, // 证书编码
+          qualifi_url: taxpayer[0].status === 'done' ? taxpayer[0].response.key : '', // url
+          effective_date: values.taxpayer_date[0].format('YYYY-MM-DD'), // 有效期 （格式：2018-04-02）
+          expire_date: values.taxpayer_date[1].format('YYYY-MM-DD'), // 失效期
+        };
+        qualifications.push(taxpayerObj);
+      }
       if (isFlag) { // 如果立即上传产品资质
         if (values.production) { // 生产许可证
           const productionObj = {
@@ -221,7 +257,10 @@ export default class UserRegister extends Component {
     dispatch({
       type: 'user/register',
       data,
-      success: () => { message.success('注册成功'); jumpToLogin(); },
+      success: () => {
+        message.success('注册成功');
+        // jumpToLogin();
+      },
       error: (res) => { message.error(handleServerMsgObj(res.msg)); },
     });
   }
@@ -284,6 +323,21 @@ export default class UserRegister extends Component {
     }
   };
 
+  showAgreement = () => {
+    const { isShowAgreement } = this.state;
+    this.setState({ isShowAgreement: !isShowAgreement });
+  }
+
+  // 公司性质单选框改变时
+  handleCompanyTypeChange = (e) => {
+    this.setState({ companyType: e.target.value });
+  }
+
+  // 是否为一般纳税人改变
+  handleTaxpayerChange = (e) => {
+    this.setState({ isGeneralTaxpayer: Boolean(e.target.value) });
+  }
+
   renderPasswordProgress = () => {
     const { form } = this.props;
     const value = form.getFieldValue('password');
@@ -305,8 +359,11 @@ export default class UserRegister extends Component {
     const { getFieldDecorator } = this.props.form;
     const { upload } = this.props;
     const {
-      count, previewVisible, previewImage, isFlag, file, photos, production, certification, other,
+      count, previewVisible, previewImage, isFlag, file,
+      photos, production, certification, other, agency, integrator, taxpayer,
+      companyType, isGeneralTaxpayer,
     } = this.state;
+    // console.log('用户注册state', this.state);
 
     const uploadButton = (
       <div>
@@ -558,7 +615,7 @@ export default class UserRegister extends Component {
                 }],
                 initialValue: 'supplier',
               })(
-                <Radio.Group>
+                <Radio.Group onChange={this.handleCompanyTypeChange}>
                   <Radio value="supplier">厂家</Radio>
                   <Radio value="agency">代理商</Radio>
                   <Radio value="integrator">集成商</Radio>
@@ -566,16 +623,142 @@ export default class UserRegister extends Component {
                 </Radio.Group>
               )}
             </FormItem>
+            {
+              companyType === 'agency' ? (
+                <FormItem {...formItemLayout} label="代理商相关证书" help="证书照片(图片小于1M，支持格式jpg\png)">
+                  {
+                    getFieldDecorator('agency', {
+                      rules: [{
+                        required: false,
+                        message: '请上传代理商相关证书照片',
+                      }],
+                    })(
+                      <div>
+                        <Upload
+                          name="file"
+                          action={QINIU_SERVER}
+                          listType="picture-card"
+                          className="avatar-uploader"
+                          beforeUpload={currFile => (this.handleBeforeUpload('agency', currFile))}
+                          onChange={({ fileList }) => { this.handleUploadChange('agency', fileList); }}
+                          onPreview={this.handlePreview}
+                          data={
+                            {
+                              token: upload.upload_token,
+                              key: `supplier/qualification/images/${file.uid}.${getFileSuffix(file.name)}`,
+                            }
+                          }
+                        >
+                          {(agency && agency.length >= 1) ? null : uploadButton}
+                        </Upload>
+                        <FormItem label="有效期">
+                          {getFieldDecorator('agency_date', {
+                            rules: [{
+                              required: agency && agency.length > 0,
+                              message: '请选择起止日期',
+                            }],
+                          })(<RangePicker style={{ width: '350px' }} placeholder={['开始日期', '结束日期']} />)}
+                        </FormItem>
+                      </div>
+                    )
+                  }
+                </FormItem>
+              ) : null
+            }
+            {
+              companyType === 'integrator' ? (
+                <FormItem {...formItemLayout} label="集成商相关证书" help="证书照片(图片小于1M，支持格式jpg\png)">
+                  {
+                    getFieldDecorator('integrator', {
+                      rules: [{
+                        required: false,
+                        message: '请上传集成商相关证书照片',
+                      }],
+                    })(
+                      <div>
+                        <Upload
+                          name="file"
+                          action={QINIU_SERVER}
+                          listType="picture-card"
+                          className="avatar-uploader"
+                          beforeUpload={currFile => (this.handleBeforeUpload('integrator', currFile))}
+                          onChange={({ fileList }) => { this.handleUploadChange('integrator', fileList); }}
+                          onPreview={this.handlePreview}
+                          data={
+                            {
+                              token: upload.upload_token,
+                              key: `supplier/qualification/images/${file.uid}.${getFileSuffix(file.name)}`,
+                            }
+                          }
+                        >
+                          {(integrator && integrator.length >= 1) ? null : uploadButton}
+                        </Upload>
+                        <FormItem label="有效期">
+                          {getFieldDecorator('integrator_date', {
+                            rules: [{
+                              required: integrator && integrator.length > 0,
+                              message: '请选择起止日期',
+                            }],
+                          })(<RangePicker style={{ width: '350px' }} placeholder={['开始日期', '结束日期']} />)}
+                        </FormItem>
+                      </div>
+                    )
+                  }
+                </FormItem>
+              ) : null
+            }
             <FormItem {...formItemLayout} label="一般纳税人">
               {getFieldDecorator('is_general_taxpayer', {
-                initialValue: '1',
+                initialValue: 0,
               })(
-                <Radio.Group>
-                  <Radio value="0">否</Radio>
-                  <Radio value="1">是</Radio>
+                <Radio.Group onChange={this.handleTaxpayerChange}>
+                  <Radio value={0}>否</Radio>
+                  <Radio value={1}>是</Radio>
                 </Radio.Group>
               )}
             </FormItem>
+            {
+              isGeneralTaxpayer ? (
+                <FormItem {...formItemLayout} label="一般纳税人证明" help="照片(图片小于1M，支持格式jpg\png)">
+                  {
+                    getFieldDecorator('taxpayer', {
+                      rules: [{
+                        required: false,
+                        message: '请上传一般纳税人证明照片',
+                      }],
+                    })(
+                      <div>
+                        <Upload
+                          name="file"
+                          action={QINIU_SERVER}
+                          listType="picture-card"
+                          className="avatar-uploader"
+                          beforeUpload={currFile => (this.handleBeforeUpload('taxpayer', currFile))}
+                          onChange={({ fileList }) => { this.handleUploadChange('taxpayer', fileList); }}
+                          onPreview={this.handlePreview}
+                          data={
+                            {
+                              token: upload.upload_token,
+                              key: `supplier/qualification/images/${file.uid}.${getFileSuffix(file.name)}`,
+                            }
+                          }
+                        >
+                          {(taxpayer && taxpayer.length >= 1) ? null : uploadButton}
+                        </Upload>
+                        <FormItem label="有效期">
+                          {getFieldDecorator('taxpayer_date', {
+                            rules: [{
+                              required: integrator && integrator.length > 0,
+                              message: '请选择起止日期',
+                            }],
+                          })(<RangePicker style={{ width: '350px' }} placeholder={['开始日期', '结束日期']} />)}
+                        </FormItem>
+                      </div>
+                    )
+                  }
+                </FormItem>
+              ) : null
+            }
             <FormItem {...formItemLayout} label="产品资质" help="完善产品资质信息将有利于您的账号优先审核，加快入驻合作">
               {getFieldDecorator('public', {
                 initialValue: false,
@@ -588,7 +771,7 @@ export default class UserRegister extends Component {
               isFlag ?
                 (
                   <div>
-                    <FormItem {...formItemLayout} label="产品生产许可证" help="证书照片(图片小于1M，支持格式jpg\png)">
+                    <FormItem style={{ marginBottom: 30 }} {...formItemLayout} label="产品生产许可证" help="证书照片(图片小于1M，支持格式jpg\png)">
                       {
                         getFieldDecorator('production', {
                           rules: [{
@@ -626,7 +809,7 @@ export default class UserRegister extends Component {
                         )
                       }
                     </FormItem>
-                    <FormItem {...formItemLayout} label="产品合格证" help="证书照片(图片小于1M，支持格式jpg\png)">
+                    <FormItem {...formItemLayout} style={{ marginBottom: 30 }} label="产品合格证" help="证书照片(图片小于1M，支持格式jpg\png)">
                       {
                         getFieldDecorator('certification', {
                           rules: [{
@@ -664,7 +847,7 @@ export default class UserRegister extends Component {
                         )
                       }
                     </FormItem>
-                    <FormItem {...formItemLayout} label="其他证书" help="证书照片(图片小于1M，支持格式jpg\png)">
+                    <FormItem {...formItemLayout} style={{ marginBottom: 30 }} label="其他证书" help="证书照片(图片小于1M，支持格式jpg\png)">
                       {
                         getFieldDecorator('other', {
                           rules: [{
@@ -712,6 +895,7 @@ export default class UserRegister extends Component {
             visible={this.state.modalVisible}
             okText="同意协议"
             cancelText="不同意"
+            className={styles['register-modal']}
           >
             <p style={{ lineHeight: 2 }}>
               <b>【审慎阅读】</b>您在申请注册流程中点击同意前，应当认真阅读以下协议。请您务必审慎阅读、充分理解协议中相关条款内容，其中包括：<br />
@@ -721,8 +905,12 @@ export default class UserRegister extends Component {
               如您对协议有任何疑问，可向工业魔方服务中心咨询<br />
               <b>【特别提示】 </b>您已充分理解，当您按照注册页面提示填写信息、阅读并同意协议且完成全部注册程序后，即表示您已充分阅读、理解并接受协议的全部内容。
               阅读协议的过程中，如果您不同意相关协议或其中任何条款约定，您应立即停止注册程序。<br />
-              <a>《工业魔方服务条款》</a><br />
-              <a>《隐私政策》</a><br />
+              <a onClick={this.showAgreement}>《工业魔方服务条款》</a><br />
+              {/* <a>《隐私政策》</a><br /> */}
+              {
+                this.state.isShowAgreement ? <Agreement /> : null
+              }
+
             </p>
           </Modal>
           {/* 图片预览 */}

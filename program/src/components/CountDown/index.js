@@ -57,7 +57,7 @@ class CountDown extends Component {
     };
   }
   // defaultFormat = time => (
-  //  <span>{moment(time).format('hh:mm:ss')}</span>
+  //  <span>{moment(time).format('HH:mm:ss')}</span>
   // );
   defaultFormat = (time) => {
     const hours = 60 * 60 * 1000;
