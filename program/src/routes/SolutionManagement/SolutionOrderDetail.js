@@ -212,7 +212,7 @@ class SolutionOrderDetail extends React.Component {
             type="primary"
             size="large"
             className={styles.footerBotton}
-            href={`${location.href.split('detail')[0]}solutionPriceQuotation`}
+            href={`${location.href.split('detail')[0]}solutionPriceQuotation?sln_no=${location.href.split('=').pop()}`}
           >
             立即报价
           </Button>
