@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { notification } from 'antd';
+import Cookies from 'js-cookie';
 import './interceptors';
 
 const codeMessage = {
@@ -42,9 +43,13 @@ function checkStatus(response) {
  * @return {object}           An object containing either "data" or "err"
  */
 export default function request(url, options) {
+  const token = Cookies.get('access_token');
   const defaultOptions = {
     credentials: 'include',
     timeout: 5000,
+    headers: {
+      Authorization: token,
+    },
   };
   const newOptions = { ...defaultOptions, ...options };
   if (newOptions.method === 'POST' || newOptions.method === 'PUT') {
