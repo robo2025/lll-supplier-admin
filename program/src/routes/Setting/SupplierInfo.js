@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Cookies from 'js-cookie';
 import { connect } from 'dva';
 import { Card, Form, Steps } from 'antd';
+import { getAreaBycode } from '../../utils/cascader-address-options';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
 const FormItem = Form.Item;
@@ -50,7 +51,7 @@ export default class SupplierInfo extends Component {
     const license = qualifies.find(val => (val.qualifi_name === 'license'));
     const companyTypeLicense = companyType ?
       qualifies.find(val => (val.qualifi_name === companyType)) : {};
-    // console.log('公司性质证书', companyTypeLicense);
+    const areaAddress = getAreaBycode(supplierInfo.profile ? supplierInfo.profile.district_id.toString() : '');
 
     return (
       <PageHeaderLayout
@@ -88,7 +89,7 @@ export default class SupplierInfo extends Component {
             <span>{supplierInfo.profile && supplierInfo.profile.legal}</span>
           </FormItem>
           <FormItem {...formItemLayout} label="企业地址" style={style}>
-            <span>{supplierInfo.profile && supplierInfo.profile.address}</span>
+            <span>{areaAddress.join('')}{supplierInfo.profile && supplierInfo.profile.address}</span>
           </FormItem>
           <FormItem {...formItemLayout} label="固定电话" style={style}>
             <span>{supplierInfo.profile && supplierInfo.profile.telphone}</span>
