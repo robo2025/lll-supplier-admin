@@ -145,8 +145,13 @@ class PRSPLayout extends React.PureComponent {
       // 退出登录
       logout();
     }
+    // 登录
     if (key === 'login') {
       login();
+    }
+    // 个人中心
+    if (key === 'user') {
+      this.props.history.push('/setting/userinfo');
     }
   }
   handleNoticeVisibleChange = (visible) => {
