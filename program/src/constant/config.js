@@ -27,6 +27,9 @@ export const USERS_SERVER = 'https://testapi.robo2025.com/user';
 export const ORDERS_URL = '//testapi.robo2025.com/order';
 // export const ORDERS_URL = '//192.168.2.109:8009';
 
+// 方案中心URL
+export const SOLUTION_URL = 'https://testapi.robo2025.com/slncenter';
+
 // 验证登录接口URL
 export const LOGIN_URL = `${URL}/server/authorize`;
 
