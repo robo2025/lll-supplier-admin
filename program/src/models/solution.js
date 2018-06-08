@@ -1,4 +1,4 @@
-import { queryList, queryDetail, addCart, queryUserInfo } from '../services/solution';
+import { queryList, queryDetail, queryUserInfo } from '../services/solution';
 
 export default {
   namespace: 'solution',
@@ -8,10 +8,7 @@ export default {
     profile: {},
   },
   effects: {
-    *fetch({ payload }, { call, put, select }) {
-      const tabType = yield select((state) => {
-        return state.solution.tabType;
-      });
+    *fetch({ payload }, { call, put }) {
       const response = yield call(queryList, {
         ...payload,
         is_type: 'all',
@@ -32,7 +29,7 @@ export default {
         });
       }
     },
-    *fetchDetail({ payload }, { call, put }) {
+    *fetchDetail({ payload, callback }, { call, put }) {
       const response = yield call(queryDetail, { sln_no: payload });
       let userInfo = {};
       if (response.rescode === 10000) {
@@ -41,6 +38,7 @@ export default {
             id: response.data.customer.sln_basic_info.customer_id,
           });
           userInfo = res.data;
+          if (callback) { callback(response.data); }
         }
       }
       yield put({

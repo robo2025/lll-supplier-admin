@@ -19,6 +19,11 @@ const extra = (
 );
 const columns = [
   {
+    title: '商品类型',
+    dataIndex: 'device_type',
+    key: 'device_type',
+  },
+  {
     title: '商品名称',
     dataIndex: 'device_name',
     key: 'device_name',
@@ -95,12 +100,18 @@ class SolutionOrderDetail extends React.Component {
         <Description term="创建时间">
           {moment.unix(sln_basic_info.sln_date).format('YYYY-MM-DD HH:MM')}
         </Description>
-        <Description term="客户备注">{sln_user_info.welding_note === '' ? '无' : sln_user_info.welding_note}</Description>
+        <Description term="客户备注">
+          {sln_user_info.welding_note === ''
+            ? '无'
+            : sln_user_info.welding_note}
+        </Description>
       </DescriptionList>
     );
     const deviceMoney = () => {
       let money = 0;
-      welding_device.forEach((item) => { money += item.device_num * item.device_price; });
+      welding_device.forEach((item) => {
+        money += item.device_num * item.device_price;
+      });
       return money;
     };
     return (
@@ -160,18 +171,19 @@ class SolutionOrderDetail extends React.Component {
                 {sln_user_info.welding_name}
               </Description>
               <Description term="工件CAD图">
-                {welding_file.map((item) => {
+                <div>{welding_file.map((item) => {
                   if (item.file_type === 'cad') {
-                    return <a href={item.file_url}>{item.file_name}</a>;
+                    return <a href={item.file_url} key={item.id}>{item.file_name}</a>;
                   }
                   return null;
                 })}
+                </div>
               </Description>
               <Description term="工件图片">
                 {welding_file.map((item) => {
                   if (item.file_type === 'img') {
                     return (
-                      <a href={item.file_url}>
+                      <a href={item.file_url} key={item.id}>
                         <img src={item.file_url} alt={item.file_name} />
                       </a>
                     );
@@ -183,7 +195,12 @@ class SolutionOrderDetail extends React.Component {
           </Card>
         </Card>
         <Card title="核心设备清单" style={{ marginTop: 30 }}>
-          <Table columns={columns} dataSource={welding_device} />
+          <Table
+            columns={columns}
+            dataSource={welding_device.map((item) => {
+              return { ...item, key: item.id };
+            })}
+          />
           <div className={styles.tabelFooter}>
             核心设备价格：
             <span>
@@ -191,7 +208,12 @@ class SolutionOrderDetail extends React.Component {
               元
             </span>
           </div>
-          <Button type="primary" size="large" className={styles.footerBotton} href={`${location.href.split('detail')[0]}solutionPriceQuotation`}>
+          <Button
+            type="primary"
+            size="large"
+            className={styles.footerBotton}
+            href={`${location.href.split('detail')[0]}solutionPriceQuotation?sln_no=${location.href.split('=').pop()}`}
+          >
             立即报价
           </Button>
         </Card>

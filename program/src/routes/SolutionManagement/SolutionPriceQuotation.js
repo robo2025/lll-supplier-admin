@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import { connect } from 'dva';
+import { routerRedux } from 'dva/router';
 import moment from 'moment';
 import {
   Card,
@@ -36,11 +37,11 @@ const CoreDeviceListModal = Form.create()((props) => {
   const formItemLayout = {
     labelCol: {
       xs: { span: 24 },
-      sm: { span: 5 },
+      sm: { span: 6 },
     },
     wrapperCol: {
       xs: { span: 24 },
-      sm: { span: 15 },
+      sm: { span: 12 },
     },
   };
   return (
@@ -63,7 +64,7 @@ const CoreDeviceListModal = Form.create()((props) => {
           initialValue: '核心设备',
         })(<Input placeholder="请输入" disabled />)}
       </FormItem>
-      <FormItem label="所属组成部分" {...formItemLayout}>
+      <FormItem label="组成部分" {...formItemLayout}>
         {form.getFieldDecorator('device_name', {
           rules: [
             {
@@ -72,9 +73,9 @@ const CoreDeviceListModal = Form.create()((props) => {
             },
           ],
         })(
-          <Select>
-            <Option>机器人部分</Option>
-            <Option>焊机部分</Option>
+          <Select style={{ width: '100%' }}>
+            <Option value="robot">机器人部分</Option>
+            <Option value="welder">焊机部分</Option>
           </Select>
         )}
       </FormItem>
@@ -204,10 +205,29 @@ class SolutionPriceQuotation extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // coreDeviceListData: [],
+      coreDeviceListData: [],
       coreDeviceListModalVisibal: false,
       // aidDeviceListModalVisibal: false,
     };
+    this.selectRef = React.createRef();
+  }
+
+  componentDidMount() {
+    if (!this.props.profile.customer) {
+      this.props.dispatch({
+        type: 'solution/fetchDetail',
+        payload: location.href.split('=').pop(),
+        callback: (data) => {
+          this.setState({
+            coreDeviceListData: data.customer.welding_device.map((item) => { return { ...item, key: item.id }; }),
+          });
+        },
+      });
+    }
+  }
+  onSelectChange=(value) => {
+    console.log(this.selectRef);
+    // this.selectRef.value = 100 - parseInt(value, 10);
   }
   handleCoreDeviceListModalVisibal = (flag) => {
     this.setState({
@@ -231,7 +251,7 @@ class SolutionPriceQuotation extends React.Component {
       welding_info,
       welding_file,
     } = customer;
-    const { coreDeviceListModalVisibal } = this.state;
+    const { coreDeviceListModalVisibal, coreDeviceListData } = this.state;
     const headContent = (
       <DescriptionList size="small" col="2">
         <Description term="方案名称">{sln_basic_info.sln_name}</Description>
@@ -391,7 +411,7 @@ class SolutionPriceQuotation extends React.Component {
         >
           <Table
             columns={coreDeviceTableColumns}
-            dataSource={welding_device}
+            dataSource={coreDeviceListData}
             pagination={false}
           />
         </Card>
@@ -443,17 +463,16 @@ class SolutionPriceQuotation extends React.Component {
         >
           <Form layout="horizontal">
             <FormItem {...formItemLayout} label="付款比例">
-              <span style={{ marginLeft: 20 }}>首款：</span>
-              {getFieldDecorator('residence', {
+              {getFieldDecorator('pay_ratio', {
                 rules: [
                   {
                     required: true,
-                    message: '请选择首款！',
+                    message: '请选择！',
                   },
                 ],
               })(
                 // TOTO: 添加自动赋值
-                <Select style={{ width: 120 }} onChange={this.onSelectChange}>
+                <Select style={{ width: 107 }} onChange={value => this.onSelectChange(value)} placeholder="首款">
                   <Option value="30">30%</Option>
                   <Option value="35">35%</Option>
                   <Option value="40">40%</Option>
@@ -461,14 +480,13 @@ class SolutionPriceQuotation extends React.Component {
                   <Option value="50">50%</Option>
                 </Select>
               )}
-              <span style={{ marginLeft: 20 }}>尾款：</span>
-              <Select style={{ width: 120 }}>
-                <Option value="70">70%</Option>
-                <Option value="65">65%</Option>
-                <Option value="60">60%</Option>
-                <Option value="55">55%</Option>
-                <Option value="50">50%</Option>
-              </Select>
+                <Select style={{ width: 107, marginLeft: 8 }} placeholder="尾款" ref={this.selectRef}>
+                  <Option value="70">70%</Option>
+                  <Option value="65">65%</Option>
+                  <Option value="60">60%</Option>
+                  <Option value="55">55%</Option>
+                  <Option value="50">50%</Option>
+                </Select>
             </FormItem>
             <FormItem {...formItemLayout} label="运费">
               {getFieldDecorator('email', {
@@ -481,7 +499,7 @@ class SolutionPriceQuotation extends React.Component {
               })(<Input placeholder="请输入" />)}
               <span> 元</span>
             </FormItem>
-            <FormItem {...formItemLayout} label="方案总价（含运费）">
+            <FormItem {...formItemLayout} label="方案总价">
               {getFieldDecorator('email', {
                 rules: [
                   {
@@ -490,7 +508,7 @@ class SolutionPriceQuotation extends React.Component {
                   },
                 ],
               })(<Input placeholder="请输入" />)}
-              <span> 元</span>
+              <span> 元（含运费）</span>
             </FormItem>
             <FormItem {...formItemLayout} label="报价有效期">
               {getFieldDecorator('email', {
@@ -532,7 +550,7 @@ class SolutionPriceQuotation extends React.Component {
               textAlign: 'right',
             }}
           >
-            <Button size="large">取消</Button>
+            <Button size="large" onClick={() => { this.props.dispatch(routerRedux.goBack()); }}>取消</Button>
             <Button type="primary" style={{ marginLeft: 8 }} size="large">
               提交
             </Button>
