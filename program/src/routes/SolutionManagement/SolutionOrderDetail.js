@@ -19,9 +19,9 @@ const extra = (
 );
 const columns = [
   {
-    title: '商品类型',
-    dataIndex: 'device_type',
-    key: 'device_type',
+    title: '组成部分',
+    dataIndex: 'device_component',
+    key: 'device_component',
   },
   {
     title: '商品名称',

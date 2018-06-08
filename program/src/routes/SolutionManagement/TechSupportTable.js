@@ -1,8 +1,6 @@
 import React from 'react';
 import { Form, Checkbox, Input, Table } from 'antd';
 
-const FormItem = Form.Item;
-@Form.create()
 class TechSupportTable extends React.Component {
   state = {
     installChecked: false,
@@ -43,9 +41,15 @@ class TechSupportTable extends React.Component {
               const { target } = e;
               const { value } = target;
               const reg = /^-?(0|[1-9][0-9]*)(\.[0-9]*)?$/;
-              if (reg.test(value)) {
+              if (
+                (!isNaN(value) && reg.test(value)) ||
+                value === '' ||
+                value === '-'
+              ) {
                 return value;
-              } 
+              } else {
+                return form.getFieldValue(`${row.key}_price`);
+              }
             },
           })(<Input disabled={!this.state[`${row.key}Checked`]} />),
       },
@@ -53,7 +57,8 @@ class TechSupportTable extends React.Component {
         title: '备注',
         key: 'remarks',
         align: 'center',
-        render: row => <Input disabled={!this.state[`${row.key}Checked`]} />,
+        render: row =>
+          getFieldDecorator(`${row.key}_note`)(<Input disabled={!this.state[`${row.key}Checked`]} />),
       },
     ];
     const dataSource = [
