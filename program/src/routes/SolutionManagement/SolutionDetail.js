@@ -1,14 +1,27 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
 import Cookies from 'js-cookie';
-import { Card, Row, Col, Spin, Table, Divider, Button } from 'antd';
+import { Card, Row, Col, Spin, Table } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import DescriptionList from '../../components/DescriptionList';
-import styles from './SolutionOrderDetail.less';
 import { getAreaBycode } from '../../utils/cascader-address-options';
+import CustomerOrder from './CustomerOrder';
+import solutionImg from '../../assets/solution.jpg';
 
 const { Description } = DescriptionList;
+
+const tabList = [
+  {
+    key: 'supplier',
+    tab: '我的报价',
+  },
+  {
+    key: 'customer',
+    tab: '询价单详情',
+  },
+];
+
 const coreDeviceTableColumns = [
   {
     title: '组成部分',
@@ -101,6 +114,9 @@ const adiDeviceTableColumns = [
   loading: loading.models.solution,
 }))
 class SolutionDetail extends React.Component {
+  state = {
+    key: 'supplier',
+  };
   componentDidMount() {
     const userId = Cookies.getJSON('userinfo').id;
     if (userId) {
@@ -114,32 +130,133 @@ class SolutionDetail extends React.Component {
       payload: location.href.split('=').pop(),
     });
   }
+  onTabChange = (key) => {
+    this.setState({ key });
+  };
   render() {
-    const { profile, supplierInfo, loading } = this.props;
+    const { profile, supplierInfo } = this.props;
     const { customer, supplier } = profile;
-    if (!customer) {
+    if (!customer || !supplier) {
       return <Spin />;
     }
-    // if (!customer || !supplier) {
-    //   return <Spin />;
-    // }
     const { sln_basic_info, sln_user_info } = customer;
-    const { sln_supplier_info, welding_device, welding_tech_param, welding_support } = supplier;
+    const {
+      sln_supplier_info,
+      welding_device,
+      welding_tech_param,
+      welding_support,
+    } = supplier;
     const coreDeviceTableData = welding_device.filter(
       item => item.device_type === '核心设备'
     );
     const aidDeviceTableData = welding_device.filter(
       item => item.device_type === '辅助设备'
     );
+    const contentList = {
+      supplier: (
+        <div>
+          <Card title="我的信息">
+            <DescriptionList size="small" col="3">
+              <Description term="公司名称">
+                {supplierInfo.profile.company}
+              </Description>
+              <Description term="联系人">{supplierInfo.username}</Description>
+              <Description term="联系电话">{supplierInfo.mobile}</Description>
+              <Description term="公司所在地">
+                {getAreaBycode(`${supplierInfo.profile.district_id}`)}
+              </Description>
+            </DescriptionList>
+          </Card>
+          <Card title="核心设备清单" style={{ marginTop: 30 }}>
+            <Table
+              columns={coreDeviceTableColumns}
+              dataSource={coreDeviceTableData.map((item) => {
+                return { ...item, key: item.device_id };
+              })}
+              pagination={false}
+            />
+          </Card>
+          <Card title="辅助设备" style={{ marginTop: 30 }}>
+            <Table
+              columns={adiDeviceTableColumns}
+              dataSource={aidDeviceTableData.map((item) => {
+                return { ...item, key: item.device_id };
+              })}
+              pagination={false}
+            />
+          </Card>
+          <Card style={{ marginTop: 30 }} title="技术支持">
+            <DescriptionList size="small" col="2">
+              {welding_support
+                ? welding_support.map((item) => {
+                    return (
+                      <Description term={item.name}>
+                        ￥{item.price}元<span style={{ marginLeft: 35 }}>
+                          备注：{item.note}
+                                      </span>
+                      </Description>
+                    );
+                  })
+                : null}
+            </DescriptionList>
+          </Card>
+          <Card style={{ marginTop: 30 }} title="技术参数">
+            <DescriptionList size="small" col="2">
+              {welding_tech_param
+                ? welding_tech_param.map((item) => {
+                    return (
+                      <Description term={item.name}>
+                        {item.value}
+                        <span style={{ marginLeft: 5 }}>{item.unit_name}</span>
+                      </Description>
+                    );
+                  })
+                : null}
+            </DescriptionList>
+          </Card>
+          <Card style={{ marginTop: 30 }} title="报价信息">
+            <DescriptionList size="small" col="3">
+              <Description term="付款比例">
+                <span>首付：{sln_supplier_info.pay_ratio}% </span>
+                <span>尾款：{100 - sln_supplier_info.pay_ratio}%</span>
+              </Description>
+              <Description term="运费">
+                ￥{sln_supplier_info.freight_price}元
+              </Description>
+              <Description term="方案总价">
+                ￥{sln_supplier_info.total_price}元（含运费）
+              </Description>
+              <Description term="报价有效期">
+                {moment
+                  .unix(sln_supplier_info.expired_date)
+                  .format('YYYY年MM月DD日')}
+              </Description>
+              <Description term="方案发货期">
+                {sln_supplier_info.delivery_date}
+              </Description>
+              <Description term="方案介绍">
+                {sln_supplier_info.sln_desc}
+              </Description>
+              <Description term="备注">
+                {sln_supplier_info.sln_note}
+              </Description>
+            </DescriptionList>
+          </Card>
+        </div>
+      ),
+      customer: <CustomerOrder profile={profile} hideBuuton />,
+    };
     const extra = (
       <Row style={{ marginRight: 20 }}>
         <Col xs={24} sm={12}>
           <div>报价金额</div>
-          <div style={{ fontSize: 20, color: 'green' }}>￥1000000</div>
+          <div style={{ fontSize: 25, color: 'green' }}>
+            ￥{sln_supplier_info.total_price}
+          </div>
         </Col>
         <Col xs={24} sm={12}>
           <div>状态</div>
-          <div style={{ fontSize: 20, color: 'green' }}>已报价</div>
+          <div style={{ fontSize: 25, color: 'green' }}>已报价</div>
         </Col>
       </Row>
     );
@@ -147,7 +264,7 @@ class SolutionDetail extends React.Component {
       <DescriptionList size="small" col="2">
         <Description term="方案名称">{sln_basic_info.sln_name}</Description>
         <Description term="预算金额">
-          <span style={{ color: 'red', fontSize: 18 }}>
+          <span style={{ color: 'red', fontSize: 20 }}>
             ￥{sln_basic_info.customer_price}
           </span>
         </Description>
@@ -168,87 +285,15 @@ class SolutionDetail extends React.Component {
     );
     return (
       <PageHeaderLayout
-        title="方案询价单号：FAXJ201805121021001"
-        // title={`单号：${subOrder.son_order_sn}`}
-        logo={
-          <img
-            alt="logo"
-            src="https://imgcdn.robo2025.com/login/robotImg.jpg"
-          />
-        }
+        title={`单号：${sln_basic_info.sln_no}`}
+        logo={<img alt="logo" src={solutionImg} />}
         content={headContent}
         extraContent={extra}
+        tabList={tabList}
+        tabActiveKey={this.state.key}
+        onTabChange={this.onTabChange} //  TODO:选中的TAB 没有高亮
       >
-        <Card title="我的信息">
-          <DescriptionList size="small" col="3">
-            <Description term="公司名称">
-              {supplierInfo.profile.company}
-            </Description>
-            <Description term="联系人">{supplierInfo.username}</Description>
-            <Description term="联系电话">{supplierInfo.mobile}</Description>
-            <Description term="公司所在地">
-              {getAreaBycode(`${supplierInfo.profile.district_id}`)}
-            </Description>
-          </DescriptionList>
-        </Card>
-        <Card title="核心设备清单" style={{ marginTop: 30 }}>
-          <Table
-            columns={coreDeviceTableColumns}
-            dataSource={coreDeviceTableData.map((item) => {
-              return { ...item, key: item.id };
-            })}
-            pagination={false}
-          />
-        </Card>
-        <Card title="辅助设备" style={{ marginTop: 30 }}>
-          <Table
-            columns={coreDeviceTableColumns}
-            dataSource={aidDeviceTableData.map((item) => {
-              return { ...item, key: item.id };
-            })}
-            pagination={false}
-          />
-        </Card>
-        <Card style={{ marginTop: 30 }} title="技术支持">
-          <DescriptionList size="small" col="2">
-            {welding_support
-              ? welding_support.map((item) => {
-                  return (
-                    <Fragment>
-                      <Description term={item.name}>
-                        ￥{item.price}元
-                      </Description>
-                      <Description term="备注">{item.note}</Description>
-                    </Fragment>
-                  );
-                })
-              : null}
-          </DescriptionList>
-        </Card>
-        <Card style={{ marginTop: 30 }} title="技术参数">
-          <DescriptionList size="small" col="2">
-            {welding_tech_param
-              ? welding_tech_param.map((item) => {
-                  return (
-                    <Fragment>
-                      <Description term={item.name}>{item.value}</Description>
-                    </Fragment>
-                  );
-                })
-              : null}
-          </DescriptionList>
-        </Card>
-        <Card style={{ marginTop: 30 }} title="报价信息">
-          <DescriptionList size="small" col="1">
-            <Description term="付款比例"><span>首付：{sln_supplier_info.pay_ratio}% </span><span>尾款：{100 - sln_supplier_info.pay_ratio}%</span></Description>
-            <Description term="运费">￥{sln_supplier_info.freight_price}元</Description>
-            <Description term="方案总价">￥{sln_supplier_info.total_price}元（含运费）</Description>
-            <Description term="报价有效期">{sln_supplier_info.expired_date}</Description>
-            <Description term="方案发货期">{sln_supplier_info.delivery_date}</Description>
-            <Description term="方案介绍">{sln_supplier_info.sln_desc}</Description>
-            <Description term="备注">{sln_supplier_info.sln_note}</Description>
-          </DescriptionList>
-        </Card>
+        {contentList[this.state.key]}
       </PageHeaderLayout>
     );
   }

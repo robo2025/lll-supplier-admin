@@ -15,7 +15,7 @@ import {
   Input,
   InputNumber,
   Select,
-  DatePicker,
+  message,
 } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import DescriptionList from '../../components/DescriptionList';
@@ -23,6 +23,19 @@ import TechSupportTable from './TechSupportTable';
 import styles from './SolutionPriceQuotation.less';
 
 const { TextArea } = Input;
+const getValueFromEvent = (e, preValue) => {
+  if (!e || !e.target) {
+    return e;
+  }
+  const { target } = e;
+  const { value } = target;
+  const reg = /^-?(0|[1-9][0-9]*)(\.[0-9]*)?$/;
+  if ((!isNaN(value) && reg.test(value)) || value === '' || value === '-') {
+    return value;
+  } else {
+    return preValue;
+  }
+};
 const DeviceListModal = Form.create({
   mapPropsToFields(props) {
     const { rowSelected } = props;
@@ -177,7 +190,9 @@ const DeviceListModal = Form.create({
               message: '请输入数字!',
             },
           ],
-        })(<InputNumber placeholder="请输入" style={{ width: '100%' }} />)}
+        })(
+          <InputNumber placeholder="请输入" style={{ width: '100%' }} min={1} />
+        )}
       </FormItem>
       <FormItem label="单价（元）" {...formItemLayout}>
         {form.getFieldDecorator('device_price', {
@@ -187,7 +202,9 @@ const DeviceListModal = Form.create({
               message: '该字段为必填项!',
             },
           ],
-        })(<Input placeholder="请输入" />)}
+        })(
+          <InputNumber placeholder="请输入" style={{ width: '100%' }} min={0} />
+        )}
       </FormItem>
       <FormItem label="备注" {...formItemLayout}>
         {form.getFieldDecorator('device_note')(
@@ -276,19 +293,17 @@ class SolutionPriceQuotation extends React.Component {
   }
 
   componentDidMount() {
-    if (!this.props.profile.customer) {
-      this.props.dispatch({
-        type: 'solution/fetchDetail',
-        payload: location.href.split('=').pop(),
-        callback: (data) => {
-          this.setState({
-            coreDeviceListData: data.customer.welding_device.map((item) => {
-              return { ...item, key: item.id };
-            }),
-          });
-        },
-      });
-    }
+    this.props.dispatch({
+      type: 'solution/fetchDetail',
+      payload: location.href.split('=').pop(),
+      callback: (data) => {
+        this.setState({
+          coreDeviceListData: data.customer.welding_device.map((item) => {
+            return { ...item, key: item.id };
+          }),
+        });
+      },
+    });
   }
 
   handleDeviceListModalVisibal = (flag) => {
@@ -374,9 +389,72 @@ class SolutionPriceQuotation extends React.Component {
       },
     });
   };
-  handleFormSubmit=() => {
-    console.log(this.props.form.getFieldsValue());
-  }
+  handleFormSubmit = () => {
+    this.props.form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      const { coreDeviceListData, aidDeviceListData } = this.state;
+      // 安装、工艺、培训 备注和价格   welding_electric焊接电流
+      const {
+        install_note,
+        install_price,
+        technology_note,
+        technology_price,
+        train_note,
+        train_price,
+        welding_electric,
+        total_price,
+        freight_price,
+        delivery_date,
+        ...others
+      } = fieldsValue;
+      // TODO  优化  现在是取出数据转换JSON
+      const welding_support = [
+        { name: '安装', price: install_price, note: install_note },
+        {
+          name: '工艺编码调试',
+          price: technology_price,
+          note: technology_note,
+        },
+        { name: '培训', price: train_price, note: train_note },
+      ]
+        .filter(item => item.price !== undefined)
+        .map((item) => {
+          return { ...item, price: parseInt(item.price, 10) };
+        });
+      const welding_tech_param = [
+        { name: '焊接电流', value: welding_electric, unit_name: 'mA' },
+      ];
+      const welding_device = coreDeviceListData.concat(aidDeviceListData);
+      // string转为int
+      const sln_supplier_info = {
+        ...others,
+        total_price: parseInt(total_price, 10),
+        freight_price: parseInt(freight_price, 10),
+        delivery_date: parseInt(delivery_date, 10),
+      };
+      this.props.dispatch({
+        type: 'solution/handleFormSubmit',
+        payload: {
+          sln_no: location.href.split('=').pop(),
+          sln_supplier_info,
+          welding_device,
+          welding_support,
+          welding_tech_param,
+        },
+        callback: (success, data) => {
+          if (success && success === true) {
+            message.success(data);
+            location.href = location.href.replace(
+              'solutionPriceQuotation',
+              'solutionDetail'
+            );
+          } else {
+            message.error(data);
+          }
+        },
+      });
+    });
+  };
   render() {
     const {
       profile,
@@ -603,13 +681,15 @@ class SolutionPriceQuotation extends React.Component {
           className={styles.techForm}
         >
           <FormItem {...formItemLayout} label="焊接电流">
-            {getFieldDecorator('welding_tech_param', {
+            {getFieldDecorator('welding_electric', {
               rules: [
                 {
                   required: true,
                   message: '该字段为必填项！',
                 },
               ],
+              getValueFromEvent: e =>
+                getValueFromEvent(e, form.getFieldValue('welding_electric')),
             })(<Input placeholder="请输入" />)}
           </FormItem>
         </Card>
@@ -628,30 +708,30 @@ class SolutionPriceQuotation extends React.Component {
                     message: '请选择！',
                   },
                 ],
-                initialValue: '30',
+                initialValue: 30,
               })(
                 <Select style={{ width: 107 }} placeholder="首款">
-                  <Option value="30">30%</Option>
-                  <Option value="35">35%</Option>
-                  <Option value="40">40%</Option>
-                  <Option value="45">45%</Option>
-                  <Option value="50">50%</Option>
+                  <Option value={30}>30%</Option>
+                  <Option value={35}>35%</Option>
+                  <Option value={40}>40%</Option>
+                  <Option value={45}>45%</Option>
+                  <Option value={50}>50%</Option>
                 </Select>
               )}
               <span style={{ marginLeft: 8 }}>尾款：</span>
               <Select
                 style={{ width: 107 }}
                 placeholder="尾款"
-                value={`${100 - form.getFieldValue('pay_ratio')}`}
+                value={100 - form.getFieldValue('pay_ratio')}
                 onChange={value =>
-                  form.setFieldsValue({ pay_ratio: `${100 - value}` })
+                  form.setFieldsValue({ pay_ratio: 100 - value })
                 }
               >
-                <Option value="70">70%</Option>
-                <Option value="65">65%</Option>
-                <Option value="60">60%</Option>
-                <Option value="55">55%</Option>
-                <Option value="50">50%</Option>
+                <Option value={70}>70%</Option>
+                <Option value={65}>65%</Option>
+                <Option value={60}>60%</Option>
+                <Option value={55}>55%</Option>
+                <Option value={50}>50%</Option>
               </Select>
             </FormItem>
             <FormItem {...formItemLayout} label="运费">
@@ -662,7 +742,13 @@ class SolutionPriceQuotation extends React.Component {
                     message: '该字段为必填项！',
                   },
                 ],
-              })(<Input placeholder="请输入" />)}
+              })(
+                <InputNumber
+                  placeholder="请输入"
+                  style={{ width: '66%' }}
+                  min={0}
+                />
+              )}
               <span> 元</span>
             </FormItem>
             <FormItem {...formItemLayout} label="方案总价">
@@ -673,18 +759,14 @@ class SolutionPriceQuotation extends React.Component {
                     message: '该字段为必填项！',
                   },
                 ],
-              })(<Input placeholder="请输入" />)}
+              })(
+                <InputNumber
+                  placeholder="请输入"
+                  style={{ width: '66%' }}
+                  min={0}
+                />
+              )}
               <span> 元（含运费）</span>
-            </FormItem>
-            <FormItem {...formItemLayout} label="方案有效期">
-              {getFieldDecorator('expired_date', {
-                rules: [
-                  {
-                    required: true,
-                    message: '该字段为必填项！',
-                  },
-                ],
-              })(<DatePicker placeholder="请选择" />)}
             </FormItem>
             <FormItem {...formItemLayout} label="方案发货期">
               {getFieldDecorator('delivery_date', {
@@ -694,7 +776,13 @@ class SolutionPriceQuotation extends React.Component {
                     message: '该字段为必填项！',
                   },
                 ],
-              })(<Input placeholder="请输入" />)}
+              })(
+                <InputNumber
+                  placeholder="请输入"
+                  style={{ width: '66%' }}
+                  min={0}
+                />
+              )}
               <span> 天</span>
             </FormItem>
             <FormItem {...formItemLayout} label="方案介绍">
@@ -729,7 +817,12 @@ class SolutionPriceQuotation extends React.Component {
             >
               取消
             </Button>
-            <Button type="primary" style={{ marginLeft: 8 }} size="large" onClick={this.handleFormSubmit}>
+            <Button
+              type="primary"
+              style={{ marginLeft: 8 }}
+              size="large"
+              onClick={this.handleFormSubmit}
+            >
               提交
             </Button>
           </div>

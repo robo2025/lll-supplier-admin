@@ -1,8 +1,7 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
 import {
-  Divider,
   Card,
   Badge,
   message,
@@ -23,11 +22,8 @@ import styles from './index.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
-const { TabPane } = Tabs;
 const { RangePicker } = DatePicker;
-const rangeConfig = {
-  rules: [{ type: 'array', required: false, message: '请选择日期' }],
-};
+
 const slnStatus = (status) => {
   switch (status) {
     case 'P':
@@ -158,7 +154,7 @@ class SolutionList extends React.Component {
           if (row.sln_status === 'P') { // 未报价（已发布）
             return <a href={`${location.href}/detail?sln_no=${row.sln_no}`}>报价</a>;
           } else {
-            return <a onClick={() => this.handleDelete(row)}>查看详情</a>;
+            return <a href={`${location.href}/solutionDetail?sln_no=${row.sln_no}`}>查看详情</a>;
           }
         },
       },
