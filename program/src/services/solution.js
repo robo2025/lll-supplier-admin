@@ -22,3 +22,15 @@ export async function queryDetail({ sln_no }) {
 export async function queryUserInfo({ id }) {
   return lyRequest(USERS_SERVER + '/service/customers/' + id);
 }
+
+export async function handleQuotation({ sln_no, sln_supplier_info, welding_device, welding_tech_param, welding_support }) {
+  return lyRequest(`${SOLUTION_URL}/v1/offer/${sln_no}`, {
+    method: 'post',
+    data: {
+      sln_supplier_info,
+      welding_device,
+      welding_tech_param,
+      welding_support,
+    },
+  });
+}

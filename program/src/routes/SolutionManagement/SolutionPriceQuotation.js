@@ -13,7 +13,9 @@ import {
   Form,
   Spin,
   Input,
+  InputNumber,
   Select,
+  message,
 } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import DescriptionList from '../../components/DescriptionList';
@@ -21,17 +23,54 @@ import TechSupportTable from './TechSupportTable';
 import styles from './SolutionPriceQuotation.less';
 
 const { TextArea } = Input;
-const CoreDeviceListModal = Form.create()((props) => {
+const getValueFromEvent = (e, preValue) => {
+  if (!e || !e.target) {
+    return e;
+  }
+  const { target } = e;
+  const { value } = target;
+  const reg = /^-?(0|[1-9][0-9]*)(\.[0-9]*)?$/;
+  if ((!isNaN(value) && reg.test(value)) || value === '' || value === '-') {
+    return value;
+  } else {
+    return preValue;
+  }
+};
+const DeviceListModal = Form.create({
+  mapPropsToFields(props) {
+    const { rowSelected } = props;
+    if (Object.keys(rowSelected).length === 0) {
+      return {}; // 如果为空,返回false
+    }
+    let formData = {};
+    Object.keys(rowSelected).map((item) => {
+      formData = {
+        ...formData,
+        [item]: Form.createFormField({ value: rowSelected[item] }),
+      };
+      return null;
+    });
+    return formData;
+  },
+})((props) => {
   const {
+    title, // 核心设备||辅助设备
     visible,
-    handleCoreDeviceListConfirm,
-    handleCoreDeviceListModalVisibal,
+    handleDeviceListAdd,
+    handleDeviceListModify,
+    handleDeviceListModalVisibal,
+    modalType, // add||modify
     form,
   } = props;
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      handleCoreDeviceListConfirm(fieldsValue);
+      if (modalType === 'add') {
+        handleDeviceListAdd(fieldsValue);
+      } else if (modalType === 'modify') {
+        handleDeviceListModify(fieldsValue);
+      }
+      form.resetFields();
     });
   };
   const formItemLayout = {
@@ -46,39 +85,73 @@ const CoreDeviceListModal = Form.create()((props) => {
   };
   return (
     <Modal
-      title="添加核心设备"
+      title={title}
       visible={visible}
       onOk={okHandle}
       okText="确定"
       onCancel={() => {
-        handleCoreDeviceListModalVisibal(false);
+        handleDeviceListModalVisibal(false);
         form.resetFields();
       }}
     >
-      <FormItem
-        label="产品类型"
-        {...formItemLayout}
-        style={{ display: 'none' }}
-      >
-        {form.getFieldDecorator('device_type', {
-          initialValue: '核心设备',
-        })(<Input placeholder="请输入" disabled />)}
+      <FormItem style={{ display: 'none' }}>
+        {form.getFieldDecorator('key')(<Input placeholder="请输入" disabled />)}
       </FormItem>
-      <FormItem label="组成部分" {...formItemLayout}>
-        {form.getFieldDecorator('device_name', {
-          rules: [
-            {
-              required: true,
-              message: '该字段为必填项!',
-            },
-          ],
-        })(
-          <Select style={{ width: '100%' }}>
-            <Option value="robot">机器人部分</Option>
-            <Option value="welder">焊机部分</Option>
-          </Select>
-        )}
-      </FormItem>
+      {title === '核心设备' ? (
+        <Fragment>
+          <FormItem
+            label="产品类型"
+            {...formItemLayout}
+            style={{ display: 'none' }}
+          >
+            {form.getFieldDecorator('device_type', {
+              initialValue: '核心设备',
+            })(<Input placeholder="请输入" disabled />)}
+          </FormItem>
+          <FormItem label="组成部分" {...formItemLayout}>
+            {form.getFieldDecorator('device_component', {
+              rules: [
+                {
+                  required: true,
+                  message: '该字段为必填项!',
+                },
+              ],
+            })(
+              <Select style={{ width: '100%' }}>
+                <Option value="机器人部分">机器人部分</Option>
+                <Option value="焊机部分">焊机部分</Option>
+              </Select>
+            )}
+          </FormItem>
+        </Fragment>
+      ) : (
+        <Fragment>
+          <FormItem
+            label="产品类型"
+            {...formItemLayout}
+            style={{ display: 'none' }}
+          >
+            {form.getFieldDecorator('device_type', {
+              initialValue: '辅助设备',
+            })(<Input placeholder="请输入" disabled />)}
+          </FormItem>
+          <FormItem label="所属类型" {...formItemLayout}>
+            {form.getFieldDecorator('device_component', {
+              rules: [
+                {
+                  required: true,
+                  message: '该字段为必填项!',
+                },
+              ],
+            })(
+              <Select style={{ width: '100%' }}>
+                <Option value="设备">设备</Option>
+                <Option value="耗材">耗材</Option>
+              </Select>
+            )}
+          </FormItem>
+        </Fragment>
+      )}
       <FormItem label="产品名称" {...formItemLayout}>
         {form.getFieldDecorator('device_name', {
           rules: [
@@ -114,12 +187,14 @@ const CoreDeviceListModal = Form.create()((props) => {
           rules: [
             {
               required: true,
-              message: '该字段为必填项!',
+              message: '请输入数字!',
             },
           ],
-        })(<Input placeholder="请输入" />)}
+        })(
+          <InputNumber placeholder="请输入" style={{ width: '100%' }} min={1} />
+        )}
       </FormItem>
-      <FormItem label="单价" {...formItemLayout}>
+      <FormItem label="单价（元）" {...formItemLayout}>
         {form.getFieldDecorator('device_price', {
           rules: [
             {
@@ -127,17 +202,12 @@ const CoreDeviceListModal = Form.create()((props) => {
               message: '该字段为必填项!',
             },
           ],
-        })(<Input placeholder="请输入" />)}
+        })(
+          <InputNumber placeholder="请输入" style={{ width: '100%' }} min={0} />
+        )}
       </FormItem>
       <FormItem label="备注" {...formItemLayout}>
-        {form.getFieldDecorator('device_note', {
-          rules: [
-            {
-              required: true,
-              message: '该字段为必填项!',
-            },
-          ],
-        })(
+        {form.getFieldDecorator('device_note')(
           <TextArea
             placeholder="请输入"
             autosize={{ minRows: 4, maxRows: 6 }}
@@ -147,6 +217,7 @@ const CoreDeviceListModal = Form.create()((props) => {
     </Modal>
   );
 });
+
 const { Description } = DescriptionList;
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -204,54 +275,206 @@ const CardHeader = ({ onButtonClick, description, title, hideButton }) => {
 class SolutionPriceQuotation extends React.Component {
   constructor(props) {
     super(props);
+    let coreDeviceListData = [];
+    const { customer } = this.props.profile;
+    if (customer) {
+      coreDeviceListData = customer.welding_device.map((item) => {
+        return { ...item, key: item.id };
+      });
+    }
     this.state = {
-      coreDeviceListData: [],
-      coreDeviceListModalVisibal: false,
-      // aidDeviceListModalVisibal: false,
+      coreDeviceListData,
+      aidDeviceListData: [],
+      deviceListModalVisibal: false,
+      modalType: 'add',
+      title: '核心设备',
+      rowSelected: {},
     };
-    this.selectRef = React.createRef();
   }
 
   componentDidMount() {
-    if (!this.props.profile.customer) {
-      this.props.dispatch({
-        type: 'solution/fetchDetail',
-        payload: location.href.split('=').pop(),
-        callback: (data) => {
-          this.setState({
-            coreDeviceListData: data.customer.welding_device.map((item) => { return { ...item, key: item.id }; }),
-          });
-        },
+    this.props.dispatch({
+      type: 'solution/fetchDetail',
+      payload: location.href.split('=').pop(),
+      callback: (data) => {
+        this.setState({
+          coreDeviceListData: data.customer.welding_device.map((item) => {
+            return { ...item, key: item.id };
+          }),
+        });
+      },
+    });
+  }
+
+  handleDeviceListModalVisibal = (flag) => {
+    this.setState({
+      deviceListModalVisibal: flag,
+    });
+  };
+
+  handleDeviceListAdd = (fieldsValue) => {
+    const { coreDeviceListData, aidDeviceListData, title } = this.state;
+    const { device_name, device_model } = fieldsValue; // 暂时不知道用什么做KEY。
+    if (title === '核心设备') {
+      this.setState({
+        coreDeviceListData: [
+          ...coreDeviceListData,
+          { ...fieldsValue, key: device_name + device_model },
+        ],
+        deviceListModalVisibal: false,
+      });
+    } else if (title === '辅助设备') {
+      this.setState({
+        aidDeviceListData: [
+          ...aidDeviceListData,
+          { ...fieldsValue, key: device_name + device_model },
+        ],
+        deviceListModalVisibal: false,
       });
     }
-  }
-  onSelectChange=(value) => {
-    console.log(this.selectRef);
-    // this.selectRef.value = 100 - parseInt(value, 10);
-  }
-  handleCoreDeviceListModalVisibal = (flag) => {
+  };
+  handleDeviceListModify = (fieldsValue) => {
+    const { coreDeviceListData, aidDeviceListData } = this.state;
+    const { key } = fieldsValue; // 暂时不知道用什么做KEY。
+    // 将state里面的数据替换
     this.setState({
-      coreDeviceListModalVisibal: flag,
+      coreDeviceListData: coreDeviceListData.map((item) => {
+        if (item.key === key) {
+          return {
+            ...fieldsValue,
+          };
+        } else {
+          return item;
+        }
+      }),
+      aidDeviceListData: aidDeviceListData.map((item) => {
+        if (item.key === key) {
+          return {
+            ...fieldsValue,
+          };
+        } else {
+          return item;
+        }
+      }),
+      deviceListModalVisibal: false,
+      rowSelected: {},
+    });
+  };
+  handleRowModify = (row, title) => {
+    this.setState({
+      title,
+      rowSelected: row,
+      modalType: 'modify',
+      deviceListModalVisibal: true,
+    });
+  };
+  handleRowDelete = (row) => {
+    const { coreDeviceListData, aidDeviceListData } = this.state;
+    const setState = () => {
+      this.setState({
+        coreDeviceListData: coreDeviceListData.filter(
+          item => item.key !== row.key
+        ),
+        aidDeviceListData: aidDeviceListData.filter(
+          item => item.key !== row.key
+        ),
+      });
+    };
+    Modal.confirm({
+      title: '确定删除这个设备？',
+      okText: '确定',
+      cancelText: '取消',
+      onOk() {
+        setState();
+      },
+    });
+  };
+  handleFormSubmit = () => {
+    this.props.form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      const { coreDeviceListData, aidDeviceListData } = this.state;
+      // 安装、工艺、培训 备注和价格   welding_electric焊接电流
+      const {
+        install_note,
+        install_price,
+        technology_note,
+        technology_price,
+        train_note,
+        train_price,
+        welding_electric,
+        total_price,
+        freight_price,
+        delivery_date,
+        ...others
+      } = fieldsValue;
+      // TODO  优化  现在是取出数据转换JSON
+      const welding_support = [
+        { name: '安装', price: install_price, note: install_note },
+        {
+          name: '工艺编码调试',
+          price: technology_price,
+          note: technology_note,
+        },
+        { name: '培训', price: train_price, note: train_note },
+      ]
+        .filter(item => item.price !== undefined)
+        .map((item) => {
+          return { ...item, price: parseInt(item.price, 10) };
+        });
+      const welding_tech_param = [
+        { name: '焊接电流', value: welding_electric, unit_name: 'mA' },
+      ];
+      const welding_device = coreDeviceListData.concat(aidDeviceListData);
+      // string转为int
+      const sln_supplier_info = {
+        ...others,
+        total_price: parseInt(total_price, 10),
+        freight_price: parseInt(freight_price, 10),
+        delivery_date: parseInt(delivery_date, 10),
+      };
+      this.props.dispatch({
+        type: 'solution/handleFormSubmit',
+        payload: {
+          sln_no: location.href.split('=').pop(),
+          sln_supplier_info,
+          welding_device,
+          welding_support,
+          welding_tech_param,
+        },
+        callback: (success, data) => {
+          if (success && success === true) {
+            message.success(data);
+            location.href = location.href.replace(
+              'solutionPriceQuotation',
+              'solutionDetail'
+            );
+          } else {
+            message.error(data);
+          }
+        },
+      });
     });
   };
   render() {
     const {
       profile,
       loading,
+      form,
       form: { getFieldDecorator },
     } = this.props;
     const { customer } = profile;
     if (!customer) {
       return <Spin />;
     }
+    const { sln_basic_info, sln_user_info } = customer;
     const {
-      sln_basic_info,
-      sln_user_info,
-      welding_device,
-      welding_info,
-      welding_file,
-    } = customer;
-    const { coreDeviceListModalVisibal, coreDeviceListData } = this.state;
+      deviceListModalVisibal,
+      coreDeviceListData,
+      aidDeviceListData,
+      modalType,
+      title,
+      rowSelected,
+    } = this.state;
     const headContent = (
       <DescriptionList size="small" col="2">
         <Description term="方案名称">{sln_basic_info.sln_name}</Description>
@@ -276,6 +499,11 @@ class SolutionPriceQuotation extends React.Component {
       </DescriptionList>
     );
     const coreDeviceTableColumns = [
+      {
+        title: '组成部分',
+        dataIndex: 'device_component',
+        key: 'device_component',
+      },
       {
         title: '商品名称',
         dataIndex: 'device_name',
@@ -317,9 +545,9 @@ class SolutionPriceQuotation extends React.Component {
         key: 'opreation',
         render: row => (
           <div>
-            <a onClick={() => this.addCart(row)}>修改</a>
+            <a onClick={() => this.handleRowModify(row, '核心设备')}>修改</a>
             <Divider type="vertical" />
-            <a onClick={() => this.handleDelete(row)}>删除</a>
+            <a onClick={() => this.handleRowDelete(row)}>删除</a>
           </div>
         ),
       },
@@ -327,59 +555,53 @@ class SolutionPriceQuotation extends React.Component {
     const adiDeviceTableColumns = [
       {
         title: '所属类型',
-        dataIndex: 'son_order_sn',
-        key: 'son_order_sn',
+        dataIndex: 'device_component',
+        key: 'device_component',
       },
       {
         title: '商品名称',
-        dataIndex: 'goods_name',
-        key: 'goods_name',
+        dataIndex: 'device_name',
+        key: 'device_name',
       },
       {
         title: '型号',
-        dataIndex: 'model',
-        key: 'model',
+        dataIndex: 'device_model',
+        key: 'device_model',
       },
       {
         title: '品牌',
-        dataIndex: 'brand',
-        key: 'brand',
-      },
-      {
-        title: '单位',
-        dataIndex: 'number',
-        key: 'number',
+        dataIndex: 'brand_name',
+        key: 'brand_name',
       },
       {
         title: '数量',
-        dataIndex: 'max_delivery_time',
-        key: 'max_delivery_time',
-        render: text => <span>{text}天</span>,
+        dataIndex: 'device_num',
+        key: 'device_num',
       },
       {
         title: '单价（元）',
-        dataIndex: 'univalent',
-        key: 'univalent',
+        dataIndex: 'device_price',
+        key: 'device_price',
       },
       {
         title: '小计（元）',
-        dataIndex: 'price_discount',
-        key: 'price_discount',
-        rener: () => <span>无</span>,
+        key: 'total_price',
+        render: row => <span>{row.device_num * row.device_price}</span>,
       },
       {
         title: '备注',
-        key: 'sold_price',
-        render: text => <span>{text.univalent - 0}</span>,
+        key: 'device_note',
+        dataIndex: 'device_note',
+        render: text => (text === '' ? '无' : text),
       },
       {
         title: '操作',
         key: 'option',
         render: row => (
           <div>
-            <a onClick={() => this.addCart(row)}>修改</a>
+            <a onClick={() => this.handleRowModify(row, '辅助设备')}>修改</a>
             <Divider type="vertical" />
-            <a onClick={() => this.handleDelete(row)}>删除</a>
+            <a onClick={() => this.handleRowDelete(row)}>删除</a>
           </div>
         ),
       },
@@ -387,8 +609,7 @@ class SolutionPriceQuotation extends React.Component {
 
     return (
       <PageHeaderLayout
-        title="方案询价单号：FAXJ201805121021001"
-        // title={`单号：${subOrder.son_order_sn}`}
+        title={`方案询价单号：${sln_basic_info.sln_no}`}
         logo={
           <img
             alt="logo"
@@ -404,7 +625,12 @@ class SolutionPriceQuotation extends React.Component {
               title="核心设备清单"
               description="若当前核心设备需添加或删除设备时，可自行操作，但该项不能为空！"
               onButtonClick={() => {
-                this.handleCoreDeviceListModalVisibal(true);
+                this.setState({
+                  title: '核心设备',
+                  modalType: 'add',
+                  rowSelected: {},
+                });
+                this.handleDeviceListModalVisibal(true);
               }}
             />
           }
@@ -422,12 +648,20 @@ class SolutionPriceQuotation extends React.Component {
               title="辅助设备"
               description="若方案需要时请务必详情填写清楚，以便客户查阅，无需技术支持项时，则无需添加！"
               onButtonClick={() => {
-                this.handleCoreDeviceListModalVisibal(true);
+                this.setState({
+                  title: '辅助设备',
+                  modalType: 'add',
+                  rowSelected: {},
+                });
+                this.handleDeviceListModalVisibal(true);
               }}
             />
           }
         >
-          <Table columns={adiDeviceTableColumns} />
+          <Table
+            columns={adiDeviceTableColumns}
+            dataSource={aidDeviceListData}
+          />
         </Card>
         <Card
           style={{ marginTop: 30 }}
@@ -439,20 +673,23 @@ class SolutionPriceQuotation extends React.Component {
             />
           }
         >
-          <TechSupportTable />
+          <TechSupportTable form={form} />
         </Card>
         <Card
           style={{ marginTop: 30 }}
           title={<CardHeader title="技术参数" description="" hideButton />}
+          className={styles.techForm}
         >
           <FormItem {...formItemLayout} label="焊接电流">
-            {getFieldDecorator('email', {
+            {getFieldDecorator('welding_electric', {
               rules: [
                 {
                   required: true,
                   message: '该字段为必填项！',
                 },
               ],
+              getValueFromEvent: e =>
+                getValueFromEvent(e, form.getFieldValue('welding_electric')),
             })(<Input placeholder="请输入" />)}
           </FormItem>
         </Card>
@@ -463,6 +700,7 @@ class SolutionPriceQuotation extends React.Component {
         >
           <Form layout="horizontal">
             <FormItem {...formItemLayout} label="付款比例">
+              <span>首款：</span>
               {getFieldDecorator('pay_ratio', {
                 rules: [
                   {
@@ -470,79 +708,100 @@ class SolutionPriceQuotation extends React.Component {
                     message: '请选择！',
                   },
                 ],
+                initialValue: 30,
               })(
-                // TOTO: 添加自动赋值
-                <Select style={{ width: 107 }} onChange={value => this.onSelectChange(value)} placeholder="首款">
-                  <Option value="30">30%</Option>
-                  <Option value="35">35%</Option>
-                  <Option value="40">40%</Option>
-                  <Option value="45">45%</Option>
-                  <Option value="50">50%</Option>
+                <Select style={{ width: 107 }} placeholder="首款">
+                  <Option value={30}>30%</Option>
+                  <Option value={35}>35%</Option>
+                  <Option value={40}>40%</Option>
+                  <Option value={45}>45%</Option>
+                  <Option value={50}>50%</Option>
                 </Select>
               )}
-                <Select style={{ width: 107, marginLeft: 8 }} placeholder="尾款" ref={this.selectRef}>
-                  <Option value="70">70%</Option>
-                  <Option value="65">65%</Option>
-                  <Option value="60">60%</Option>
-                  <Option value="55">55%</Option>
-                  <Option value="50">50%</Option>
-                </Select>
+              <span style={{ marginLeft: 8 }}>尾款：</span>
+              <Select
+                style={{ width: 107 }}
+                placeholder="尾款"
+                value={100 - form.getFieldValue('pay_ratio')}
+                onChange={value =>
+                  form.setFieldsValue({ pay_ratio: 100 - value })
+                }
+              >
+                <Option value={70}>70%</Option>
+                <Option value={65}>65%</Option>
+                <Option value={60}>60%</Option>
+                <Option value={55}>55%</Option>
+                <Option value={50}>50%</Option>
+              </Select>
             </FormItem>
             <FormItem {...formItemLayout} label="运费">
-              {getFieldDecorator('email', {
+              {getFieldDecorator('freight_price', {
                 rules: [
                   {
                     required: true,
                     message: '该字段为必填项！',
                   },
                 ],
-              })(<Input placeholder="请输入" />)}
+              })(
+                <InputNumber
+                  placeholder="请输入"
+                  style={{ width: '66%' }}
+                  min={0}
+                />
+              )}
               <span> 元</span>
             </FormItem>
             <FormItem {...formItemLayout} label="方案总价">
-              {getFieldDecorator('email', {
+              {getFieldDecorator('total_price', {
                 rules: [
                   {
                     required: true,
                     message: '该字段为必填项！',
                   },
                 ],
-              })(<Input placeholder="请输入" />)}
+              })(
+                <InputNumber
+                  placeholder="请输入"
+                  style={{ width: '66%' }}
+                  min={0}
+                />
+              )}
               <span> 元（含运费）</span>
             </FormItem>
-            <FormItem {...formItemLayout} label="报价有效期">
-              {getFieldDecorator('email', {
-                rules: [
-                  {
-                    required: true,
-                    message: '该字段为必填项！',
-                  },
-                ],
-              })(<Input placeholder="请输入" />)}
-            </FormItem>
             <FormItem {...formItemLayout} label="方案发货期">
-              {getFieldDecorator('email', {
+              {getFieldDecorator('delivery_date', {
                 rules: [
                   {
                     required: true,
                     message: '该字段为必填项！',
                   },
                 ],
-              })(<Input placeholder="请输入" />)}
+              })(
+                <InputNumber
+                  placeholder="请输入"
+                  style={{ width: '66%' }}
+                  min={0}
+                />
+              )}
               <span> 天</span>
             </FormItem>
             <FormItem {...formItemLayout} label="方案介绍">
-              {getFieldDecorator('email', {
+              {getFieldDecorator('sln_desc', {
                 rules: [
                   {
                     required: true,
                     message: '该字段为必填项！',
                   },
                 ],
-              })(<Input placeholder="请输入" />)}
+              })(
+                <TextArea
+                  placeholder="请输入"
+                  autosize={{ minRows: 4, maxRows: 6 }}
+                />
+              )}
             </FormItem>
             <FormItem {...formItemLayout} label="备注">
-              {getFieldDecorator('eeee')(<Input placeholder="请输入" />)}
+              {getFieldDecorator('sln_note')(<Input placeholder="请输入" />)}
             </FormItem>
           </Form>
           <div
@@ -550,17 +809,32 @@ class SolutionPriceQuotation extends React.Component {
               textAlign: 'right',
             }}
           >
-            <Button size="large" onClick={() => { this.props.dispatch(routerRedux.goBack()); }}>取消</Button>
-            <Button type="primary" style={{ marginLeft: 8 }} size="large">
+            <Button
+              size="large"
+              onClick={() => {
+                this.props.dispatch(routerRedux.goBack());
+              }}
+            >
+              取消
+            </Button>
+            <Button
+              type="primary"
+              style={{ marginLeft: 8 }}
+              size="large"
+              onClick={this.handleFormSubmit}
+            >
               提交
             </Button>
           </div>
         </Card>
-        <CoreDeviceListModal
-          visible={coreDeviceListModalVisibal}
-          handleCoreDeviceListModalVisibal={
-            this.handleCoreDeviceListModalVisibal
-          }
+        <DeviceListModal
+          visible={deviceListModalVisibal}
+          handleDeviceListModalVisibal={this.handleDeviceListModalVisibal}
+          handleDeviceListAdd={this.handleDeviceListAdd}
+          handleDeviceListModify={this.handleDeviceListModify}
+          modalType={modalType}
+          title={title}
+          rowSelected={rowSelected}
         />
       </PageHeaderLayout>
     );

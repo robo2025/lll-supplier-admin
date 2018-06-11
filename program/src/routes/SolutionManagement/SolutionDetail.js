@@ -1,110 +1,299 @@
 import React from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
-import { Card, Row, Col, Spin, Table, Divider, Button } from 'antd';
+import Cookies from 'js-cookie';
+import { Card, Row, Col, Spin, Table } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import DescriptionList from '../../components/DescriptionList';
-import styles from './SolutionOrderDetail.less';
+import { getAreaBycode } from '../../utils/cascader-address-options';
+import CustomerOrder from './CustomerOrder';
+import solutionImg from '../../assets/solution.jpg';
 
 const { Description } = DescriptionList;
-const extra = (
-  <Row>
-    <Col xs={24} sm={15}>
-      <div>状态</div>
-      <div style={{ fontSize: 20, color: 'red' }}>未报价</div>
-    </Col>
-  </Row>
-);
-const columns = [
+
+const tabList = [
+  {
+    key: 'supplier',
+    tab: '我的报价',
+  },
+  {
+    key: 'customer',
+    tab: '询价单详情',
+  },
+];
+
+const coreDeviceTableColumns = [
   {
     title: '组成部分',
-    dataIndex: 'son_order_sn',
-    key: 'son_order_sn',
+    dataIndex: 'device_component',
+    key: 'device_component',
   },
   {
     title: '商品名称',
-    dataIndex: 'goods_name',
-    key: 'goods_name',
+    dataIndex: 'device_name',
+    key: 'device_name',
   },
   {
     title: '型号',
-    dataIndex: 'model',
-    key: 'model',
+    dataIndex: 'device_model',
+    key: 'device_model',
   },
   {
     title: '品牌',
-    dataIndex: 'brand',
-    key: 'brand',
-  },
-  {
-    title: '单位',
-    dataIndex: 'number',
-    key: 'number',
+    dataIndex: 'brand_name',
+    key: 'brand_name',
   },
   {
     title: '数量',
-    dataIndex: 'max_delivery_time',
-    key: 'max_delivery_time',
-    render: text => <span>{text}天</span>,
+    dataIndex: 'device_num',
+    key: 'device_num',
   },
   {
     title: '单价（元）',
-    dataIndex: 'univalent',
-    key: 'univalent',
+    dataIndex: 'device_price',
+    key: 'device_price',
   },
   {
     title: '小计（元）',
-    dataIndex: 'price_discount',
-    key: 'price_discount',
-    rener: () => <span>无</span>,
+    key: 'total_price',
+    render: row => <span>{row.device_num * row.device_price}</span>,
   },
   {
     title: '备注',
-    key: 'sold_price',
-    render: text => <span>{text.univalent - 0}</span>,
+    key: 'device_note',
+    dataIndex: 'device_note',
+    render: text => (text === '' ? '无' : text),
   },
 ];
-@connect(({ solution, loading }) => ({
+const adiDeviceTableColumns = [
+  {
+    title: '所属类型',
+    dataIndex: 'device_component',
+    key: 'device_component',
+  },
+  {
+    title: '商品名称',
+    dataIndex: 'device_name',
+    key: 'device_name',
+  },
+  {
+    title: '型号',
+    dataIndex: 'device_model',
+    key: 'device_model',
+  },
+  {
+    title: '品牌',
+    dataIndex: 'brand_name',
+    key: 'brand_name',
+  },
+  {
+    title: '数量',
+    dataIndex: 'device_num',
+    key: 'device_num',
+  },
+  {
+    title: '单价（元）',
+    dataIndex: 'device_price',
+    key: 'device_price',
+  },
+  {
+    title: '小计（元）',
+    key: 'total_price',
+    render: row => <span>{row.device_num * row.device_price}</span>,
+  },
+  {
+    title: '备注',
+    key: 'device_note',
+    dataIndex: 'device_note',
+    render: text => (text === '' ? '无' : text),
+  },
+];
+@connect(({ solution, user, loading }) => ({
   profile: solution.profile,
+  supplierInfo: user.supplierInfo,
   loading: loading.models.solution,
 }))
 class SolutionDetail extends React.Component {
+  state = {
+    key: 'supplier',
+  };
   componentDidMount() {
+    const userId = Cookies.getJSON('userinfo').id;
+    if (userId) {
+      this.props.dispatch({
+        type: 'user/fetchSupplierInfo',
+        supplierId: userId,
+      });
+    }
     this.props.dispatch({
       type: 'solution/fetchDetail',
-      payload: location.href.split('/').pop(),
+      payload: location.href.split('=').pop(),
     });
   }
+  onTabChange = (key) => {
+    this.setState({ key });
+  };
   render() {
-    const { profile, loading } = this.props;
+    const { profile, supplierInfo } = this.props;
+    const { customer, supplier } = profile;
+    if (!customer || !supplier) {
+      return <Spin />;
+    }
+    const { sln_basic_info, sln_user_info } = customer;
+    const {
+      sln_supplier_info,
+      welding_device,
+      welding_tech_param,
+      welding_support,
+    } = supplier;
+    const coreDeviceTableData = welding_device.filter(
+      item => item.device_type === '核心设备'
+    );
+    const aidDeviceTableData = welding_device.filter(
+      item => item.device_type === '辅助设备'
+    );
+    const contentList = {
+      supplier: (
+        <div>
+          <Card title="我的信息">
+            <DescriptionList size="small" col="3">
+              <Description term="公司名称">
+                {supplierInfo.profile.company}
+              </Description>
+              <Description term="联系人">{supplierInfo.username}</Description>
+              <Description term="联系电话">{supplierInfo.mobile}</Description>
+              <Description term="公司所在地">
+                {getAreaBycode(`${supplierInfo.profile.district_id}`)}
+              </Description>
+            </DescriptionList>
+          </Card>
+          <Card title="核心设备清单" style={{ marginTop: 30 }}>
+            <Table
+              columns={coreDeviceTableColumns}
+              dataSource={coreDeviceTableData.map((item) => {
+                return { ...item, key: item.device_id };
+              })}
+              pagination={false}
+            />
+          </Card>
+          <Card title="辅助设备" style={{ marginTop: 30 }}>
+            <Table
+              columns={adiDeviceTableColumns}
+              dataSource={aidDeviceTableData.map((item) => {
+                return { ...item, key: item.device_id };
+              })}
+              pagination={false}
+            />
+          </Card>
+          <Card style={{ marginTop: 30 }} title="技术支持">
+            <DescriptionList size="small" col="2">
+              {welding_support
+                ? welding_support.map((item) => {
+                    return (
+                      <Description term={item.name}>
+                        ￥{item.price}元<span style={{ marginLeft: 35 }}>
+                          备注：{item.note}
+                                      </span>
+                      </Description>
+                    );
+                  })
+                : null}
+            </DescriptionList>
+          </Card>
+          <Card style={{ marginTop: 30 }} title="技术参数">
+            <DescriptionList size="small" col="2">
+              {welding_tech_param
+                ? welding_tech_param.map((item) => {
+                    return (
+                      <Description term={item.name}>
+                        {item.value}
+                        <span style={{ marginLeft: 5 }}>{item.unit_name}</span>
+                      </Description>
+                    );
+                  })
+                : null}
+            </DescriptionList>
+          </Card>
+          <Card style={{ marginTop: 30 }} title="报价信息">
+            <DescriptionList size="small" col="3">
+              <Description term="付款比例">
+                <span>首付：{sln_supplier_info.pay_ratio}% </span>
+                <span>尾款：{100 - sln_supplier_info.pay_ratio}%</span>
+              </Description>
+              <Description term="运费">
+                ￥{sln_supplier_info.freight_price}元
+              </Description>
+              <Description term="方案总价">
+                ￥{sln_supplier_info.total_price}元（含运费）
+              </Description>
+              <Description term="报价有效期">
+                {moment
+                  .unix(sln_supplier_info.expired_date)
+                  .format('YYYY年MM月DD日')}
+              </Description>
+              <Description term="方案发货期">
+                {sln_supplier_info.delivery_date}
+              </Description>
+              <Description term="方案介绍">
+                {sln_supplier_info.sln_desc}
+              </Description>
+              <Description term="备注">
+                {sln_supplier_info.sln_note}
+              </Description>
+            </DescriptionList>
+          </Card>
+        </div>
+      ),
+      customer: <CustomerOrder profile={profile} hideBuuton />,
+    };
+    const extra = (
+      <Row style={{ marginRight: 20 }}>
+        <Col xs={24} sm={12}>
+          <div>报价金额</div>
+          <div style={{ fontSize: 25, color: 'green' }}>
+            ￥{sln_supplier_info.total_price}
+          </div>
+        </Col>
+        <Col xs={24} sm={12}>
+          <div>状态</div>
+          <div style={{ fontSize: 25, color: 'green' }}>已报价</div>
+        </Col>
+      </Row>
+    );
     const headContent = (
       <DescriptionList size="small" col="2">
-        <Description term="方案名称">焊接</Description>
+        <Description term="方案名称">{sln_basic_info.sln_name}</Description>
         <Description term="预算金额">
-          <span style={{ color: 'red', fontSize: 18 }}>￥600000.00 </span>
+          <span style={{ color: 'red', fontSize: 20 }}>
+            ￥{sln_basic_info.customer_price}
+          </span>
         </Description>
-        <Description term="方案编号">FABH8378824</Description>
-        <Description term="意向付款比例">30%</Description>
-        <Description term="创建时间">2017-01-10 10:21:34</Description>
-        <Description term="客户备注">请于两个工作日内报价</Description>
+        <Description term="方案编号">{sln_basic_info.sln_no}</Description>
+        <Description term="意向付款比例">
+          <span>阶段一（首款）{sln_user_info.pay_ratio}%</span>
+          <span> 阶段二（尾款）{100 - sln_user_info.pay_ratio}%</span>
+        </Description>
+        <Description term="创建时间">
+          {moment.unix(sln_basic_info.sln_date).format('YYYY-MM-DD HH:MM')}
+        </Description>
+        <Description term="客户备注">
+          {sln_user_info.welding_note === ''
+            ? '无'
+            : sln_user_info.welding_note}
+        </Description>
       </DescriptionList>
     );
     return (
       <PageHeaderLayout
-        title="方案询价单号：FAXJ201805121021001"
-        // title={`单号：${subOrder.son_order_sn}`}
-        logo={
-          <img
-            alt="logo"
-            src="https://imgcdn.robo2025.com/login/robotImg.jpg"
-          />
-        }
+        title={`单号：${sln_basic_info.sln_no}`}
+        logo={<img alt="logo" src={solutionImg} />}
         content={headContent}
         extraContent={extra}
+        tabList={tabList}
+        tabActiveKey={this.state.key}
+        onTabChange={this.onTabChange} //  TODO:选中的TAB 没有高亮
       >
-        <Card title="用户信息">
-        helloword
-        </Card>
+        {contentList[this.state.key]}
       </PageHeaderLayout>
     );
   }

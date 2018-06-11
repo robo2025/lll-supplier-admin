@@ -1,4 +1,9 @@
-import { queryList, queryDetail, queryUserInfo } from '../services/solution';
+import {
+  queryList,
+  queryDetail,
+  queryUserInfo,
+  handleQuotation,
+} from '../services/solution';
 
 export default {
   namespace: 'solution',
@@ -38,13 +43,25 @@ export default {
             id: response.data.customer.sln_basic_info.customer_id,
           });
           userInfo = res.data;
-          if (callback) { callback(response.data); }
+          if (callback) {
+            callback(response.data);
+          }
         }
       }
       yield put({
         type: 'saveSolutionOrder',
         payload: { ...response.data, userInfo },
       });
+    },
+    *handleFormSubmit({ payload, callback }, { call, put }) {
+      const response = yield call(handleQuotation, { ...payload });
+      if (callback && typeof (callback) === 'function') {
+        if (response.rescode === 10000) {
+          callback(true, response.msg);
+        } else {
+          callback(false, response.msg);
+        }
+      }
     },
   },
 
