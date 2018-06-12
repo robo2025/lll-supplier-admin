@@ -40,7 +40,7 @@ export default class NewGood extends Component {
             min_quantity: 1, // 最小数量
             max_quantity: 1, // 最大数量
             price: '0', // 价格
-            shipping_fee_type: 0, // 包邮
+            shipping_fee_type: 1, // 包邮
             lead_time: '0', // 货期
           },
         ],
@@ -235,6 +235,7 @@ export default class NewGood extends Component {
       message.error('你还没有选择产品');
       return;
     }
+    console.log('提交数据', { ...fields });
     dispatch({
       type: 'good/add',
       data: {

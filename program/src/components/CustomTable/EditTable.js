@@ -32,9 +32,9 @@ const EditableCell = ({ editable, value, onChange, minVal }) => (
 );
 
 const RadioGroupCell = ({ value, onChange }) => (
-  <RadioGroup onChange={onChange} value={value || 0}>
-    <Radio value={0}>包邮</Radio>
-    {/* <Radio value={1}>到付</Radio> */}
+  <RadioGroup onChange={onChange} value={value || 1}>
+    <Radio value={1}>包邮</Radio>
+    {/* <Radio value={0}>到付</Radio> */}
   </RadioGroup>
 );
 

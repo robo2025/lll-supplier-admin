@@ -274,12 +274,13 @@ export default class NewGoodForm extends Component {
             >
               {getFieldDecorator('min_buy', {
                 rules: [{
-                  type: 'number',
+                  required: true,
+                  type: 'string',
                   message: '最低采购量必须是整数',
                 }],
-                initialValue: data.min_buy,
+                initialValue: data.min_buy >> 0,
               })(
-                <Input />
+                <Input type="number" />
               )}
             </FormItem>
             <FormItem
