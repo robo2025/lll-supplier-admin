@@ -259,7 +259,7 @@ export default class UserRegister extends Component {
       data,
       success: () => {
         message.success('注册成功');
-        // jumpToLogin();
+        jumpToLogin();
       },
       error: (res) => { message.error(handleServerMsgObj(res.msg)); },
     });
