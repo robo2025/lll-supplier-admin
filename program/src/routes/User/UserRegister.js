@@ -80,7 +80,7 @@ export default class UserRegister extends Component {
   onGetCaptcha = () => {
     const { form } = this.props;
 
-    let count = 599;
+    let count = 59;
 
     // 发送手机验证码
     const mobile = form.getFieldValue('mobile');
