@@ -884,7 +884,7 @@ export default class UserRegister extends Component {
               <Button type="primary" htmlType="submit" loading={false}>
                 提交
               </Button>
-              <Button style={{ marginLeft: 8 }}>保存</Button>
+              {/* <Button style={{ marginLeft: 8 }}>保存</Button> */}
             </FormItem>
           </Form>
           {/* 用户协议 */}
