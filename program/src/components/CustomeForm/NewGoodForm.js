@@ -53,6 +53,12 @@ export default class NewGoodForm extends Component {
     };
   }
 
+  componentDidMount() {
+    if (this.props.bindForm) {
+      this.props.bindForm(this.props.form);
+    }
+  }
+
   handleCancel = () => this.setState({ previewVisible: false })
   handlePreview = (file) => {
     this.setState({

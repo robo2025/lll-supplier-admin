@@ -11,7 +11,7 @@ const menuData = [{
       path: 'list',
     },
     {
-      name: '新增商品信息',
+      name: '新建商品信息',
       path: 'new',
     },
   ],
