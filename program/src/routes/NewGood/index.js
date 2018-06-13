@@ -235,24 +235,25 @@ export default class NewGood extends Component {
       message.error('你还没有选择产品');
       return;
     }
-    this.$formObj.validateFields((err, values) => {
-      if (!err) {
-        console.log('提交数据', { ...values });
-      }
-    });
-    // dispatch({
-    //   type: 'good/add',
-    //   data: {
-    //     ...fields,
-    //     mno: args.mno,
-    //   },
-    //   success: () => { history.push('/goods/list'); },
-    //   error: (res) => { message.error(res.msg, 2.5); },
-    // });
+    if (this.$formObj) {
+      this.$formObj.validateFields((err, values) => {
+        if (!err) {
+          console.log('提交数据', { ...fields }, values);
+          dispatch({
+            type: 'good/add',
+            data: {
+              ...fields,
+              mno: args.mno,
+            },
+            success: () => { history.push('/goods/list'); },
+            error: (res) => { message.error(res.msg, 2.5); },
+          });
+        }
+      });
+    }
   }
 
   bindForm = (formObj) => {
-    // 将子组件的this.props.form传给父组件，方便后面校验
     this.$formObj = formObj;
   }
 

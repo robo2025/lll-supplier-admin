@@ -281,10 +281,10 @@ export default class NewGoodForm extends Component {
               {getFieldDecorator('min_buy', {
                 rules: [{
                   required: true,
-                  message: '采购数量不能为空',
+                  message: '最低采购量必须填写',
                 }, {
                   pattern: /^(\d+)$/,
-                  message: '最低采购量必须是整数',
+                  message: '库存数量必须是整数',
                 }],
                 initialValue: data.min_buy >> 0,
               })(
