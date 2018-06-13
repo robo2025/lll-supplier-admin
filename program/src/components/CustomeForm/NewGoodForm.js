@@ -53,6 +53,12 @@ export default class NewGoodForm extends Component {
     };
   }
 
+  componentDidMount() {
+    if (this.props.bindForm) {
+      this.props.bindForm(this.props.form);
+    }
+  }
+
   handleCancel = () => this.setState({ previewVisible: false })
   handlePreview = (file) => {
     this.setState({
@@ -274,12 +280,15 @@ export default class NewGoodForm extends Component {
             >
               {getFieldDecorator('min_buy', {
                 rules: [{
-                  type: 'number',
-                  message: '最低采购量必须是整数',
+                  required: true,
+                  message: '最低采购量必须填写',
+                }, {
+                  pattern: /^(\d+)$/,
+                  message: '库存数量必须是整数',
                 }],
-                initialValue: data.min_buy,
+                initialValue: data.min_buy >> 0,
               })(
-                <Input />
+                <Input type="number" />
               )}
             </FormItem>
             <FormItem
@@ -325,7 +334,7 @@ export default class NewGoodForm extends Component {
                   required: true,
                   message: '请输入库存数量',
                 }, {
-                  type: 'number',
+                  pattern: /^(\d+)$/,
                   message: '库存数量必须是整数',
                 }],
                 initialValue: data.stock,

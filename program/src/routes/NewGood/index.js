@@ -40,7 +40,7 @@ export default class NewGood extends Component {
             min_quantity: 1, // 最小数量
             max_quantity: 1, // 最大数量
             price: '0', // 价格
-            shipping_fee_type: 0, // 包邮
+            shipping_fee_type: 1, // 包邮
             lead_time: '0', // 货期
           },
         ],
@@ -235,15 +235,26 @@ export default class NewGood extends Component {
       message.error('你还没有选择产品');
       return;
     }
-    dispatch({
-      type: 'good/add',
-      data: {
-        ...fields,
-        mno: args.mno,
-      },
-      success: () => { history.push('/goods/list'); },
-      error: (res) => { message.error(res.msg, 2.5); },
-    });
+    if (this.$formObj) {
+      this.$formObj.validateFields((err, values) => {
+        if (!err) {
+          console.log('提交数据', { ...fields }, values);
+          dispatch({
+            type: 'good/add',
+            data: {
+              ...fields,
+              mno: args.mno,
+            },
+            success: () => { history.push('/goods/list'); },
+            error: (res) => { message.error(res.msg, 2.5); },
+          });
+        }
+      });
+    }
+  }
+
+  bindForm = (formObj) => {
+    this.$formObj = formObj;
   }
 
   renderSimpleForm() {
@@ -354,6 +365,7 @@ export default class NewGood extends Component {
             onChange={this.handleFormChange}
             onAttrChange={this.handleGoodAttr}
             args={args}
+            bindForm={this.bindForm}
           />
           <SectionHeader
             title="商品其他属性"
