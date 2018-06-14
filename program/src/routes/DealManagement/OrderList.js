@@ -197,6 +197,7 @@ export default class OrderList extends Component {
         start_time: fieldsValue.create_time ? fieldsValue.create_time[0].format('YYYY-MM-DD') : '',
         end_time: fieldsValue.create_time ? fieldsValue.create_time[1].format('YYYY-MM-DD') : '',
       };
+      delete values.create_time;
       console.log('搜索字段', values);
       dispatch({
         type: 'orders/fetchSearch',

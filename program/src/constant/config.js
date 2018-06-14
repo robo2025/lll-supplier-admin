@@ -73,4 +73,3 @@ export const EXPIRED_TOKEN = 20002; // token过期
 export const ILLEGAL_TOKEN = 20003; // 非法token
 export const LOGIN_TIMEOUT = 20004; // 登录超时
 export const NO_AUTH = 30001; // 无权限
-

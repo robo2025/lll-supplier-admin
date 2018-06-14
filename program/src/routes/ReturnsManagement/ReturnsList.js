@@ -63,7 +63,7 @@ export default class ReturnsList extends Component {
         start_time: fieldsValue.create_time ? fieldsValue.create_time[0].format('YYYY-MM-DD') : '',
         end_time: fieldsValue.create_time ? fieldsValue.create_time[1].format('YYYY-MM-DD') : '',
       };
-
+      delete values.create_time;
       console.log('搜索字段', values);
       dispatch({
         type: 'orders/fetchReturns',
@@ -213,7 +213,7 @@ export default class ReturnsList extends Component {
           </Col>
           <Col xll={4} md={10} sm={24}>
             <FormItem label="退货单起止时间">
-              {getFieldDecorator('no')(
+              {getFieldDecorator('create_time')(
                 <RangePicker onChange={this.onDatepickerChange} />
               )}
             </FormItem>
