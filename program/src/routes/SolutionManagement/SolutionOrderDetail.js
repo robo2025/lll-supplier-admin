@@ -22,12 +22,10 @@ const extra = (
 }))
 class SolutionOrderDetail extends React.Component {
   componentDidMount() {
-    if (!this.props.profile.customer) {
-      this.props.dispatch({
-        type: 'solution/fetchDetail',
-        payload: location.href.split('=').pop(),
-      });
-    }
+    this.props.dispatch({
+      type: 'solution/fetchDetail',
+      payload: location.href.split('=').pop(),
+    });
   }
   render() {
     const { profile } = this.props;
@@ -35,10 +33,7 @@ class SolutionOrderDetail extends React.Component {
     if (!customer || !userInfo) {
       return <Spin />;
     }
-    const {
-      sln_basic_info,
-      sln_user_info,
-    } = customer;
+    const { sln_basic_info, sln_user_info } = customer;
     const headContent = (
       <DescriptionList size="small" col="2">
         <Description term="方案名称">{sln_basic_info.sln_name}</Description>
