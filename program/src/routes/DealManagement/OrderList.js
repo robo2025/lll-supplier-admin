@@ -262,9 +262,8 @@ export default class OrderList extends Component {
               {getFieldDecorator('order_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="0">全部</Option>
-                  <Option value="1">待支付</Option>
                   <Option value="2">取消订单</Option>
-                  <Option value="3">待结单</Option>
+                  <Option value="3">待接单</Option>
                   <Option value="4">待发货</Option>
                   <Option value="5">已发货,配送中</Option>
                   <Option value="6">已完成</Option>
@@ -325,12 +324,19 @@ export default class OrderList extends Component {
               {getFieldDecorator('order_status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="0">全部</Option>
-                  <Option value="1">待接单</Option>
-                  <Option value="2">已发货</Option>
-                  <Option value="3">已收货</Option>
-                  <Option value="4">商家无货</Option>
-                  <Option value="5">申请延时发货</Option>
-                  <Option value="5">允许延时发货</Option>
+                  <Option value="2">取消订单</Option>
+                  <Option value="3">待接单</Option>
+                  <Option value="4">待发货</Option>
+                  <Option value="5">已发货,配送中</Option>
+                  <Option value="6">已完成</Option>
+                  <Option value="8">申请延期中</Option>
+                  <Option value="10">退款中</Option>
+                  <Option value="11">退货中</Option>
+                  <Option value="12">作废</Option>
+                  <Option value="13">无货</Option>
+                  <Option value="14">退款完成</Option>
+                  <Option value="15">退货完成</Option>
+                  <Option value="16">订单流转结束</Option>
                 </Select>
               )}
             </FormItem>
