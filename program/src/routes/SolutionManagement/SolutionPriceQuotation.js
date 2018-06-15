@@ -299,7 +299,7 @@ class SolutionPriceQuotation extends React.Component {
       callback: (data) => {
         this.setState({
           coreDeviceListData: data.customer.welding_device.map((item) => {
-            return { ...item, key: item.id };
+            return { ...item, key: item.device_id };
           }),
         });
       },
