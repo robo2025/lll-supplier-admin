@@ -38,6 +38,7 @@ export default class OrderList extends Component {
       openReceipt: [], // 开票信息
       data: {},
       args: qs.parse(props.location.search, { ignoreQueryPrefix: true }),
+      searchValues: {},
     };
   }
 
@@ -205,6 +206,7 @@ export default class OrderList extends Component {
         end_time: fieldsValue.create_time ? fieldsValue.create_time[1].format('YYYY-MM-DD') : '',
       };
       delete values.create_time;
+      this.setState({ searchValues: values });
       console.log('搜索字段', values);
       dispatch({
         type: 'orders/fetchSearch',
@@ -216,6 +218,7 @@ export default class OrderList extends Component {
   // 处理表单改变
   handlePaginationChange = (page, pageSize) => {
     const { dispatch, history } = this.props;
+    const { searchValues } = this.state;
 
     const params = {
       currentPage: page,
@@ -235,6 +238,7 @@ export default class OrderList extends Component {
       supplierId: 100,
       offset: params.offset,
       limit: params.limit,
+      params: searchValues,
     });
   }
 
