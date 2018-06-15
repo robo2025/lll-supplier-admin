@@ -75,8 +75,8 @@ const ListItem = ({ data, onSendClick, onTakingClick, onOpenReceiptClick, onExce
       </Tooltip>
     </Col>
     <Col span={5} className="item">
-      <Tooltip placement="topLeft" title={`${data.goods_name}-${data.model}`}>
-        {data.goods_name}-{data.model}
+      <Tooltip placement="topLeft" title={`${data.goods_name} / ${data.model}`}>
+        {data.goods_name}&nbsp;/&nbsp;{data.model}
       </Tooltip>
     </Col>
     <Col span={3} className="item">
@@ -126,7 +126,7 @@ const ListHeader = () => (
       商品ID
     </Col>
     <Col span={5} className="item">
-      商品名称-型号
+      商品名称&nbsp;/&nbsp;型号
     </Col>
     <Col span={3} className="item">
       品牌

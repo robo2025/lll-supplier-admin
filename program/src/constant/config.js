@@ -3,7 +3,7 @@
 * */
 
 // 单点登录URL
-export const URL = 'https://login.robo2025.com';
+export const URL = '//login.robo2025.com';
 
 // 网站内容接口URL
 export const API_URL = '//api.robo2025.com/scm';
@@ -12,23 +12,23 @@ export const API_URL = '//api.robo2025.com/scm';
 export const OPERATION_URL = '//api.robo2025.com/scm';
 
 // 上传文件获取token URL
-export const UPLOAD_URL = 'https://api.robo2025.com/common';
+export const UPLOAD_URL = '//api.robo2025.com/common';
 
 // 接口主域名
-export const MAIN_URL = 'https://api.robo2025.com';
+export const MAIN_URL = '//api.robo2025.com';
 
 // 用户管理系统API URL
-export const USERS_URL = 'https://api.robo2025.com/user/service';
+export const USERS_URL = '//api.robo2025.com/user/service';
 
 // 用户管理系统URL
-export const USERS_SERVER = 'https://api.robo2025.com/user';
+export const USERS_SERVER = '//api.robo2025.com/user';
 
 // 订单系统接口
 export const ORDERS_URL = '//api.robo2025.com/order';
 // export const ORDERS_URL = '//192.168.2.109:8009';
 
 // 方案中心URL
-export const SOLUTION_URL = 'https://api.robo2025.com/slncenter';
+export const SOLUTION_URL = '//api.robo2025.com/slncenter';
 
 // 验证登录接口URL
 export const LOGIN_URL = `${URL}/server/authorize`;
@@ -73,4 +73,3 @@ export const EXPIRED_TOKEN = 20002; // token过期
 export const ILLEGAL_TOKEN = 20003; // 非法token
 export const LOGIN_TIMEOUT = 20004; // 登录超时
 export const NO_AUTH = 30001; // 无权限
-

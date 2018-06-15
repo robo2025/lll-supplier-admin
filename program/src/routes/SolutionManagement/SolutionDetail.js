@@ -290,7 +290,7 @@ class SolutionDetail extends React.Component {
         content={headContent}
         extraContent={extra}
         tabList={tabList}
-        tabActiveKey={this.state.key}
+        activeTabKey={this.state.key}
         onTabChange={this.onTabChange} //  TODO:选中的TAB 没有高亮
       >
         {contentList[this.state.key]}

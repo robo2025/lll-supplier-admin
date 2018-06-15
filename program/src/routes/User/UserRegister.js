@@ -143,6 +143,7 @@ export default class UserRegister extends Component {
 
   handleModalCanle = () => {
     message.warning('不同意就注册不了哦');
+    this.props.history.push('/goods/list');
   }
 
   // 提交注册
