@@ -151,10 +151,17 @@ class SolutionList extends React.Component {
         title: '操作',
         key: 'option',
         render: (row) => {
-          if (row.sln_status === 'P') { // 未报价（已发布）
-            return <a href={`${location.href}/detail?sln_no=${row.sln_no}`}>报价</a>;
+          if (row.sln_status === 'P') {
+            // 未报价（已发布）
+            return (
+              <a href={`${location.href}/detail?sln_no=${row.sln_no}`}>报价</a>
+            );
           } else {
-            return <a href={`${location.href}/solutionDetail?sln_no=${row.sln_no}`}>查看详情</a>;
+            return (
+              <a href={`${location.href}/solutionDetail?sln_no=${row.sln_no}`}>
+                查看详情
+              </a>
+            );
           }
         },
       },
@@ -169,7 +176,7 @@ class SolutionList extends React.Component {
           >
             <Row gutter={{ md: 24, lg: 24, xl: 48 }}>
               <Col xll={4} md={8} sm={24}>
-                <FormItem label="方案编号">
+                <FormItem label="方案询价单号">
                   {getFieldDecorator('sln_no')(<Input placeholder="请输入" />)}
                 </FormItem>
               </Col>
@@ -267,7 +274,7 @@ class SolutionList extends React.Component {
           </Form>
         </Card>
         <Card bordered={false} loading={loading} style={{ marginTop: 30 }}>
-          <Table columns={columns} pagination={false} dataSource={list} />
+          <Table columns={columns} dataSource={list} />
         </Card>
       </PageHeaderLayout>
     );
