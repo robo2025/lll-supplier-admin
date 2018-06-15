@@ -38,6 +38,7 @@ export default class OrderList extends Component {
       openReceipt: [], // 开票信息
       data: {},
       args: qs.parse(props.location.search, { ignoreQueryPrefix: true }),
+      searchValues: {},
     };
   }
 
@@ -155,13 +156,20 @@ export default class OrderList extends Component {
     const { exceptionInfo, orderId } = this.state;
     const that = this;
     this.formObj.validateFields((error, values) => {
-      console.log('校验结果：', error, values);
+      console.log('异常校验结果：', exceptionInfo);
       if (!error) {
+        let newExceptionInfo = {};
+        if (exceptionInfo.expect_date_of_delivery) {
+          newExceptionInfo = {
+            ...exceptionInfo,
+            remarks: `${exceptionInfo.remarks}\n(预计发货时间：${exceptionInfo.expect_date_of_delivery})`,
+          };
+        }
         that.setState({ isShowExceptionModal: false });
         dispatch({
           type: 'orders/fetchException',
           orderId,
-          data: { ...exceptionInfo },
+          data: newExceptionInfo,
           success: () => { message.success('订单异常申请提交成功'); },
           error: (res) => { message.error(handleServerMsgObj(res.msg)); },
         });
@@ -198,6 +206,7 @@ export default class OrderList extends Component {
         end_time: fieldsValue.create_time ? fieldsValue.create_time[1].format('YYYY-MM-DD') : '',
       };
       delete values.create_time;
+      this.setState({ searchValues: values });
       console.log('搜索字段', values);
       dispatch({
         type: 'orders/fetchSearch',
@@ -209,6 +218,7 @@ export default class OrderList extends Component {
   // 处理表单改变
   handlePaginationChange = (page, pageSize) => {
     const { dispatch, history } = this.props;
+    const { searchValues } = this.state;
 
     const params = {
       currentPage: page,
@@ -228,6 +238,7 @@ export default class OrderList extends Component {
       supplierId: 100,
       offset: params.offset,
       limit: params.limit,
+      params: searchValues,
     });
   }
 
@@ -401,33 +412,33 @@ export default class OrderList extends Component {
           <div className={styles.tableList}>
             <List.Header />
             {
-               orders.list.length > 0
-               ?
+              orders.list.length > 0
+                ?
                 null
-               :
+                :
                 <div style={{ textAlign: 'center' }}>暂无订单数据</div>
             }
             <Spin indicator={antIcon} tip="别急，我拼了老命也要把数据加载出来..." spinning={loading} >
               {
-              orders.list.map((val, idx) => {
-                const orderListItemHeader = (
-                  <div className={styles['order-list-header']}>
-                    <b>商品订单号：</b>
-                    <a className="order-sn">{val.sub_order[0].son_order_sn}</a>
-                    <span className="order-time">{moment(val.add_time * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
-                  </div>
-                );
-                return (
-                  <List
-                    header={orderListItemHeader}
-                    data={val.sub_order}
-                    key={idx}
-                    bindModalClick={this.showModal}
-                    handleTakingClick={this.takingOrder}
-                  />
-                );
-              })
-            }
+                orders.list.map((val, idx) => {
+                  const orderListItemHeader = (
+                    <div className={styles['order-list-header']}>
+                      <b>商品订单号：</b>
+                      <a className="order-sn">{val.sub_order[0].son_order_sn}</a>
+                      <span className="order-time">{moment(val.add_time * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+                    </div>
+                  );
+                  return (
+                    <List
+                      header={orderListItemHeader}
+                      data={val.sub_order}
+                      key={idx}
+                      bindModalClick={this.showModal}
+                      handleTakingClick={this.takingOrder}
+                    />
+                  );
+                })
+              }
             </Spin>
           </div>
           <Pagination

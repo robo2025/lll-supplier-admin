@@ -26,6 +26,7 @@ export default class RefundsList extends Component {
       expandForm: false,
       currentPage: args.page ? args.page >> 0 : 1,
       args,
+      searchValues: {},
     };
   }
 
@@ -65,7 +66,8 @@ export default class RefundsList extends Component {
         start_time: fieldsValue.create_time ? fieldsValue.create_time[0].format('YYYY-MM-DD') : '',
         end_time: fieldsValue.create_time ? fieldsValue.create_time[1].format('YYYY-MM-DD') : '',
       };
-
+      delete values.create_time;
+      this.setState({ searchValues: values });
       dispatch({
         type: 'orders/fetchRefunds',
         params: values,
@@ -76,6 +78,7 @@ export default class RefundsList extends Component {
   // 处理分页改变
   handlePaginationChange = (page, pageSize) => {
     const { dispatch, history } = this.props;
+    const { searchValues } = this.state;
 
     const params = {
       currentPage: page,
@@ -93,6 +96,7 @@ export default class RefundsList extends Component {
       type: 'orders/fetchRefunds',
       offset: params.offset,
       limit: params.limit,
+      params: searchValues,
     });
   }
 
