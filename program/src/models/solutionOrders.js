@@ -3,8 +3,8 @@ import {
   prepareGoods,
   queryDetail,
   querySolutionDetail,
+  delivery,
 } from '../services/solutionOrders';
-import { queryUserInfo } from '../services/solution';
 
 export default {
   namespace: 'solutionOrders',
@@ -16,13 +16,19 @@ export default {
   },
   effects: {
     *fetch({ payload }, { call, put, select }) {
-      const pagination = yield select((state) => { return state.solutionOrders.pagination; });
+      const pagination = yield select((state) => {
+        return state.solutionOrders.pagination;
+      });
       const { current, pageSize } = pagination;
       const params = {
         offset: (current - 1) * pageSize,
         limit: pageSize,
       };
-      const response = yield call(queryOrders, { ...payload, ...params, is_type: 'all' });
+      const response = yield call(queryOrders, {
+        ...payload,
+        ...params,
+        is_type: 'all',
+      });
       const { data, headers, rescode } = response;
       if (rescode === '10000') {
         const dataWithKey = data.map((item) => {
@@ -51,7 +57,7 @@ export default {
     *fetchDetail({ payload, callback }, { call, put }) {
       const response = yield call(queryDetail, { plan_order_sn: payload });
       let slnInfo = {};
-            const { data, rescode } = response;
+      const { data, rescode } = response;
       if (rescode === '10000') {
         const res = yield call(querySolutionDetail, data.order_info.plan_sn);
         slnInfo = res.data;
@@ -66,6 +72,14 @@ export default {
     },
     *handlePrepare({ payload, callback }, { call, put }) {
       const response = yield call(prepareGoods, { ...payload, is_type: 1 });
+      if (response.status === 200 && response.rescode === '10000') {
+        callback(true, response.msg);
+      } else {
+        callback(false, response.msg);
+      }
+    },
+    *handleDelivery({ payload, callback }, { call }) {
+      const response = yield call(delivery, { ...payload });
       if (response.status === 200 && response.rescode === '10000') {
         callback(true, response.msg);
       } else {

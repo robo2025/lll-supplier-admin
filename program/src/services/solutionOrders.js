@@ -25,7 +25,14 @@ export async function prepareGoods(params) {
         data: { is_type },
     });
 }
-export async function querySolutionDetail(plan_order_sn) {
-    return lyRequest('https://api.robo2025.com/slncenter/v1/welding/FA20180611182536001?role=supplier');
+export async function delivery(params) {
+    const { plan_order_sn, mobile, logistics_company, logistics_number, sender } = params;
+    return lyRequest(`${SLN_ORDER_URL}/v1/user/order/${plan_order_sn}`, {
+        method: 'put',
+        data: { mobile, logistics_company, logistics_number, sender, plan_order_sn, is_type: 2 },
+    });
 }
 
+export async function querySolutionDetail(plan_order_sn) {
+    return lyRequest(`${SOLUTION_URL}/v1/welding/${plan_order_sn}?role=supplier`);
+}

@@ -23,6 +23,45 @@ const Tablefooter = (props) => {
     </DescriptionList>
   );
 };
+const logisticsColumns = [{
+  title: '商品ID',
+  dataIndex: 'goods_sn',
+  key: 'goods_sn',
+}, {
+  title: '商品名称',
+  dataIndex: 'goods_name',
+  key: 'goods_name',
+}, {
+  title: '型号',
+  dataIndex: 'model',
+  key: 'model',
+}, {
+  title: '品牌',
+  dataIndex: 'brand',
+  key: 'brand',
+}, {
+  title: '发货日期',
+  dataIndex: 'add_time',
+  key: 'add_time',
+  render: val => (<span>{moment(val * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>),
+}, {
+  title: '送货人',
+  dataIndex: 'sender',
+  key: 'sender',
+  render: text => (<span>{text || '---'}</span>),
+}, {
+  title: '联系号码',
+  dataIndex: 'mobile',
+  key: 'mobile',
+}, {
+  title: '物流公司',
+  dataIndex: 'logistics_company',
+  key: 'logistics_company',
+}, {
+  title: '物流单号',
+  dataIndex: 'logistics_number',
+  key: 'logistics_number',
+}];
 const opreationColumns = [
   {
     title: '操作人',
@@ -93,6 +132,7 @@ const columns = [
     render: text => (text === '' ? '无' : text),
   },
 ];
+
 @connect(({ solutionOrders, loading }) => ({
   profile: solutionOrders.profile,
   loading: loading.models.solutionOrders,
@@ -115,6 +155,7 @@ class SolutionOrderDetail extends React.Component {
       guest_info,
       receipt_info,
       supplier_info,
+      delivery_info,
       order_operations,
       supplier,
       customer,
@@ -240,6 +281,18 @@ class SolutionOrderDetail extends React.Component {
                       </span>
               </Col>
             </Row>
+          </Card>
+          <Card title="发货记录">
+          <Table
+            style={{ marginBottom: 24 }}
+            pagination={false}
+            dataSource={delivery_info}
+            columns={logisticsColumns}
+            rowKey="add_time"
+            locale={{
+              emptyText: '暂无发货记录',
+            }}
+          />
           </Card>
           <Card title="订单操作记录">
             <Table
