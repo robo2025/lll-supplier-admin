@@ -30,6 +30,9 @@ export const ORDERS_URL = '//testapi.robo2025.com/order';
 // 方案中心URL
 export const SOLUTION_URL = '//testapi.robo2025.com/slncenter';
 
+// 方案订单接口
+export const SLN_ORDER_URL = '//testapi.robo2025.com/sln-order';
+
 // 验证登录接口URL
 export const LOGIN_URL = `${URL}/server/authorize`;
 
