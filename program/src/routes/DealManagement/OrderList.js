@@ -164,6 +164,8 @@ export default class OrderList extends Component {
             ...exceptionInfo,
             remarks: `${exceptionInfo.remarks}\n(预计发货时间：${exceptionInfo.expect_date_of_delivery})`,
           };
+        } else {
+          newExceptionInfo = { ...exceptionInfo };
         }
         that.setState({ isShowExceptionModal: false });
         dispatch({
