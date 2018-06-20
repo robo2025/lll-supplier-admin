@@ -15,7 +15,7 @@ export async function queryList(params) {
 }
 
 export async function queryDetail({ sln_no }) {
-  return lyRequest(`${SOLUTION_URL}/v1/sln/${sln_no}?role=supplier`);
+  return lyRequest(`${SOLUTION_URL}/v1/welding/${sln_no}?role=supplier`);
 }
 
 
@@ -23,14 +23,14 @@ export async function queryUserInfo({ id }) {
   return lyRequest(USERS_SERVER + '/service/customers/' + id);
 }
 
-export async function handleQuotation({ sln_no, sln_supplier_info, welding_device, welding_tech_param, welding_support }) {
+export async function handleQuotation({ sln_no, sln_supplier_info, sln_device, welding_tech_param, sln_support }) {
   return lyRequest(`${SOLUTION_URL}/v1/offer/${sln_no}`, {
     method: 'post',
     data: {
       sln_supplier_info,
-      welding_device,
+      sln_device,
       welding_tech_param,
-      welding_support,
+      sln_support,
     },
   });
 }
