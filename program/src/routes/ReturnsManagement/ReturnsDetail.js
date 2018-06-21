@@ -121,6 +121,7 @@ export default class ReturnsDetail extends Component {
             <Description term="联系号码">{ returnLogistics.length > 0 ? returnLogistics[0].mobile : ''}</Description>
             <Description term="物流公司">{returnLogistics.length > 0 ? returnLogistics[0].logistics_company : ''}</Description>
             <Description term="物流单号">{returnLogistics.length > 0 ? returnLogistics[0].logistics_number : ''}</Description>
+            <Description term="收货地址">{returnLogistics.length > 0 ? returnLogistics[0].address : ''}</Description>
           </DescriptionList>
         </Card>
         {/* <Card
