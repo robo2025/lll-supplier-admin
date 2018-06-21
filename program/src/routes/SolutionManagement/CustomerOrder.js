@@ -127,7 +127,7 @@ class CustomerOrder extends React.Component {
                   {sln_file.map((item) => {
                     if (item.file_type === 'cad') {
                       return (
-                        <a href={item.file_url} key={item.id}>
+                        <a href={item.file_url} key={item.id} target="_blank">
                           {item.file_name}
                         </a>
                       );
@@ -140,7 +140,7 @@ class CustomerOrder extends React.Component {
                 {sln_file.map((item) => {
                   if (item.file_type === 'img') {
                     return (
-                      <a href={item.file_url} key={item.id}>
+                      <a href={item.file_url} key={item.id} target="_blank" >
                         <img src={item.file_url} alt={item.file_name} />
                       </a>
                     );
