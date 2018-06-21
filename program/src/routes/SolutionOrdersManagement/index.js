@@ -207,7 +207,7 @@ const DeliveryModal = Form.create()((props) => {
               >
                 {form.getFieldDecorator('mobile', {
                   rules: [
-                    { required: true, pattern: /^[0-9-]*$/, message: '请输入正确的电话号码' },
+                    { pattern: /^[0-9-]*$/, message: '请输入正确的电话号码' },
                   ],
                 })(<Input placeholder="请输入" />)}
               </FormItem>
@@ -219,11 +219,7 @@ const DeliveryModal = Form.create()((props) => {
                 wrapperCol={{ span: 12 }}
                 label="送货人"
               >
-                {form.getFieldDecorator('sender', {
-                  rules: [
-                    { required: true, whitespace: true, message: '请输入' },
-                  ],
-                })(<Input placeholder="请输入" />)}
+                {form.getFieldDecorator('sender')(<Input placeholder="请输入" />)}
               </FormItem>
             </Col>
           </Row>
