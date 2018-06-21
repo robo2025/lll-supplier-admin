@@ -100,7 +100,7 @@ export const SlnStatus = ({ status }) => {
     case 5:
       return (
         <span>
-          <Badge status="processing" />发货中
+          <Badge status="processing" />已发货待确认
         </span>
       );
     case 6:
