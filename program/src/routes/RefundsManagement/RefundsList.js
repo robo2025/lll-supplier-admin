@@ -209,7 +209,7 @@ export default class RefundsList extends Component {
             </FormItem>
           </Col>
           <Col xll={4} md={10} sm={24}>
-            <FormItem label="退货单起止时间">
+            <FormItem label="退款单起止时间">
               {getFieldDecorator('no')(
                 <RangePicker onChange={this.onDatepickerChange} />
               )}
@@ -269,11 +269,11 @@ export default class RefundsList extends Component {
                     <div>
                       <b>退款单编号：</b>
                       <a className="order-sn">{val.refund_sn}</a>
+                      <span className="order-time">({moment(val.refund_time * 1000).format('YYYY-MM-DD HH:mm')})</span>
                     </div>
                     <div>
                       <b>退货单编号：</b>
                       <a className="order-sn">{val.returns_sn}</a>
-                      <span className="order-time">({moment(val.returns_time * 1000).format('YYYY-MM-DD HH:mm')})</span>
                     </div>
                   </div>
                 );
