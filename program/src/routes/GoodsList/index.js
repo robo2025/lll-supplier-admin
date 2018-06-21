@@ -217,7 +217,7 @@ export default class GoodsList extends Component {
       gno,
       goodStatus: status,
       success: () => {
-        message.success('修改成功');
+        message.success('上架成功');
         this.dispatchDefaultList();
       },
       error: (res) => { message.error(handleServerMsgObj(res.msg)); },
