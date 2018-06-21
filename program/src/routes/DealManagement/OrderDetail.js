@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Cookies from 'js-cookie';
-import { Card, Icon, Table, Badge } from 'antd';
+import { Card, Icon, Table, Badge, Button } from 'antd';
 import { connect } from 'dva';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
@@ -311,6 +311,9 @@ export default class OrderDetail extends Component {
               )
           }
         </Card>
+        <div className={styles['submit-btn-wrap']}>
+          <Button type="primary" onClick={() => { this.props.history.goBack(); }}>返回列表</Button>
+        </div>
       </PageHeaderLayout>
     );
   }
