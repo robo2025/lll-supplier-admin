@@ -23,45 +23,57 @@ const Tablefooter = (props) => {
     </DescriptionList>
   );
 };
-const logisticsColumns = [{
-  title: '商品ID',
-  dataIndex: 'goods_sn',
-  key: 'goods_sn',
-}, {
-  title: '商品名称',
-  dataIndex: 'goods_name',
-  key: 'goods_name',
-}, {
-  title: '型号',
-  dataIndex: 'model',
-  key: 'model',
-}, {
-  title: '品牌',
-  dataIndex: 'brand',
-  key: 'brand',
-}, {
-  title: '发货日期',
-  dataIndex: 'add_time',
-  key: 'add_time',
-  render: val => (<span>{moment(val * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>),
-}, {
-  title: '送货人',
-  dataIndex: 'sender',
-  key: 'sender',
-  render: text => (<span>{text || '---'}</span>),
-}, {
-  title: '联系号码',
-  dataIndex: 'mobile',
-  key: 'mobile',
-}, {
-  title: '物流公司',
-  dataIndex: 'logistics_company',
-  key: 'logistics_company',
-}, {
-  title: '物流单号',
-  dataIndex: 'logistics_number',
-  key: 'logistics_number',
-}];
+const logisticsColumns = [
+  {
+    title: '商品ID',
+    dataIndex: 'goods_sn',
+    key: 'goods_sn',
+  },
+  {
+    title: '商品名称',
+    dataIndex: 'goods_name',
+    key: 'goods_name',
+  },
+  {
+    title: '型号',
+    dataIndex: 'model',
+    key: 'model',
+  },
+  {
+    title: '品牌',
+    dataIndex: 'brand',
+    key: 'brand',
+  },
+  {
+    title: '发货日期',
+    dataIndex: 'add_time',
+    key: 'add_time',
+    render: val => (
+      <span>{moment(val * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+    ),
+  },
+  {
+    title: '送货人',
+    dataIndex: 'sender',
+    key: 'sender',
+    render: text => <span>{text || '---'}</span>,
+  },
+  {
+    title: '联系号码',
+    dataIndex: 'mobile',
+    key: 'mobile',
+  },
+  {
+    title: '物流公司',
+    dataIndex: 'logistics_company',
+    key: 'logistics_company',
+  },
+  {
+    title: '物流单号',
+    dataIndex: 'logistics_number',
+    key: 'logistics_number',
+  },
+];
 const opreationColumns = [
   {
     title: '操作人',
@@ -145,7 +157,7 @@ class SolutionOrderDetail extends React.Component {
     });
   }
   render() {
-    const { profile } = this.props;
+    const { profile, loading } = this.props;
     if (!profile.order_info) {
       return <Spin />;
     }
@@ -162,157 +174,167 @@ class SolutionOrderDetail extends React.Component {
     } = profile;
     return (
       <PageHeaderLayout title="方案订单详情">
-        <div className={styles.SolutionOrderDetail}>
-          <Card title="订单基本信息">
-            <DescriptionList size="small" col="3">
-              <Description term="方案订单号">
-                {order_info.plan_order_sn}{' '}
-              </Description>
-              <Description term="订单金额">
-                ￥{order_info.total_money}
-              </Description>
-              <Description term="订单状态">
-                {<SlnStatus status={order_info.status} />}
-              </Description>
-              <Description term="下单时间">
-                {moment
-                  .unix(order_info.place_an_order_time)
-                  .format('YYYY-MM-DD HH:MM')}
-              </Description>
-            </DescriptionList>
-          </Card>
-          <Card title="支付信息">
-            {pay_info.ia}
-            <DescriptionList size="small" col="4">
-              <Description term="首款">{pay_info[0].pay_ratio} %</Description>
-              <Description term="金额">
-                ￥{order_info.total_money * (pay_info[0].pay_ratio / 100)}
-              </Description>
-              <Description term="支付状态">
-                {pay_info[0].status === 2 ? '已支付' : '未支付'}
-              </Description>
-              <Description term="支付时间">
-                {moment.unix(pay_info[0].pay_time).format('YYYY-MM-DD HH:MM')
-                // 1为已支付，2为未支付
-                }
-              </Description>
-              <Description term="尾款">{pay_info[1].pay_ratio} % </Description>
-              <Description term="金额">
-                ￥{order_info.total_money * (pay_info[1].pay_ratio / 100)}
-              </Description>
-              <Description term="支付状态">
-                {pay_info[1].status === 2 ? '已支付' : '未支付'}
-              </Description>
-              <Description term="支付时间">
-                {moment.unix(pay_info[1].pay_time).format('YYYY-MM-DD HH:MM')}
-              </Description>
-            </DescriptionList>
-          </Card>
-          <Card title="客户信息">
-            <DescriptionList size="small" col="3">
-              <Description term="联系人">{guest_info.receiver} </Description>
-              <Description term="联系电话">{guest_info.mobile}</Description>
-              <Description term="公司名称">
-                {guest_info.guest_company_name}
-              </Description>
-              <Description term="收货地址">
-                {guest_info.province +
-                  guest_info.city +
-                  guest_info.district +
-                  guest_info.address}
-              </Description>
-              <Description term="备注">{guest_info.remarks}</Description>
-            </DescriptionList>
-          </Card>
-          <Card title="开票信息">
-            <DescriptionList size="small" col="3">
-              <Description term="发票抬头">{receipt_info.title}</Description>
-              <Description term="公司账户">{receipt_info.account}</Description>
-              <Description term="税务编号">
-                {receipt_info.tax_number}
-              </Description>
-              <Description term="公司电话">
-                {receipt_info.telephone}
-              </Description>
-              <Description term="开户银行">{receipt_info.bank}</Description>
-              <Description term="公司地址">
-                {receipt_info.company_address}
-              </Description>
-            </DescriptionList>
-          </Card>
-          <Card title="供应商信息">
-            <DescriptionList size="small" col="3">
-              <Description term="联系人">{supplier_info.username} </Description>
-              <Description term="联系电话">{supplier_info.mobile}</Description>
-              <Description term="公司名称">
-                {supplier_info.profile.company}
-              </Description>
-              <Description term="地址">
-                {supplier_info.profile.address}
-              </Description>
-            </DescriptionList>
-          </Card>
-          <Card title="方案商品信息">
-            <DescriptionList size="small" col="3">
-              {/* <Description term="方案询价单号">0000000022</Description> */}
-              <Description term="方案编号">{supplier.sln_no}</Description>
-              <Description term="方案名称">
-                {customer.sln_basic_info.sln_name}
-              </Description>
-            </DescriptionList>
-            {/* TODO: dataSource={supplier.sln_device.map((item) => { return { ...item, key: item.device_id }; })} */}
-            <Table
-              style={{ marginTop: 28 }}
-              columns={columns}
-              dataSource={supplier.sln_device}
-              pagination={false}
-              footer={() => <Tablefooter {...supplier} />}
-            />
-            <Divider />
-            <Row style={{ textAlign: 'right' }}>
-              <Col span={8} offset={8}>
-                交货期：<span>
-                  {supplier.sln_supplier_info.delivery_date}天
-                    </span>
-              </Col>
-              <Col span={8} style={{ fontSize: 18 }}>
-                方案总金额：<span style={{ color: 'red' }}>
-                  ￥{supplier.sln_supplier_info.total_price}元
+        <Spin spinning={loading}>
+          <div className={styles.SolutionOrderDetail}>
+            <Card title="订单基本信息">
+              <DescriptionList size="small" col="3">
+                <Description term="方案订单号">
+                  {order_info.plan_order_sn}{' '}
+                </Description>
+                <Description term="订单金额">
+                  ￥{order_info.total_money}
+                </Description>
+                <Description term="订单状态">
+                  {<SlnStatus status={order_info.status} />}
+                </Description>
+                <Description term="下单时间">
+                  {moment
+                    .unix(order_info.place_an_order_time)
+                    .format('YYYY-MM-DD HH:MM')}
+                </Description>
+              </DescriptionList>
+            </Card>
+            <Card title="支付信息">
+              {pay_info.ia}
+              <DescriptionList size="small" col="4">
+                <Description term="首款">{pay_info[0].pay_ratio} %</Description>
+                <Description term="金额">
+                  ￥{order_info.total_money * (pay_info[0].pay_ratio / 100)}
+                </Description>
+                <Description term="支付状态">
+                  {pay_info[0].status === 2 ? '已支付' : '未支付'}
+                </Description>
+                <Description term="支付时间">
+                  {moment.unix(pay_info[0].pay_time).format('YYYY-MM-DD HH:MM')
+                  // 1为已支付，2为未支付
+                  }
+                </Description>
+                <Description term="尾款">
+                  {pay_info[1].pay_ratio} %
+                </Description>
+                <Description term="金额">
+                  ￥{order_info.total_money * (pay_info[1].pay_ratio / 100)}
+                </Description>
+                <Description term="支付状态">
+                  {pay_info[1].status === 2 ? '已支付' : '未支付'}
+                </Description>
+                <Description term="支付时间">
+                  {moment.unix(pay_info[1].pay_time).format('YYYY-MM-DD HH:MM')}
+                </Description>
+              </DescriptionList>
+            </Card>
+            <Card title="客户信息">
+              <DescriptionList size="small" col="3">
+                <Description term="联系人">{guest_info.receiver} </Description>
+                <Description term="联系电话">{guest_info.mobile}</Description>
+                <Description term="公司名称">
+                  {guest_info.guest_company_name}
+                </Description>
+                <Description term="收货地址">
+                  {guest_info.province +
+                    guest_info.city +
+                    guest_info.district +
+                    guest_info.address}
+                </Description>
+                <Description term="备注">{guest_info.remarks}</Description>
+              </DescriptionList>
+            </Card>
+            <Card title="开票信息">
+              <DescriptionList size="small" col="3">
+                <Description term="发票抬头">{receipt_info.title}</Description>
+                <Description term="公司账户">
+                  {receipt_info.account}
+                </Description>
+                <Description term="税务编号">
+                  {receipt_info.tax_number}
+                </Description>
+                <Description term="公司电话">
+                  {receipt_info.telephone}
+                </Description>
+                <Description term="开户银行">{receipt_info.bank}</Description>
+                <Description term="公司地址">
+                  {receipt_info.company_address}
+                </Description>
+              </DescriptionList>
+            </Card>
+            <Card title="供应商信息">
+              <DescriptionList size="small" col="3">
+                <Description term="联系人">
+                  {supplier_info.username}
+                </Description>
+                <Description term="联系电话">
+                  {supplier_info.mobile}
+                </Description>
+                <Description term="公司名称">
+                  {supplier_info.profile.company}
+                </Description>
+                <Description term="地址">
+                  {supplier_info.profile.address}
+                </Description>
+              </DescriptionList>
+            </Card>
+            <Card title="方案商品信息">
+              <DescriptionList size="small" col="3">
+                {/* <Description term="方案询价单号">0000000022</Description> */}
+                <Description term="方案编号">{supplier.sln_no}</Description>
+                <Description term="方案名称">
+                  {customer.sln_basic_info.sln_name}
+                </Description>
+              </DescriptionList>
+              {/* TODO: dataSource={supplier.sln_device.map((item) => { return { ...item, key: item.device_id }; })} */}
+              <Table
+                style={{ marginTop: 28 }}
+                columns={columns}
+                dataSource={supplier.sln_device}
+                pagination={false}
+                footer={() => <Tablefooter {...supplier} />}
+              />
+              <Divider />
+              <Row style={{ textAlign: 'right' }}>
+                <Col span={8} offset={8}>
+                  交货期：<span>
+                    {supplier.sln_supplier_info.delivery_date}天
                       </span>
-              </Col>
-            </Row>
-          </Card>
-          <Card title="发货记录">
-          <Table
-            style={{ marginBottom: 24 }}
-            pagination={false}
-            dataSource={delivery_info}
-            columns={logisticsColumns}
-            rowKey="add_time"
-            locale={{
-              emptyText: '暂无发货记录',
-            }}
-          />
-          </Card>
-          <Card title="订单操作记录">
-            <Table
-              columns={opreationColumns}
-              dataSource={order_operations}
-              pagination={false}
-            />
-            <div className={styles.footerBotton}>
-              <Button
-                type="primary"
-                size="large"
-                onClick={() => {
-                  this.props.dispatch(routerRedux.goBack());
+                </Col>
+                <Col span={8} style={{ fontSize: 18 }}>
+                  方案总金额：<span style={{ color: 'red' }}>
+                    ￥{supplier.sln_supplier_info.total_price}元
+                        </span>
+                </Col>
+              </Row>
+            </Card>
+            <Card title="发货记录">
+              <Table
+                style={{ marginBottom: 24 }}
+                pagination={false}
+                dataSource={delivery_info}
+                columns={logisticsColumns}
+                rowKey="add_time"
+                locale={{
+                  emptyText: '暂无发货记录',
                 }}
-              >
-                返回
-              </Button>
-            </div>
-          </Card>
-        </div>
+              />
+            </Card>
+            <Card title="订单操作记录">
+              <Table
+                columns={opreationColumns}
+                dataSource={order_operations}
+                pagination={false}
+              />
+              <div className={styles.footerBotton}>
+                <Button
+                  type="primary"
+                  size="large"
+                  onClick={() => {
+                    this.props.dispatch(routerRedux.goBack());
+                  }}
+                >
+                  返回
+                </Button>
+              </div>
+            </Card>
+          </div>
+        </Spin>
       </PageHeaderLayout>
     );
   }
