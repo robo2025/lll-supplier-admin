@@ -3,32 +3,32 @@
 * */
 
 // 单点登录URL
-export const URL = '//login.robo2025.com';
+export const URL = '//testlogin.robo2025.com';
 
 // 网站内容接口URL
-export const API_URL = '//api.robo2025.com/scm';
+export const API_URL = '//testapi.robo2025.com/scm';
 
 // 操作日志URL
-export const OPERATION_URL = '//api.robo2025.com/scm';
+export const OPERATION_URL = '//testapi.robo2025.com/scm';
 
 // 上传文件获取token URL
-export const UPLOAD_URL = '//api.robo2025.com/common';
+export const UPLOAD_URL = '//testapi.robo2025.com/common';
 
 // 接口主域名
-export const MAIN_URL = '//api.robo2025.com';
+export const MAIN_URL = '//testapi.robo2025.com';
 
 // 用户管理系统API URL
-export const USERS_URL = '//api.robo2025.com/user/service';
+export const USERS_URL = '//testapi.robo2025.com/user/service';
 
 // 用户管理系统URL
-export const USERS_SERVER = '//api.robo2025.com/user';
+export const USERS_SERVER = '//testapi.robo2025.com/user';
 
 // 订单系统接口
-export const ORDERS_URL = '//api.robo2025.com/order';
+export const ORDERS_URL = '//testapi.robo2025.com/order';
 // export const ORDERS_URL = '//192.168.2.109:8009';
 
 // 方案中心URL
-export const SOLUTION_URL = '//api.robo2025.com/slncenter';
+export const SOLUTION_URL = '//testapi.robo2025.com/slncenter';
 
 // 方案订单接口
 export const SLN_ORDER_URL = '//testapi.robo2025.com/sln-order';
