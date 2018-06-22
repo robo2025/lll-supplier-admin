@@ -339,7 +339,7 @@ export default class NewGoodForm extends Component {
                 }],
                 initialValue: data.stock,
               })(
-                <Input />
+                <Input type="number" />
               )}
             </FormItem>
           </Form>

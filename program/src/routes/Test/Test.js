@@ -13,9 +13,9 @@ class Test extends React.Component {
     const { dispatch } = this.props;
     dispatch({
       type: 'user/fetch',
-      success: (res) => { 
-        Cookies.set('userinfo', JSON.stringify(res.data), { expires: 7 });        
-        window.location.href = HOME_PAGE; 
+      success: (res) => {
+        Cookies.set('userinfo', JSON.stringify(res.data), { expires: 7 });
+        window.location.href = HOME_PAGE;
       },
     });
   }
