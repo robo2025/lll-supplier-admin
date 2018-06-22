@@ -142,14 +142,14 @@ class SolutionDetail extends React.Component {
     const { sln_basic_info, sln_user_info } = customer;
     const {
       sln_supplier_info,
-      welding_device,
+      sln_device,
       welding_tech_param,
-      welding_support,
+      sln_support,
     } = supplier;
-    const coreDeviceTableData = welding_device.filter(
+    const coreDeviceTableData = sln_device.filter(
       item => item.device_type === '核心设备'
     );
-    const aidDeviceTableData = welding_device.filter(
+    const aidDeviceTableData = sln_device.filter(
       item => item.device_type === '辅助设备'
     );
     const contentList = {
@@ -187,8 +187,8 @@ class SolutionDetail extends React.Component {
           </Card>
           <Card style={{ marginTop: 30 }} title="技术支持">
             <DescriptionList size="small" col="2">
-              {welding_support
-                ? welding_support.map((item) => {
+              {sln_support
+                ? sln_support.map((item) => {
                     return (
                       <Description term={item.name}>
                         ￥{item.price}元<span style={{ marginLeft: 35 }}>

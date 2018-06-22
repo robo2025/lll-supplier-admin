@@ -232,7 +232,7 @@ export default class NewGood extends Component {
     const { fields, args } = this.state;
     const { dispatch, history } = this.props;
     if (!args.mno) {
-      message.error('你还没有选择产品');
+      message.error('请选择产品！');
       return;
     }
     if (this.$formObj) {

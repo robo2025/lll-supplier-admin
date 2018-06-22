@@ -47,6 +47,7 @@ export default class GoodsList extends Component {
       isImportModal: false,
       prices: [], // 商品价格区间数组
       args: qs.parse(props.location.search, { ignoreQueryPrefix: true }),
+      searchValues: {},
     };
   }
 
@@ -216,7 +217,7 @@ export default class GoodsList extends Component {
       gno,
       goodStatus: status,
       success: () => {
-        message.success('修改成功');
+        message.success('上架成功');
         this.dispatchDefaultList();
       },
       error: (res) => { message.error(handleServerMsgObj(res.msg)); },
@@ -262,6 +263,7 @@ export default class GoodsList extends Component {
         prices,
       },
       success: () => {
+        message.success('操作成功');
         this.dispatchDefaultList();
       },
       error: (res) => { message.error(handleServerMsg(res.msg)); },
@@ -283,6 +285,7 @@ export default class GoodsList extends Component {
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch, history } = this.props;
+    const { searchValues } = this.state;
     const params = {
       currentPage: pagination.current,
       pageSize: pagination.pageSize,
@@ -298,6 +301,7 @@ export default class GoodsList extends Component {
       type: 'good/fetch',
       offset: params.offset,
       limit: params.pageSize,
+      params: searchValues,
     });
   }
 
@@ -372,6 +376,7 @@ export default class GoodsList extends Component {
         ...createTime,
       };
 
+      this.setState({ searchValues: values });
       const {
         gno,
         created_start,

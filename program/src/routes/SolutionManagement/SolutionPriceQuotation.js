@@ -278,7 +278,7 @@ class SolutionPriceQuotation extends React.Component {
     let coreDeviceListData = [];
     const { customer } = this.props.profile;
     if (customer) {
-      coreDeviceListData = customer.welding_device.map((item) => {
+      coreDeviceListData = customer.sln_device.map((item) => {
         return { ...item, key: item.id };
       });
     }
@@ -298,8 +298,8 @@ class SolutionPriceQuotation extends React.Component {
       payload: location.href.split('=').pop(),
       callback: (data) => {
         this.setState({
-          coreDeviceListData: data.customer.welding_device.map((item) => {
-            return { ...item, key: item.id };
+          coreDeviceListData: data.customer.sln_device.map((item) => {
+            return { ...item, key: item.device_id };
           }),
         });
       },
@@ -408,7 +408,7 @@ class SolutionPriceQuotation extends React.Component {
         ...others
       } = fieldsValue;
       // TODO  优化  现在是取出数据转换JSON
-      const welding_support = [
+      const sln_support = [
         { name: '安装', price: install_price, note: install_note },
         {
           name: '工艺编码调试',
@@ -424,7 +424,7 @@ class SolutionPriceQuotation extends React.Component {
       const welding_tech_param = [
         { name: '焊接电流', value: welding_electric, unit_name: 'mA' },
       ];
-      const welding_device = coreDeviceListData.concat(aidDeviceListData);
+      const sln_device = coreDeviceListData.concat(aidDeviceListData);
       // string转为int
       const sln_supplier_info = {
         ...others,
@@ -437,8 +437,8 @@ class SolutionPriceQuotation extends React.Component {
         payload: {
           sln_no: location.href.split('=').pop(),
           sln_supplier_info,
-          welding_device,
-          welding_support,
+          sln_device,
+          sln_support,
           welding_tech_param,
         },
         callback: (success, data) => {

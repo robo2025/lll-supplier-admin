@@ -59,14 +59,14 @@ class CustomerOrder extends React.Component {
     }
     const {
       sln_user_info,
-      welding_device,
+      sln_device,
       welding_info,
-      welding_file,
+      sln_file,
     } = customer;
 
     const deviceMoney = () => {
       let money = 0;
-      welding_device.forEach((item) => {
+      sln_device.forEach((item) => {
         money += item.device_num * item.device_price;
       });
       return money;
@@ -124,7 +124,7 @@ class CustomerOrder extends React.Component {
               </Description>
               <Description term="工件CAD图">
                 <div>
-                  {welding_file.map((item) => {
+                  {sln_file.map((item) => {
                     if (item.file_type === 'cad') {
                       return (
                         <a href={item.file_url} key={item.id}>
@@ -137,7 +137,7 @@ class CustomerOrder extends React.Component {
                 </div>
               </Description>
               <Description term="工件图片">
-                {welding_file.map((item) => {
+                {sln_file.map((item) => {
                   if (item.file_type === 'img') {
                     return (
                       <a href={item.file_url} key={item.id}>
@@ -154,7 +154,7 @@ class CustomerOrder extends React.Component {
         <Card title="核心设备清单" style={{ marginTop: 30 }}>
           <Table
             columns={columns}
-            dataSource={welding_device.map((item) => {
+            dataSource={sln_device.map((item) => {
               return { ...item, key: item.device_id };
             })}
           />
