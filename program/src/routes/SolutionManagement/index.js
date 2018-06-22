@@ -102,6 +102,36 @@ class SolutionList extends React.Component {
       },
     });
   };
+  handleFormReset = () => {
+    const { dispatch, form } = this.props;
+    form.resetFields();
+    dispatch({
+      type: 'solution/fetch',
+    });
+  };
+  handleSearch = (e) => {
+    e.preventDefault();
+    const { dispatch, form, solutionOrders } = this.props;
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      const rangeValue = fieldsValue['range-picker'];
+      const { sln_no, sln_status } = fieldsValue;
+      const values = {
+        start_time: rangeValue ? rangeValue[0].format('YYYY-MM-DD') : null,
+        end_time: rangeValue ? rangeValue[1].format('YYYY-MM-DD') : null,
+        sln_no,
+        sln_status,
+      };
+      dispatch({
+        type: 'solution/savePagination',
+        payload: { ...solutionOrders.pagination, current: 1 },
+      });
+      dispatch({
+        type: 'solution/fetch',
+        payload: values,
+      });
+    });
+  };
   render() {
     const { list } = this.props.solution;
     const { loading, form } = this.props;
@@ -194,8 +224,8 @@ class SolutionList extends React.Component {
               </Col>
               <Col xll={4} md={8} sm={24}>
                 <FormItem label="创建时间">
-                  {getFieldDecorator('brand')(
-                    <RangePicker onChange={this.onDatepickerChange} />
+                  {getFieldDecorator('range-picker')(
+                    <RangePicker />
                   )}
                 </FormItem>
               </Col>
