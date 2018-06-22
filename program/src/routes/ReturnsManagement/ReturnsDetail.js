@@ -116,7 +116,7 @@ export default class ReturnsDetail extends Component {
           />
         </Card>
         <Card title="物流信息" style={{ marginBottom: 24 }} bordered>
-          <DescriptionList className={styles.headerList} col="4">
+          <DescriptionList className={styles.headerList} col="3">
             <Description term="收货人">{returnLogistics.length > 0 ? returnLogistics[0].receiver : ''}</Description>
             <Description term="联系号码">{ returnLogistics.length > 0 ? returnLogistics[0].mobile : ''}</Description>
             <Description term="物流公司">{returnLogistics.length > 0 ? returnLogistics[0].logistics_company : ''}</Description>

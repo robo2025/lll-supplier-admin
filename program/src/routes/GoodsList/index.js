@@ -263,6 +263,7 @@ export default class GoodsList extends Component {
         prices,
       },
       success: () => {
+        message.success('操作成功');
         this.dispatchDefaultList();
       },
       error: (res) => { message.error(handleServerMsg(res.msg)); },
