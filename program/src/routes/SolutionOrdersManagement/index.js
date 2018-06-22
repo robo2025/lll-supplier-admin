@@ -274,14 +274,14 @@ class SolutionOrderList extends React.Component {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       const rangeValue = fieldsValue['range-picker'];
-      const { plan_order_sn, status, plan_name, pay_status } = fieldsValue;
+      const { plan_order_sn, status, plan_name, plan_pay_status } = fieldsValue;
       const values = {
         start_time: rangeValue ? rangeValue[0].format('YYYY-MM-DD') : null,
         end_time: rangeValue ? rangeValue[1].format('YYYY-MM-DD') : null,
         plan_order_sn,
         status,
         plan_name,
-        pay_status,
+        plan_pay_status,
         updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
       };
       dispatch({
@@ -374,8 +374,8 @@ class SolutionOrderList extends React.Component {
       },
       {
         title: '支付状态',
-        dataIndex: 'pay_status',
-        key: 'pay_status',
+        dataIndex: 'plan_pay_status',
+        key: 'plan_pay_status',
         render: text => SLN_PAY_STATUS[text],
       },
       {
@@ -483,7 +483,7 @@ class SolutionOrderList extends React.Component {
               <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
                 <Col xll={4} md={8} sm={24}>
                   <FormItem label="支付状态">
-                    {getFieldDecorator('plan_name')(
+                    {getFieldDecorator('plan_pay_status')(
                       <Select placeholder="请选择" style={{ width: '100%' }}>
                         <Option value="0">全部</Option>
                         <Option value="2">尾款未支付</Option>
@@ -496,7 +496,7 @@ class SolutionOrderList extends React.Component {
                 <Col xll={4} md={8} sm={24}>
                   <FormItem label="创建时间">
                     {getFieldDecorator('range-picker')(
-                      <RangePicker onChange={this.onDatepickerChange} />
+                      <RangePicker />
                     )}
                   </FormItem>
                 </Col>
