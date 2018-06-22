@@ -34,5 +34,5 @@ export async function delivery(params) {
 }
 
 export async function querySolutionDetail(plan_order_sn) {
-    return lyRequest(`${SOLUTION_URL}/v1/welding/${plan_order_sn}?role=supplier`);
+    return lyRequest(`${SOLUTION_URL}/v1/sln/${plan_order_sn}?role=supplier`);
 }

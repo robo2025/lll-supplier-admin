@@ -15,7 +15,7 @@ export async function queryList(params) {
 }
 
 export async function queryDetail({ sln_no }) {
-  return lyRequest(`${SOLUTION_URL}/v1/welding/${sln_no}?role=supplier`);
+  return lyRequest(`${SOLUTION_URL}/v1/sln/${sln_no}?role=supplier`);
 }
 
 
