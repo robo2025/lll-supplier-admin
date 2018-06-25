@@ -24,34 +24,37 @@ const Tablefooter = (props) => {
   );
 };
 const logisticsColumns = [
+  // {
+  //   title: '商品ID',
+  //   dataIndex: 'goods_sn',
+  //   key: 'goods_sn',
+  // },
+  // {
+  //   title: '商品名称',
+  //   dataIndex: 'goods_name',
+  //   key: 'goods_name',
+  // },
+  // {
+  //   title: '型号',
+  //   dataIndex: 'model',
+  //   key: 'model',
+  // },
+  // {
+  //   title: '品牌',
+  //   dataIndex: 'brand',
+  //   key: 'brand',
+  // },
   {
-    title: '商品ID',
-    dataIndex: 'goods_sn',
-    key: 'goods_sn',
+    title: '物流公司',
+    dataIndex: 'logistics_company',
+    key: 'logistics_company',
   },
   {
-    title: '商品名称',
-    dataIndex: 'goods_name',
-    key: 'goods_name',
+    title: '物流单号',
+    dataIndex: 'logistics_number',
+    key: 'logistics_number',
   },
-  {
-    title: '型号',
-    dataIndex: 'model',
-    key: 'model',
-  },
-  {
-    title: '品牌',
-    dataIndex: 'brand',
-    key: 'brand',
-  },
-  {
-    title: '发货日期',
-    dataIndex: 'add_time',
-    key: 'add_time',
-    render: val => (
-      <span>{moment(val * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
-    ),
-  },
+  
   {
     title: '送货人',
     dataIndex: 'sender',
@@ -64,14 +67,12 @@ const logisticsColumns = [
     key: 'mobile',
   },
   {
-    title: '物流公司',
-    dataIndex: 'logistics_company',
-    key: 'logistics_company',
-  },
-  {
-    title: '物流单号',
-    dataIndex: 'logistics_number',
-    key: 'logistics_number',
+    title: '发货日期',
+    dataIndex: 'add_time',
+    key: 'add_time',
+    render: val => (
+      <span>{moment(val * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+    ),
   },
 ];
 const opreationColumns = [
