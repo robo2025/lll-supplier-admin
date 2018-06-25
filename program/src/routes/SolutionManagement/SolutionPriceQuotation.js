@@ -11,17 +11,23 @@ import {
   Divider,
   Button,
   Form,
+  message,
   Spin,
   Input,
   InputNumber,
   Select,
-  message,
 } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import DescriptionList from '../../components/DescriptionList';
 import TechSupportTable from './TechSupportTable';
 import styles from './SolutionPriceQuotation.less';
 
+// 手动控制添加列表数据吧
+const dataSource = [
+  { project_name: '安装', key: 'install' },
+  { project_name: '工艺编码调试', key: 'technology' },
+  { project_name: '培训', key: 'train' },
+];
 const { TextArea } = Input;
 const getValueFromEvent = (e, preValue) => {
   if (!e || !e.target) {
@@ -311,7 +317,6 @@ class SolutionPriceQuotation extends React.Component {
       deviceListModalVisibal: flag,
     });
   };
-
   handleDeviceListAdd = (fieldsValue) => {
     const { coreDeviceListData, aidDeviceListData, title } = this.state;
     const { device_name, device_model } = fieldsValue; // 暂时不知道用什么做KEY。
@@ -391,39 +396,33 @@ class SolutionPriceQuotation extends React.Component {
   };
   handleFormSubmit = () => {
     this.props.form.validateFields((err, fieldsValue) => {
-      if (err) return;
+      // if (err) return;
       const { coreDeviceListData, aidDeviceListData } = this.state;
       // 安装、工艺、培训 备注和价格   welding_electric焊接电流
       const {
-        install_note,
-        install_price,
-        technology_note,
-        technology_price,
-        train_note,
-        train_price,
         welding_electric,
         total_price,
         freight_price,
         delivery_date,
         ...others
       } = fieldsValue;
-      // TODO  优化  现在是取出数据转换JSON
-      const sln_support = [
-        { name: '安装', price: install_price, note: install_note },
-        {
-          name: '工艺编码调试',
-          price: technology_price,
-          note: technology_note,
-        },
-        { name: '培训', price: train_price, note: train_note },
-      ]
+      const sln_support = dataSource
+        .map((item) => {
+          return {
+            name: item.project_name,
+            price: fieldsValue[`${item.key}_price`],
+            note: fieldsValue[`${item.key}_note`],
+          };
+        })
         .filter(item => item.price !== undefined)
         .map((item) => {
           return { ...item, price: parseInt(item.price, 10) };
         });
+      // TODO 优化
       const welding_tech_param = [
         { name: '焊接电流', value: welding_electric, unit_name: 'mA' },
       ];
+
       const sln_device = coreDeviceListData.concat(aidDeviceListData);
       // string转为int
       const sln_supplier_info = {
@@ -432,15 +431,15 @@ class SolutionPriceQuotation extends React.Component {
         freight_price: parseInt(freight_price, 10),
         delivery_date: parseInt(delivery_date, 10),
       };
+      const formData = {
+        sln_no: location.href.split('=').pop(),
+        sln_supplier_info,
+        sln_device,
+        sln_support,
+      };
       this.props.dispatch({
         type: 'solution/handleFormSubmit',
-        payload: {
-          sln_no: location.href.split('=').pop(),
-          sln_supplier_info,
-          sln_device,
-          sln_support,
-          welding_tech_param,
-        },
+        payload: !welding_electric ? formData : { ...formData, welding_tech_param },
         callback: (success, data) => {
           if (success && success === true) {
             message.success(data);
@@ -458,7 +457,6 @@ class SolutionPriceQuotation extends React.Component {
   render() {
     const {
       profile,
-      loading,
       form,
       form: { getFieldDecorator },
     } = this.props;
@@ -673,12 +671,16 @@ class SolutionPriceQuotation extends React.Component {
             />
           }
         >
-          <TechSupportTable form={form} />
+          <TechSupportTable form={form} list={dataSource} />
         </Card>
         <Card
           style={{ marginTop: 30 }}
           title={<CardHeader title="技术参数" description="" hideButton />}
-          className={styles.techForm}
+          className={
+            sln_basic_info.sln_type === 'welding'
+              ? styles.techForm
+              : styles.techFormHidden
+          }
         >
           <FormItem {...formItemLayout} label="焊接电流">
             {getFieldDecorator('welding_electric', {

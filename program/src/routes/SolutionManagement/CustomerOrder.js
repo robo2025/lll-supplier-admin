@@ -3,6 +3,7 @@ import { Card, Spin, Table, Divider, Button } from 'antd';
 import DescriptionList from '../../components/DescriptionList';
 import styles from './SolutionOrderDetail.less';
 import { getAreaBycode } from '../../utils/cascader-address-options';
+import { sln_config } from '../../utils/solutionConfig';
 
 const { Description } = DescriptionList;
 
@@ -61,9 +62,10 @@ class CustomerOrder extends React.Component {
       sln_user_info,
       sln_device,
       welding_info,
+      sewage_info,
       sln_file,
     } = customer;
-
+    const sln_info = welding_info || sewage_info;
     const deviceMoney = () => {
       let money = 0;
       sln_device.forEach((item) => {
@@ -71,6 +73,7 @@ class CustomerOrder extends React.Component {
       });
       return money;
     };
+    console.log(sln_info);
     return (
       <Fragment>
         <Card title="用户信息">
@@ -89,63 +92,56 @@ class CustomerOrder extends React.Component {
           <Card title="用户需求信息">
             <DescriptionList size="small" col="3">
               <Description term="行业">
-                {welding_info.welding_business}
+                {sln_info.welding_business || sln_info.sewage_business}
               </Description>
               <Description term="应用场景">
-                {welding_info.welding_scenario}
+                {sln_info.welding_scenario || sln_info.sewage_scenario}
               </Description>
             </DescriptionList>
             <Divider />
             <DescriptionList size="small" col="3">
-              <Description term="母材">
-                {welding_info.welding_metal}
-              </Description>
-              <Description term="焊接气体">
-                {welding_info.welding_gas}
-              </Description>
-              <Description term="焊接工艺">
-                {welding_info.welding_method}
-              </Description>
-              <Description term="板厚">{welding_info.max_height}mm</Description>
-              <Description term="生产效率">
-                {welding_info.welding_efficiency}
-              </Description>
-              <Description term="飞溅">
-                {welding_info.welding_splash}
-              </Description>
-              <Description term="成型">
-                {welding_info.welding_model}
-              </Description>
+              {Object.keys(sln_info).map((key) => {
+                if (sln_config[key]) {
+                  return (
+                    <Description term={sln_config[key]}>
+                      {sln_info[key]}
+                    </Description>
+                  );
+                }
+                return <div style={{ display: 'none' }} />;
+              })}
             </DescriptionList>
             <Divider />
-            <DescriptionList size="small" col="2">
-              <Description term="工件名称">
-                {sln_user_info.welding_name}
-              </Description>
-              <Description term="工件CAD图">
-                <div>
-                  {sln_file.map((item) => {
-                    if (item.file_type === 'cad') {
-                      return (
-                        <a href={item.file_url} key={item.id} target="_blank">
-                          {item.file_name}
-                        </a>
-                      );
-                    }
-                    return null;
-                  })}
-                </div>
-              </Description>
+            <DescriptionList size="small" col="1">
+              {sln_user_info.welding_name ? (
+                <Description term="工件名称">
+                  {sln_user_info.welding_name}
+                </Description>
+              ) : (
+                <div style={{ display: 'none' }} />
+              )}
+              {sln_file.map((item) => {
+                if (item.file_type === 'cad') {
+                  return (
+                    <Description term="工件CAD图">
+                      <a href={item.file_url} key={item.id} target="_blank">
+                        {item.file_name}
+                      </a>
+                    </Description>
+                  );
+                }
+                return <div style={{ display: 'none' }} />;
+              })}
               <Description term="工件图片">
                 {sln_file.map((item) => {
                   if (item.file_type === 'img') {
                     return (
-                      <a href={item.file_url} key={item.id} target="_blank" >
+                      <a href={item.file_url} key={item.id} target="_blank">
                         <img src={item.file_url} alt={item.file_name} />
                       </a>
                     );
                   }
-                  return null;
+                  return <div style={{ display: 'none' }} />;
                 })}
               </Description>
             </DescriptionList>

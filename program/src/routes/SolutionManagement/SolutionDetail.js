@@ -136,7 +136,7 @@ class SolutionDetail extends React.Component {
   render() {
     const { profile, supplierInfo } = this.props;
     const { customer, supplier } = profile;
-    if (!customer || !supplier) {
+    if (!customer || !supplier || !supplierInfo.profile) {
       return <Spin />;
     }
     const { sln_basic_info, sln_user_info } = customer;

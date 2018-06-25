@@ -7,7 +7,6 @@ import {
   message,
   Table,
   Modal,
-  Tabs,
   Form,
   Row,
   Col,
@@ -16,6 +15,7 @@ import {
   DatePicker,
   Button,
   Icon,
+  Pagination,
 } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import styles from './index.less';
@@ -66,21 +66,20 @@ class SolutionList extends React.Component {
       type: 'solution/fetch',
     });
   }
-  handleTabChange = (key) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'solution/handleTabChange',
-      payload: key,
-    });
-    dispatch({
+  onPageChange = (page, pageSize) => {
+    const fieldsValue = this.props.form.getFieldsValue();
+    const rangeValue = fieldsValue['range-picker'];
+    this.props.dispatch({
       type: 'solution/savePagination',
-      payload: {
-        current: 1,
-        pageSize: 10,
-      },
+      payload: { current: page, pageSize },
     });
-    dispatch({
+    this.props.dispatch({
       type: 'solution/fetch',
+      payload: {
+        start_time: rangeValue ? rangeValue[0].format('YYYY-MM-DD') : null,
+        end_time: rangeValue ? rangeValue[1].format('YYYY-MM-DD') : null,
+        ...fieldsValue,
+      },
     });
   };
   addCart = (row) => {
@@ -102,6 +101,7 @@ class SolutionList extends React.Component {
       },
     });
   };
+  
   handleFormReset = () => {
     const { dispatch, form } = this.props;
     form.resetFields();
@@ -111,20 +111,20 @@ class SolutionList extends React.Component {
   };
   handleSearch = (e) => {
     e.preventDefault();
-    const { dispatch, form, solutionOrders } = this.props;
+    const { dispatch, form, solution } = this.props;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       const rangeValue = fieldsValue['range-picker'];
-      const { sln_no, sln_status } = fieldsValue;
+      const { sln_no, is_type } = fieldsValue;
       const values = {
         start_time: rangeValue ? rangeValue[0].format('YYYY-MM-DD') : null,
         end_time: rangeValue ? rangeValue[1].format('YYYY-MM-DD') : null,
         sln_no,
-        sln_status,
+        is_type,
       };
       dispatch({
         type: 'solution/savePagination',
-        payload: { ...solutionOrders.pagination, current: 1 },
+        payload: { ...solution.pagination, current: 1 },
       });
       dispatch({
         type: 'solution/fetch',
@@ -133,9 +133,16 @@ class SolutionList extends React.Component {
     });
   };
   render() {
-    const { list } = this.props.solution;
-    const { loading, form } = this.props;
+    const { loading, form, solution } = this.props;
+    const { list, pagination } = solution;
     const { getFieldDecorator } = form;
+    const paginationProps = {
+      ...pagination,
+      style: { float: 'right', marginTop: 24 },
+      onChange: this.onPageChange,
+      onShowSizeChange: this.onPageChange,
+      showSizeChanger: true,
+    };
     const columns = [
       {
         title: '序号',
@@ -212,12 +219,12 @@ class SolutionList extends React.Component {
               </Col>
               <Col xll={4} md={8} sm={24}>
                 <FormItem label="状态">
-                  {getFieldDecorator('sln_status')(
+                  {getFieldDecorator('is_type')(
                     <Select placeholder="请选择" style={{ width: '100%' }}>
-                      <Option value="">全部</Option>
-                      <Option value="2">未报价</Option>
-                      <Option value="2">已报价</Option>
-                      <Option value="4">失效</Option>
+                      <Option value="all">全部</Option>
+                      <Option value="P">未报价</Option>
+                      <Option value="M">已报价</Option>
+                      <Option value="E">失效</Option>
                     </Select>
                   )}
                 </FormItem>
@@ -304,7 +311,8 @@ class SolutionList extends React.Component {
           </Form>
         </Card>
         <Card bordered={false} loading={loading} style={{ marginTop: 30 }}>
-          <Table columns={columns} dataSource={list} />
+          <Table columns={columns} dataSource={list} pagination={false} />
+          <Pagination {...paginationProps} />
         </Card>
       </PageHeaderLayout>
     );

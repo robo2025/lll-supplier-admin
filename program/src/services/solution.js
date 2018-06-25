@@ -5,8 +5,8 @@ export async function queryList(params) {
   const { offset = 0, limit = 10, is_type = 'all', ...others } = params;
   return lyRequest(`${SOLUTION_URL}/v1/sln`, {
     params: {
-      // offset,
-      // limit,
+      offset,
+      limit,
       is_type,
       role: 'supplier',
       ...others,

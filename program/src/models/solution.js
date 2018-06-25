@@ -7,21 +7,29 @@ import {
 
 export default {
   namespace: 'solution',
-
   state: {
     list: [],
     profile: {},
+    pagination: { current: 1, pageSize: 10 },
   },
   effects: {
-    *fetch({ payload }, { call, put }) {
+    *fetch({ payload }, { call, put, select }) {
+      const pagination = yield select((state) => {
+        return state.solution.pagination;
+      });
+      const { current, pageSize } = pagination;
+      const params = {
+        offset: (current - 1) * pageSize,
+        limit: pageSize,
+      };
       const response = yield call(queryList, {
         ...payload,
-        is_type: 'all',
+        ...params,
       });
-      const { data, rescode } = response;
+      const { data, headers, rescode } = response;
       if (rescode === 10000) {
         const dataWithKey = data.map((item) => {
-          return { ...item, key: item.id };
+          return { ...item, key: item.plan_order_sn };
         });
         yield put({
           type: 'save',
@@ -33,6 +41,15 @@ export default {
           payload: data,
         });
       }
+      const newPagination = {
+        ...pagination,
+        total: parseInt(headers['x-content-total'], 10),
+        current: parseInt(headers['x-content-range'][0], 10) + 1,
+      };
+      yield put({
+        type: 'savePagination',
+        payload: newPagination,
+      });
     },
     *fetchDetail({ payload, callback }, { call, put }) {
       const response = yield call(queryDetail, { sln_no: payload });
@@ -70,6 +87,12 @@ export default {
       return {
         ...state,
         list: payload,
+      };
+    },
+    savePagination(state, { payload }) {
+      return {
+        ...state,
+        pagination: payload,
       };
     },
     saveSolutionOrder(state, { payload }) {

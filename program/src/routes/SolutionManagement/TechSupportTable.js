@@ -1,18 +1,23 @@
 import React from 'react';
 import { Checkbox, Input, Table } from 'antd';
 
+
 class TechSupportTable extends React.Component {
-  state = {
-    installChecked: false,
-    technologyChecked: false,
-    trainChecked: false,
-  };
+  constructor(props) {
+    super(props);
+    const { list } = props;
+    let state = {};
+    list.forEach((item) => {
+      state = { ...state, [`${item.key}Checked`]: false };
+    });
+    this.state = { ...state };
+  }
   onChange = (key) => {
     const isChecked = this.state[`${key}Checked`];
     this.setState({ [`${key}Checked`]: !isChecked });
   };
   render() {
-    const { form } = this.props;
+    const { form, list } = this.props;
     const { getFieldDecorator } = form;
     const columns = [
       {
@@ -61,13 +66,9 @@ class TechSupportTable extends React.Component {
           getFieldDecorator(`${row.key}_note`)(<Input disabled={!this.state[`${row.key}Checked`]} />),
       },
     ];
-    const dataSource = [
-      { project_name: '安装', key: 'install' },
-      { project_name: '工艺编码调试', key: 'technology' },
-      { project_name: '培训', key: 'train' },
-    ];
+    
     return (
-      <Table columns={columns} dataSource={dataSource} pagination={false} />
+      <Table columns={columns} dataSource={list} pagination={false} />
     );
   }
 }
