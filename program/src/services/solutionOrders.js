@@ -3,7 +3,7 @@ import { SLN_ORDER_URL, SOLUTION_URL } from '../constant/config';
 
 export async function queryOrders(params) {
     const { offset = 0, limit = 10, is_type = 0, ...others } = params;
-    return lyRequest(`${SLN_ORDER_URL}/v1/user/order`, {
+    return lyRequest(`${SLN_ORDER_URL}/v1/supplier/order`, {
         params: {
             offset,
             limit,
@@ -15,19 +15,19 @@ export async function queryOrders(params) {
 
 export async function queryDetail(params) {
     const { plan_order_sn } = params;
-    return lyRequest(`${SLN_ORDER_URL}/v1/user/order/${plan_order_sn}`);
+    return lyRequest(`${SLN_ORDER_URL}/v1/supplier/order/${plan_order_sn}`);
 }
 
 export async function prepareGoods(params) {
     const { plan_order_sn, is_type } = params;
-    return lyRequest(`${SLN_ORDER_URL}/v1/user/order/${plan_order_sn}`, {
+    return lyRequest(`${SLN_ORDER_URL}/v1/supplier/order/${plan_order_sn}`, {
         method: 'put',
         data: { is_type },
     });
 }
 export async function delivery(params) {
     const { plan_order_sn, mobile, logistics_company, logistics_number, sender } = params;
-    return lyRequest(`${SLN_ORDER_URL}/v1/user/order/${plan_order_sn}`, {
+    return lyRequest(`${SLN_ORDER_URL}/v1/supplier/order/${plan_order_sn}`, {
         method: 'put',
         data: { mobile, logistics_company, logistics_number, sender, plan_order_sn, is_type: 2 },
     });
