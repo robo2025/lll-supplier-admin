@@ -277,9 +277,9 @@ class SolutionDetail extends React.Component {
           {moment.unix(sln_basic_info.sln_date).format('YYYY-MM-DD HH:MM')}
         </Description>
         <Description term="客户备注">
-          {sln_user_info.welding_note === ''
+          {sln_user_info.sln_note === ''
             ? '无'
-            : sln_user_info.welding_note}
+            : sln_user_info.sln_note}
         </Description>
       </DescriptionList>
     );

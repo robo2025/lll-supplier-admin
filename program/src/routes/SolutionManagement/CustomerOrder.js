@@ -73,7 +73,6 @@ class CustomerOrder extends React.Component {
       });
       return money;
     };
-    console.log(sln_info);
     return (
       <Fragment>
         <Card title="用户信息">
@@ -104,7 +103,7 @@ class CustomerOrder extends React.Component {
                 if (sln_config[key]) {
                   return (
                     <Description term={sln_config[key]}>
-                      {sln_info[key]}
+                      <span>{sln_info[key]}</span>
                     </Description>
                   );
                 }

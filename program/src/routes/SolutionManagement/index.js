@@ -4,9 +4,7 @@ import moment from 'moment';
 import {
   Card,
   Badge,
-  message,
   Table,
-  Modal,
   Form,
   Row,
   Col,
@@ -82,26 +80,6 @@ class SolutionList extends React.Component {
       },
     });
   };
-  addCart = (row) => {
-    this.props.dispatch({
-      type: 'solution/addCart',
-      payload: { gno: row.sln_no, quantity: 1 },
-      callback: (success, data) => {
-        if (success && success === true) {
-          Modal.success({
-            title: '添加购物车成功！',
-            okText: '去看看',
-            maskClosable: true,
-            closable: true,
-            onOk() {},
-          });
-        } else {
-          message.error(data);
-        }
-      },
-    });
-  };
-  
   handleFormReset = () => {
     const { dispatch, form } = this.props;
     form.resetFields();

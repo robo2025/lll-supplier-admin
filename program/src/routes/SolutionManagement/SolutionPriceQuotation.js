@@ -420,7 +420,7 @@ class SolutionPriceQuotation extends React.Component {
         });
       // TODO 优化
       const welding_tech_param = [
-        { name: '焊接电流', value: welding_electric, unit_name: 'mA' },
+        { name: '焊接电流', value: welding_electric, unit_name: 'A' },
       ];
 
       const sln_device = coreDeviceListData.concat(aidDeviceListData);
@@ -439,7 +439,9 @@ class SolutionPriceQuotation extends React.Component {
       };
       this.props.dispatch({
         type: 'solution/handleFormSubmit',
-        payload: !welding_electric ? formData : { ...formData, welding_tech_param },
+        payload: !welding_electric
+          ? formData
+          : { ...formData, welding_tech_param },
         callback: (success, data) => {
           if (success && success === true) {
             message.success(data);
@@ -692,7 +694,12 @@ class SolutionPriceQuotation extends React.Component {
               ],
               getValueFromEvent: e =>
                 getValueFromEvent(e, form.getFieldValue('welding_electric')),
-            })(<Input placeholder="请输入" />)}
+            })(
+              <Fragment>
+                <Input placeholder="请输入" />
+                <span> (A)</span>
+              </Fragment>
+            )}
           </FormItem>
         </Card>
         <Card
