@@ -437,23 +437,24 @@ class SolutionPriceQuotation extends React.Component {
         sln_device,
         sln_support,
       };
-      this.props.dispatch({
-        type: 'solution/handleFormSubmit',
-        payload: !welding_electric
-          ? formData
-          : { ...formData, welding_tech_param },
-        callback: (success, data) => {
-          if (success && success === true) {
-            message.success(data);
-            location.href = location.href.replace(
-              'solutionPriceQuotation',
-              'solutionDetail'
-            );
-          } else {
-            message.error(data);
-          }
-        },
-      });
+      console.log(1);
+      // this.props.dispatch({
+      //   type: 'solution/handleFormSubmit',
+      //   payload: !welding_electric
+      //     ? formData
+      //     : { ...formData, welding_tech_param },
+      //   callback: (success, data) => {
+      //     if (success && success === true) {
+      //       message.success(data);
+      //       location.href = location.href.replace(
+      //         'solutionPriceQuotation',
+      //         'solutionDetail'
+      //       );
+      //     } else {
+      //       message.error(data);
+      //     }
+      //   },
+      // });
     });
   };
   render() {
@@ -675,33 +676,28 @@ class SolutionPriceQuotation extends React.Component {
         >
           <TechSupportTable form={form} list={dataSource} />
         </Card>
-        <Card
-          style={{ marginTop: 30 }}
-          title={<CardHeader title="技术参数" description="" hideButton />}
-          className={
-            sln_basic_info.sln_type === 'welding'
-              ? styles.techForm
-              : styles.techFormHidden
-          }
-        >
-          <FormItem {...formItemLayout} label="焊接电流">
-            {getFieldDecorator('welding_electric', {
-              rules: [
-                {
-                  required: true,
-                  message: '该字段为必填项！',
-                },
-              ],
-              getValueFromEvent: e =>
-                getValueFromEvent(e, form.getFieldValue('welding_electric')),
-            })(
-              <Fragment>
-                <Input placeholder="请输入" />
-                <span> (A)</span>
-              </Fragment>
-            )}
-          </FormItem>
-        </Card>
+        {sln_basic_info.sln_type === 'welding' ? (
+          <Card
+            style={{ marginTop: 30 }}
+            title={<CardHeader title="技术参数" description="" hideButton />}
+            className={styles.techForm}
+          >
+            <FormItem {...formItemLayout} label="焊接电流">
+              {getFieldDecorator('welding_electric', {
+                rules: [
+                  {
+                    required: true,
+                    message: '该字段为必填项！',
+                  },
+                ],
+                getValueFromEvent: e =>
+                  getValueFromEvent(e, form.getFieldValue('welding_electric')),
+              })(<Input placeholder="请输入" />)}{' '}
+              <span> (A)</span>
+            </FormItem>
+          </Card>
+        ) : null}
+
         <Card
           style={{ marginTop: 30 }}
           title={<CardHeader title="报价信息" description="" hideButton />}
@@ -719,7 +715,7 @@ class SolutionPriceQuotation extends React.Component {
                 ],
                 initialValue: 30,
               })(
-                <Select style={{ width: 107 }} placeholder="首款">
+                <Select style={{ width: 100 }} placeholder="首款">
                   <Option value={30}>30%</Option>
                   <Option value={35}>35%</Option>
                   <Option value={40}>40%</Option>
@@ -729,7 +725,7 @@ class SolutionPriceQuotation extends React.Component {
               )}
               <span style={{ marginLeft: 8 }}>尾款：</span>
               <Select
-                style={{ width: 107 }}
+                style={{ width: 100 }}
                 placeholder="尾款"
                 value={100 - form.getFieldValue('pay_ratio')}
                 onChange={value =>
