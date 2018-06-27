@@ -437,24 +437,23 @@ class SolutionPriceQuotation extends React.Component {
         sln_device,
         sln_support,
       };
-      console.log(1);
-      // this.props.dispatch({
-      //   type: 'solution/handleFormSubmit',
-      //   payload: !welding_electric
-      //     ? formData
-      //     : { ...formData, welding_tech_param },
-      //   callback: (success, data) => {
-      //     if (success && success === true) {
-      //       message.success(data);
-      //       location.href = location.href.replace(
-      //         'solutionPriceQuotation',
-      //         'solutionDetail'
-      //       );
-      //     } else {
-      //       message.error(data);
-      //     }
-      //   },
-      // });
+      this.props.dispatch({
+        type: 'solution/handleFormSubmit',
+        payload: !welding_electric
+          ? formData
+          : { ...formData, welding_tech_param },
+        callback: (success, data) => {
+          if (success && success === true) {
+            message.success(data);
+            location.href = location.href.replace(
+              'solutionPriceQuotation',
+              'solutionDetail'
+            );
+          } else {
+            message.error(data);
+          }
+        },
+      });
     });
   };
   render() {
