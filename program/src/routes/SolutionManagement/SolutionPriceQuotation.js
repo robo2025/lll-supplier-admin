@@ -396,7 +396,7 @@ class SolutionPriceQuotation extends React.Component {
   };
   handleFormSubmit = () => {
     this.props.form.validateFields((err, fieldsValue) => {
-      // if (err) return;
+      if (err) return;
       const { coreDeviceListData, aidDeviceListData } = this.state;
       // 安装、工艺、培训 备注和价格   welding_electric焊接电流
       const {
