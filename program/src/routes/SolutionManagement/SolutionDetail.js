@@ -200,20 +200,20 @@ class SolutionDetail extends React.Component {
                 : null}
             </DescriptionList>
           </Card>
-          <Card style={{ marginTop: 30 }} title="技术参数">
-            <DescriptionList size="small" col="2">
-              {welding_tech_param
-                ? welding_tech_param.map((item) => {
-                    return (
-                      <Description term={item.name}>
-                        {item.value}
-                        <span style={{ marginLeft: 5 }}>{item.unit_name}</span>
-                      </Description>
-                    );
-                  })
-                : null}
-            </DescriptionList>
-          </Card>
+          {welding_tech_param.length ? (
+            <Card style={{ marginTop: 30 }} title="技术参数">
+              <DescriptionList size="small" col="2">
+                {welding_tech_param.map((item) => {
+                  return (
+                    <Description term={item.name}>
+                      {item.value}
+                      <span style={{ marginLeft: 5 }}>{item.unit_name}</span>
+                    </Description>
+                  );
+                })}
+              </DescriptionList>
+            </Card>
+          ) : null}
           <Card style={{ marginTop: 30 }} title="报价信息">
             <DescriptionList size="small" col="3">
               <Description term="付款比例">
@@ -277,9 +277,7 @@ class SolutionDetail extends React.Component {
           {moment.unix(sln_basic_info.sln_date).format('YYYY-MM-DD HH:MM')}
         </Description>
         <Description term="客户备注">
-          {sln_user_info.sln_note === ''
-            ? '无'
-            : sln_user_info.sln_note}
+          {sln_user_info.sln_note === '' ? '无' : sln_user_info.sln_note}
         </Description>
       </DescriptionList>
     );
