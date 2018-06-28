@@ -18,7 +18,7 @@ const Tablefooter = (props) => {
       title={<span style={{ fontSize: 16 }}>技术支持</span>}
     >
       {sln_support.map(item => (
-        <Description term={item.name}>￥{item.price}元</Description>
+        <Description term={item.name}>￥{item.price}元{item.note !== '' ? <span style={{ marginLeft: 8 }}>备注：{item.note}</span> : ''}</Description>
       ))}
     </DescriptionList>
   );
@@ -277,7 +277,7 @@ class SolutionOrderDetail extends React.Component {
             <Card title="方案商品信息">
               <DescriptionList size="small" col="3">
                 {/* <Description term="方案询价单号">0000000022</Description> */}
-                <Description term="方案编号">{supplier.sln_no}</Description>
+                <Description term="方案询价单号">{supplier.sln_no}</Description>
                 <Description term="方案名称">
                   {customer.sln_basic_info.sln_name}
                 </Description>
