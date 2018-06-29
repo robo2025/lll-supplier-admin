@@ -29,7 +29,7 @@ export default {
       const { data, headers, rescode } = response;
       if (rescode === 10000) {
         const dataWithKey = data.map((item) => {
-          return { ...item, key: item.plan_order_sn };
+          return { ...item, key: item.sln_no };
         });
         yield put({
           type: 'save',

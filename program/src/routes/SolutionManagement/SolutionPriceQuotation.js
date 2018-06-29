@@ -66,6 +66,7 @@ const DeviceListModal = Form.create({
     handleDeviceListModify,
     handleDeviceListModalVisibal,
     modalType, // add||modify
+    sln_type, // welding||sewage
     form,
   } = props;
   const okHandle = () => {
@@ -124,8 +125,17 @@ const DeviceListModal = Form.create({
               ],
             })(
               <Select style={{ width: '100%' }}>
-                <Option value="机器人部分">机器人部分</Option>
-                <Option value="焊机部分">焊机部分</Option>
+                {sln_type === 'welding' ? (
+                  <OptGroup>
+                    <Option value="机器人部分">机器人部分</Option>
+                    <Option value="焊机部分">焊机部分</Option>
+                  </OptGroup>
+                ) : (
+                  <OptGroup>
+                    <Option value="控制柜">控制柜</Option>
+                    <Option value="传感器">传感器</Option>
+                  </OptGroup>
+                )}
               </Select>
             )}
           </FormItem>
@@ -141,7 +151,7 @@ const DeviceListModal = Form.create({
               initialValue: '辅助设备',
             })(<Input placeholder="请输入" disabled />)}
           </FormItem>
-          <FormItem label="所属类型" {...formItemLayout}>
+          <FormItem label="组成部分" {...formItemLayout}>
             {form.getFieldDecorator('device_component', {
               rules: [
                 {
@@ -151,8 +161,17 @@ const DeviceListModal = Form.create({
               ],
             })(
               <Select style={{ width: '100%' }}>
-                <Option value="设备">设备</Option>
-                <Option value="耗材">耗材</Option>
+                {sln_type === 'welding' ? (
+                  // 这里用Fragment会报错，尼玛。。没时间提issues，直接用OptGroup display=none代替了
+                  <OptGroup> 
+                    <Option value="设备">设备</Option>
+                    <Option value="耗材">耗材</Option>
+                  </OptGroup>
+                ) : (
+                  <OptGroup>
+                    <Option value="现场设备">现场设备</Option>
+                  </OptGroup>
+                )}
               </Select>
             )}
           </FormItem>
@@ -226,7 +245,7 @@ const DeviceListModal = Form.create({
 
 const { Description } = DescriptionList;
 const FormItem = Form.Item;
-const { Option } = Select;
+const { Option, OptGroup } = Select;
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
@@ -279,24 +298,14 @@ const CardHeader = ({ onButtonClick, description, title, hideButton }) => {
 }))
 @Form.create()
 class SolutionPriceQuotation extends React.Component {
-  constructor(props) {
-    super(props);
-    let coreDeviceListData = [];
-    const { customer } = this.props.profile;
-    if (customer) {
-      coreDeviceListData = customer.sln_device.map((item) => {
-        return { ...item, key: item.id };
-      });
-    }
-    this.state = {
-      coreDeviceListData,
-      aidDeviceListData: [],
-      deviceListModalVisibal: false,
-      modalType: 'add',
-      title: '核心设备',
-      rowSelected: {},
-    };
-  }
+  state = {
+    coreDeviceListData: [],
+    aidDeviceListData: [],
+    deviceListModalVisibal: false,
+    modalType: 'add',
+    title: '核心设备',
+    rowSelected: {},
+  };
 
   componentDidMount() {
     this.props.dispatch({
@@ -304,9 +313,16 @@ class SolutionPriceQuotation extends React.Component {
       payload: location.href.split('=').pop(),
       callback: (data) => {
         this.setState({
-          coreDeviceListData: data.customer.sln_device.map((item) => {
-            return { ...item, key: item.device_id };
-          }),
+          coreDeviceListData: data.customer.sln_device
+            .filter(item => item.device_type === '核心设备')
+            .map((item) => {
+              return { ...item, key: item.device_id };
+            }),
+          aidDeviceListData: data.customer.sln_device
+            .filter(item => item.device_type === '辅助设备')
+            .map((item) => {
+              return { ...item, key: item.device_id };
+            }),
         });
       },
     });
@@ -396,7 +412,7 @@ class SolutionPriceQuotation extends React.Component {
   };
   handleFormSubmit = () => {
     this.props.form.validateFields((err, fieldsValue) => {
-      // if (err) return;
+      if (err) return;
       const { coreDeviceListData, aidDeviceListData } = this.state;
       // 安装、工艺、培训 备注和价格   welding_electric焊接电流
       const {
@@ -420,7 +436,7 @@ class SolutionPriceQuotation extends React.Component {
         });
       // TODO 优化
       const welding_tech_param = [
-        { name: '焊接电流', value: welding_electric, unit_name: 'mA' },
+        { name: '焊接电流', value: welding_electric, unit_name: 'A' },
       ];
 
       const sln_device = coreDeviceListData.concat(aidDeviceListData);
@@ -439,7 +455,9 @@ class SolutionPriceQuotation extends React.Component {
       };
       this.props.dispatch({
         type: 'solution/handleFormSubmit',
-        payload: !welding_electric ? formData : { ...formData, welding_tech_param },
+        payload: !welding_electric
+          ? formData
+          : { ...formData, welding_tech_param },
         callback: (success, data) => {
           if (success && success === true) {
             message.success(data);
@@ -481,13 +499,13 @@ class SolutionPriceQuotation extends React.Component {
             ￥{sln_basic_info.customer_price}
           </span>
         </Description>
-        <Description term="方案编号">{sln_basic_info.sln_no}</Description>
+        <Description term="方案询价单号">{sln_basic_info.sln_no}</Description>
         <Description term="意向付款比例">
           <span>阶段一（首款）{sln_user_info.pay_ratio}%</span>
           <span> 阶段二（尾款）{100 - sln_user_info.pay_ratio}%</span>
         </Description>
         <Description term="创建时间">
-          {moment.unix(sln_basic_info.sln_date).format('YYYY-MM-DD HH:MM')}
+          {moment.unix(sln_basic_info.sln_date).format('YYYY-MM-DD HH:mm')}
         </Description>
         <Description term="客户备注">
           {sln_user_info.welding_note === ''
@@ -550,7 +568,7 @@ class SolutionPriceQuotation extends React.Component {
         ),
       },
     ];
-    const adiDeviceTableColumns = [
+    const aidDeviceTableColumns = [
       {
         title: '所属类型',
         dataIndex: 'device_component',
@@ -657,8 +675,9 @@ class SolutionPriceQuotation extends React.Component {
           }
         >
           <Table
-            columns={adiDeviceTableColumns}
+            columns={aidDeviceTableColumns}
             dataSource={aidDeviceListData}
+            pagination={false}
           />
         </Card>
         <Card
@@ -673,28 +692,28 @@ class SolutionPriceQuotation extends React.Component {
         >
           <TechSupportTable form={form} list={dataSource} />
         </Card>
-        <Card
-          style={{ marginTop: 30 }}
-          title={<CardHeader title="技术参数" description="" hideButton />}
-          className={
-            sln_basic_info.sln_type === 'welding'
-              ? styles.techForm
-              : styles.techFormHidden
-          }
-        >
-          <FormItem {...formItemLayout} label="焊接电流">
-            {getFieldDecorator('welding_electric', {
-              rules: [
-                {
-                  required: true,
-                  message: '该字段为必填项！',
-                },
-              ],
-              getValueFromEvent: e =>
-                getValueFromEvent(e, form.getFieldValue('welding_electric')),
-            })(<Input placeholder="请输入" />)}
-          </FormItem>
-        </Card>
+        {sln_basic_info.sln_type === 'welding' ? (
+          <Card
+            style={{ marginTop: 30 }}
+            title={<CardHeader title="技术参数" description="" hideButton />}
+            className={styles.techForm}
+          >
+            <FormItem {...formItemLayout} label="焊接电流">
+              {getFieldDecorator('welding_electric', {
+                rules: [
+                  {
+                    required: true,
+                    message: '该字段为必填项！',
+                  },
+                ],
+                getValueFromEvent: e =>
+                  getValueFromEvent(e, form.getFieldValue('welding_electric')),
+              })(<Input placeholder="请输入" />)}{' '}
+              <span> (A)</span>
+            </FormItem>
+          </Card>
+        ) : null}
+
         <Card
           style={{ marginTop: 30 }}
           title={<CardHeader title="报价信息" description="" hideButton />}
@@ -712,7 +731,7 @@ class SolutionPriceQuotation extends React.Component {
                 ],
                 initialValue: 30,
               })(
-                <Select style={{ width: 107 }} placeholder="首款">
+                <Select style={{ width: 100 }} placeholder="首款">
                   <Option value={30}>30%</Option>
                   <Option value={35}>35%</Option>
                   <Option value={40}>40%</Option>
@@ -722,7 +741,7 @@ class SolutionPriceQuotation extends React.Component {
               )}
               <span style={{ marginLeft: 8 }}>尾款：</span>
               <Select
-                style={{ width: 107 }}
+                style={{ width: 100 }}
                 placeholder="尾款"
                 value={100 - form.getFieldValue('pay_ratio')}
                 onChange={value =>
@@ -837,6 +856,7 @@ class SolutionPriceQuotation extends React.Component {
           modalType={modalType}
           title={title}
           rowSelected={rowSelected}
+          sln_type={sln_basic_info.sln_type}
         />
       </PageHeaderLayout>
     );

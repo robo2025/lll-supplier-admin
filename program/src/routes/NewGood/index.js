@@ -189,7 +189,7 @@ export default class NewGood extends Component {
       if (err) return;
 
       const createTime = {};
-      if (fieldsValue.create_time) {
+      if (fieldsValue.create_time && fieldsValue.create_time.length > 0) {
         createTime.created_start = fieldsValue.create_time[0].format('YYYY-MM-DD');
         createTime.created_end = fieldsValue.create_time[1].format('YYYY-MM-DD');
       }
@@ -245,7 +245,7 @@ export default class NewGood extends Component {
               ...fields,
               mno: args.mno,
             },
-            success: () => { history.push('/goods/list'); },
+            success: () => { message.success('提交成功');history.push('/goods/list'); },
             error: (res) => { message.error(res.msg, 2.5); },
           });
         }
