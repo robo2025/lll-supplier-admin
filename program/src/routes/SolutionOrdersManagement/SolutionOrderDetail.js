@@ -18,7 +18,7 @@ const Tablefooter = (props) => {
       title={<span style={{ fontSize: 16 }}>技术支持</span>}
     >
       {sln_support.map(item => (
-        <Description term={item.name}>￥{item.price}元</Description>
+        <Description term={item.name}>￥{item.price}元{item.note !== '' ? <span style={{ marginLeft: 8 }}>备注：{item.note}</span> : ''}</Description>
       ))}
     </DescriptionList>
   );
@@ -191,7 +191,7 @@ class SolutionOrderDetail extends React.Component {
                 <Description term="下单时间">
                   {moment
                     .unix(order_info.place_an_order_time)
-                    .format('YYYY-MM-DD HH:MM')}
+                    .format('YYYY-MM-DD HH:mm')}
                 </Description>
               </DescriptionList>
             </Card>
@@ -206,7 +206,7 @@ class SolutionOrderDetail extends React.Component {
                   {pay_info[0].status === 2 ? '已支付' : '未支付'}
                 </Description>
                 <Description term="支付时间">
-                  {moment.unix(pay_info[0].pay_time).format('YYYY-MM-DD HH:MM')
+                  {moment.unix(pay_info[0].pay_time).format('YYYY-MM-DD HH:mm')
                   // 1为已支付，2为未支付
                   }
                 </Description>
@@ -220,7 +220,7 @@ class SolutionOrderDetail extends React.Component {
                   {pay_info[1].status === 2 ? '已支付' : '未支付'}
                 </Description>
                 <Description term="支付时间">
-                  {moment.unix(pay_info[1].pay_time).format('YYYY-MM-DD HH:MM')}
+                  {moment.unix(pay_info[1].pay_time).format('YYYY-MM-DD HH:mm')}
                 </Description>
               </DescriptionList>
             </Card>
@@ -277,7 +277,7 @@ class SolutionOrderDetail extends React.Component {
             <Card title="方案商品信息">
               <DescriptionList size="small" col="3">
                 {/* <Description term="方案询价单号">0000000022</Description> */}
-                <Description term="方案编号">{supplier.sln_no}</Description>
+                <Description term="方案询价单号">{supplier.sln_no}</Description>
                 <Description term="方案名称">
                   {customer.sln_basic_info.sln_name}
                 </Description>

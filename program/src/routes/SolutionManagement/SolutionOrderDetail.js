@@ -42,13 +42,13 @@ class SolutionOrderDetail extends React.Component {
             ￥{sln_basic_info.customer_price}
           </span>
         </Description>
-        <Description term="方案编号">{sln_basic_info.sln_no}</Description>
+        <Description term="方案询价单号">{sln_basic_info.sln_no}</Description>
         <Description term="意向付款比例">
           <span>阶段一（首款）{sln_user_info.pay_ratio}%</span>
           <span> 阶段二（尾款）{100 - sln_user_info.pay_ratio}%</span>
         </Description>
         <Description term="创建时间">
-          {moment.unix(sln_basic_info.sln_date).format('YYYY-MM-DD HH:MM')}
+          {moment.unix(sln_basic_info.sln_date).format('YYYY-MM-DD HH:mm')}
         </Description>
         <Description term="客户备注">
           {sln_user_info.sln_note === ''

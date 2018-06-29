@@ -74,8 +74,8 @@ class SolutionList extends React.Component {
     this.props.dispatch({
       type: 'solution/fetch',
       payload: {
-        start_time: rangeValue ? rangeValue[0].format('YYYY-MM-DD') : null,
-        end_time: rangeValue ? rangeValue[1].format('YYYY-MM-DD') : null,
+        start_time: rangeValue && rangeValue.length ? rangeValue[0].format('YYYY-MM-DD') : null,
+        end_time: rangeValue && rangeValue.length ? rangeValue[1].format('YYYY-MM-DD') : null,
         ...fieldsValue,
       },
     });
@@ -95,8 +95,8 @@ class SolutionList extends React.Component {
       const rangeValue = fieldsValue['range-picker'];
       const { sln_no, is_type } = fieldsValue;
       const values = {
-        start_time: rangeValue ? rangeValue[0].format('YYYY-MM-DD') : null,
-        end_time: rangeValue ? rangeValue[1].format('YYYY-MM-DD') : null,
+        start_time: rangeValue && rangeValue.length ? rangeValue[0].format('YYYY-MM-DD') : null,
+        end_time: rangeValue && rangeValue.length ? rangeValue[1].format('YYYY-MM-DD') : null,
         sln_no,
         is_type,
       };
@@ -160,7 +160,7 @@ class SolutionList extends React.Component {
         title: '创建时间',
         dataIndex: 'sln_date',
         key: 'sln_date',
-        render: text => moment.unix(text).format('YYYY-MM-DD HH:MM'),
+        render: text => moment.unix(text).format('YYYY-MM-DD HH:mm'),
       },
       {
         title: '操作',
