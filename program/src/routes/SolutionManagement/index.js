@@ -160,7 +160,7 @@ class SolutionList extends React.Component {
         title: '创建时间',
         dataIndex: 'sln_date',
         key: 'sln_date',
-        render: text => moment.unix(text).format('YYYY-MM-DD HH:MM'),
+        render: text => moment.unix(text).format('YYYY-MM-DD HH:mm'),
       },
       {
         title: '操作',
