@@ -191,7 +191,7 @@ class SolutionOrderDetail extends React.Component {
                 <Description term="下单时间">
                   {moment
                     .unix(order_info.place_an_order_time)
-                    .format('YYYY-MM-DD HH:MM')}
+                    .format('YYYY-MM-DD HH:mm')}
                 </Description>
               </DescriptionList>
             </Card>
@@ -206,7 +206,7 @@ class SolutionOrderDetail extends React.Component {
                   {pay_info[0].status === 2 ? '已支付' : '未支付'}
                 </Description>
                 <Description term="支付时间">
-                  {moment.unix(pay_info[0].pay_time).format('YYYY-MM-DD HH:MM')
+                  {moment.unix(pay_info[0].pay_time).format('YYYY-MM-DD HH:mm')
                   // 1为已支付，2为未支付
                   }
                 </Description>
@@ -220,7 +220,7 @@ class SolutionOrderDetail extends React.Component {
                   {pay_info[1].status === 2 ? '已支付' : '未支付'}
                 </Description>
                 <Description term="支付时间">
-                  {moment.unix(pay_info[1].pay_time).format('YYYY-MM-DD HH:MM')}
+                  {moment.unix(pay_info[1].pay_time).format('YYYY-MM-DD HH:mm')}
                 </Description>
               </DescriptionList>
             </Card>

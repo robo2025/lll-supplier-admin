@@ -394,7 +394,7 @@ class SolutionOrderList extends React.Component {
         title: '下单日期',
         dataIndex: 'place_an_order_time',
         key: 'place_an_order_time',
-        render: text => moment.unix(text).format('YYYY-MM-DD HH:MM'),
+        render: text => moment.unix(text).format('YYYY-MM-DD HH:mm'),
       },
       {
         title: '操作',

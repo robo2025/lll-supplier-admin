@@ -274,7 +274,7 @@ class SolutionDetail extends React.Component {
           <span> 阶段二（尾款）{100 - sln_user_info.pay_ratio}%</span>
         </Description>
         <Description term="创建时间">
-          {moment.unix(sln_basic_info.sln_date).format('YYYY-MM-DD HH:MM')}
+          {moment.unix(sln_basic_info.sln_date).format('YYYY-MM-DD HH:mm')}
         </Description>
         <Description term="客户备注">
           {sln_user_info.sln_note === '' ? '无' : sln_user_info.sln_note}
