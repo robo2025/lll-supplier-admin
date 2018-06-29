@@ -102,12 +102,13 @@ class ProductList extends React.Component {
   }
 
   render() {
-    const { data, total, loading } = this.props;
+    const { data, total, loading} = this.props;
     const paginationProps = {
       showSizeChanger: true,
       showQuickJumper: true,
       defaultPageSize: 6,
       total,
+    //   current
     };
     console.log('产品列表props', this.props);
     return (

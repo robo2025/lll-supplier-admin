@@ -53,7 +53,7 @@ export default class ModelContent extends Component {
         formValues: values,
       });
 
-      onSearch({ params: values });
+      onSearch({ offset:0, params: values });
     });
   }
 
