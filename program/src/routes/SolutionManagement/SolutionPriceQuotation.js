@@ -66,6 +66,7 @@ const DeviceListModal = Form.create({
     handleDeviceListModify,
     handleDeviceListModalVisibal,
     modalType, // add||modify
+    sln_type, // welding||sewage
     form,
   } = props;
   const okHandle = () => {
@@ -124,8 +125,17 @@ const DeviceListModal = Form.create({
               ],
             })(
               <Select style={{ width: '100%' }}>
-                <Option value="机器人部分">机器人部分</Option>
-                <Option value="焊机部分">焊机部分</Option>
+                {sln_type === 'welding' ? (
+                  <OptGroup>
+                    <Option value="机器人部分">机器人部分</Option>
+                    <Option value="焊机部分">焊机部分</Option>
+                  </OptGroup>
+                ) : (
+                  <OptGroup>
+                    <Option value="控制柜">控制柜</Option>
+                    <Option value="传感器">传感器</Option>
+                  </OptGroup>
+                )}
               </Select>
             )}
           </FormItem>
@@ -141,7 +151,7 @@ const DeviceListModal = Form.create({
               initialValue: '辅助设备',
             })(<Input placeholder="请输入" disabled />)}
           </FormItem>
-          <FormItem label="所属类型" {...formItemLayout}>
+          <FormItem label="组成部分" {...formItemLayout}>
             {form.getFieldDecorator('device_component', {
               rules: [
                 {
@@ -151,8 +161,17 @@ const DeviceListModal = Form.create({
               ],
             })(
               <Select style={{ width: '100%' }}>
-                <Option value="设备">设备</Option>
-                <Option value="耗材">耗材</Option>
+                {sln_type === 'welding' ? (
+                  // 这里用Fragment会报错，尼玛。。没时间提issues，直接用OptGroup display=none代替了
+                  <OptGroup> 
+                    <Option value="设备">设备</Option>
+                    <Option value="耗材">耗材</Option>
+                  </OptGroup>
+                ) : (
+                  <OptGroup>
+                    <Option value="现场设备">现场设备</Option>
+                  </OptGroup>
+                )}
               </Select>
             )}
           </FormItem>
@@ -226,7 +245,7 @@ const DeviceListModal = Form.create({
 
 const { Description } = DescriptionList;
 const FormItem = Form.Item;
-const { Option } = Select;
+const { Option, OptGroup } = Select;
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
@@ -837,6 +856,7 @@ class SolutionPriceQuotation extends React.Component {
           modalType={modalType}
           title={title}
           rowSelected={rowSelected}
+          sln_type={sln_basic_info.sln_type}
         />
       </PageHeaderLayout>
     );
