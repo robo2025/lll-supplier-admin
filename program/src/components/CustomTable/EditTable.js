@@ -14,22 +14,25 @@ const data = [{
   editable: true,
 }];
 
-const EditableCell = ({ editable, value, onChange, minVal }) => (
-  <span style={{ display: 'inline-block' }}>
-    {editable
-      ?
-      (
-        <InputNumber
-          style={{ margin: '-5px 0' }}
-          value={value}
-          onChange={valueText => onChange(valueText)}
-          min={minVal}
-        />
-      )
-      : value
-    }
-  </span>
-);
+const EditableCell = ({ editable, value, onChange, minVal,type }) => {
+    return (
+        <span style={{ display: 'inline-block' }}>
+          {editable
+            ?
+            (
+              <InputNumber
+                style={{ margin: '-5px 0' }}
+                value={value}
+                onChange={valueText => onChange(valueText)}
+                min={minVal}
+                precision={type&&type==='price'?2:0}
+              />
+            )
+            : value
+          }
+        </span>
+      );
+}
 
 const RadioGroupCell = ({ value, onChange }) => (
   <RadioGroup onChange={onChange} value={value || 1}>
@@ -97,7 +100,6 @@ export default class EditableTable extends Component {
   }
 
   handleChange = (value, key, column) => {
-    console.log('价格设置handleChange', value, key, column);
     const { onChange } = this.props;
     const newData = [...this.state.data];
     let targetIdx = 0;
@@ -109,7 +111,6 @@ export default class EditableTable extends Component {
       const target = targetArr[0];
       target[column] = value;
       newData[targetIdx] = target;
-      // console.log('目标', targetIdx, target, newData);
       this.setState({ data: newData });
       // 把改变数据传给母组件
       onChange({ prices: newData });
@@ -159,6 +160,7 @@ export default class EditableTable extends Component {
   // 增加一条区间
   addLastRow = () => {
     const newData = [...this.state.data];
+    // console.log(newData);
     if (newData.length < 4) {
       newData.push({
         id: (newData.length - 100).toString(),
@@ -169,7 +171,9 @@ export default class EditableTable extends Component {
         shipping_fee_type: 0,
         editable: true,
       });
-      this.setState({ data: newData });
+      this.setState({ data: newData },() => {
+        this.props.onChange({ prices: this.state.data });
+      });
     } else {
       message.info('最多只能增加四个区间');
     }
@@ -180,6 +184,7 @@ export default class EditableTable extends Component {
       <EditableCell
         editable={record.editable}
         value={text}
+        type={column === "price"? 'price':""}
         minVal={minVal}
         onChange={value => this.handleChange(value, record.id, column)}
       />
@@ -197,7 +202,6 @@ export default class EditableTable extends Component {
 
 
   render() {
-    console.log('价格表格', this.state);
     return (
       <Table
         bordered
