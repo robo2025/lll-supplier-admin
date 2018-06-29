@@ -3,7 +3,7 @@
 * */
 
 // 单点登录URL
-export const URL = '//login.robo2025.com';
+export const URL = 'https://login.robo2025.com';
 
 // 网站内容接口URL
 export const API_URL = '//api.robo2025.com/scm';
