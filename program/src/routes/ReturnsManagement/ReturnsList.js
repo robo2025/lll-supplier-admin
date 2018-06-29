@@ -61,12 +61,11 @@ export default class ReturnsList extends Component {
       if (err) return;
       const values = {
         ...fieldsValue,
-        start_time: fieldsValue.create_time ? fieldsValue.create_time[0].format('YYYY-MM-DD') : '',
-        end_time: fieldsValue.create_time ? fieldsValue.create_time[1].format('YYYY-MM-DD') : '',
+        start_time: fieldsValue.create_time&& fieldsValue.create_time.length > 0 ? fieldsValue.create_time[0].format('YYYY-MM-DD') : '',
+        end_time: fieldsValue.create_time && fieldsValue.create_time.length > 0? fieldsValue.create_time[1].format('YYYY-MM-DD') : '',
       };
       delete values.create_time;
       this.setState({ searchValues: values });
-      console.log('搜索字段', values);
       dispatch({
         type: 'orders/fetchReturns',
         params: values,
@@ -101,7 +100,7 @@ export default class ReturnsList extends Component {
 
   // 确认收货
   handleConfirmReturn = ({ orderId, status }) => {
-    console.log('return', orderId, status);
+    // console.log('return', orderId, status);
     const { dispatch } = this.props;
     dispatch({
       type: 'orders/fetchConfirmReturn',
@@ -251,7 +250,7 @@ export default class ReturnsList extends Component {
       defaultPageSize: this.state.limit || 10,
       total,
     };
-    console.log('退货单列表--', orders.returns);
+    // console.log('退货单列表--', orders.returns);
 
     return (
       <PageHeaderLayout title="退货单列表">

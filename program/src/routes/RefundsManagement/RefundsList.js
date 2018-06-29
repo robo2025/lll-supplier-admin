@@ -55,7 +55,6 @@ export default class RefundsList extends Component {
   // 处理表单搜索
   handleSearch = (e) => {
     e.preventDefault();
-    e.preventDefault();
 
     const { dispatch, form } = this.props;
 
@@ -63,11 +62,12 @@ export default class RefundsList extends Component {
       if (err) return;
       const values = {
         ...fieldsValue,
-        start_time: fieldsValue.created_time ? fieldsValue.created_time[0].format('YYYY-MM-DD') : '',
-        end_time: fieldsValue.created_time ? fieldsValue.created_time[1].format('YYYY-MM-DD') : '',
+        start_time: fieldsValue.create_time&& fieldsValue.create_time.length > 0 ? fieldsValue.create_time[0].format('YYYY-MM-DD') : '',
+        end_time: fieldsValue.create_time && fieldsValue.create_time.length > 0? fieldsValue.create_time[1].format('YYYY-MM-DD') : '',
       };
-      delete values.created_time;
+      delete values.create_time;
       this.setState({ searchValues: values });
+      console.log('fields',values);
       dispatch({
         type: 'orders/fetchRefunds',
         params: values,
@@ -162,7 +162,7 @@ export default class RefundsList extends Component {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col xll={4} md={6} sm={24}>
             <FormItem label="单号">
-              {getFieldDecorator('refund_sn')(
+              {getFieldDecorator('sn')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
@@ -196,7 +196,7 @@ export default class RefundsList extends Component {
           </Col>
           <Col xll={4} md={10} sm={24}>
             <FormItem label="退款单起止时间">
-              {getFieldDecorator('created_time')(
+              {getFieldDecorator('create_time')(
                 <RangePicker onChange={this.onDatepickerChange} />
               )}
             </FormItem>
