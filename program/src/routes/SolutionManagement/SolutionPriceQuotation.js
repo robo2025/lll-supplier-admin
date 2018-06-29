@@ -279,24 +279,14 @@ const CardHeader = ({ onButtonClick, description, title, hideButton }) => {
 }))
 @Form.create()
 class SolutionPriceQuotation extends React.Component {
-  constructor(props) {
-    super(props);
-    let coreDeviceListData = [];
-    const { customer } = this.props.profile;
-    if (customer) {
-      coreDeviceListData = customer.sln_device.map((item) => {
-        return { ...item, key: item.id };
-      });
-    }
-    this.state = {
-      coreDeviceListData,
-      aidDeviceListData: [],
-      deviceListModalVisibal: false,
-      modalType: 'add',
-      title: '核心设备',
-      rowSelected: {},
-    };
-  }
+  state = {
+    coreDeviceListData: [],
+    aidDeviceListData: [],
+    deviceListModalVisibal: false,
+    modalType: 'add',
+    title: '核心设备',
+    rowSelected: {},
+  };
 
   componentDidMount() {
     this.props.dispatch({
@@ -304,9 +294,16 @@ class SolutionPriceQuotation extends React.Component {
       payload: location.href.split('=').pop(),
       callback: (data) => {
         this.setState({
-          coreDeviceListData: data.customer.sln_device.map((item) => {
-            return { ...item, key: item.device_id };
-          }),
+          coreDeviceListData: data.customer.sln_device
+            .filter(item => item.device_type === '核心设备')
+            .map((item) => {
+              return { ...item, key: item.device_id };
+            }),
+          aidDeviceListData: data.customer.sln_device
+            .filter(item => item.device_type === '辅助设备')
+            .map((item) => {
+              return { ...item, key: item.device_id };
+            }),
         });
       },
     });
@@ -552,7 +549,7 @@ class SolutionPriceQuotation extends React.Component {
         ),
       },
     ];
-    const adiDeviceTableColumns = [
+    const aidDeviceTableColumns = [
       {
         title: '所属类型',
         dataIndex: 'device_component',
@@ -659,8 +656,9 @@ class SolutionPriceQuotation extends React.Component {
           }
         >
           <Table
-            columns={adiDeviceTableColumns}
+            columns={aidDeviceTableColumns}
             dataSource={aidDeviceListData}
+            pagination={false}
           />
         </Card>
         <Card
