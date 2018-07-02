@@ -46,8 +46,13 @@ export default class GoodsList extends Component {
             }, // 下架原因
             isImportModal: false,
             prices: [], // 商品价格区间数组
-            args: qs.parse(props.location.search, { ignoreQueryPrefix: true }),
+            args: qs.parse(props.location.search || { page: 1, pageSize: 10 }, { ignoreQueryPrefix: true }),
             searchValues: {},
+            downloadModalParams: {
+                offset: 0,
+                limit: 6,
+                params: {}
+            },// 下载模板参数
         };
     }
 
@@ -85,7 +90,7 @@ export default class GoodsList extends Component {
     // 确定下架原因弹窗
     onOkUnpublishModal = () => {
         const { dispatch } = this.props;
-        const { unpublishReason, gno } = this.state;
+        const { unpublishReason, gno, formValues, args } = this.state;
         this.setState({ isShowUnpublishModal: false });
         if (unpublishReason.publish_type) {
             dispatch({
@@ -106,12 +111,12 @@ export default class GoodsList extends Component {
     // 获取商品列表
     dispatchDefaultList = () => {
         const { dispatch } = this.props;
-        const { args } = this.state;
+        const { args, formValues } = this.state;
         dispatch({
             type: 'good/fetch',
-            params: null,
-            offset: args.page ? (args.page - 1) * PAGE_SIZE : 0,
-            limit: PAGE_SIZE,
+            params: formValues,
+            offset: (args.page - 1) * args.pageSize,
+            limit: args.pageSize,
         });
     }
 
@@ -138,8 +143,16 @@ export default class GoodsList extends Component {
     }
 
     // 获取产品型号列表
-    dispatchProductModelList = ({ offset = 0, limit = 6, params = {} }) => {
+
+    dispatchProductModelList = ({ offset = this.state.downloadModalParams.offset, limit = this.state.downloadModalParams.limit, params = this.state.downloadModalParams.params }) => {
         const { dispatch } = this.props;
+        this.setState({
+            downloadModalParams: {
+                offset,
+                limit,
+                params
+            }
+        })
         dispatch({
             type: 'good/fetchAassociatedProduct',
             offset,
@@ -160,6 +173,12 @@ export default class GoodsList extends Component {
             pageSize: pagination.pageSize,
             offset: (pagination.current - 1) * (pagination.pageSize),
         };
+        this.setState({
+            downloadModalParams: {
+                offset: (pagination.current - 1) * (pagination.pageSize),
+                limit: pagination.pageSize,
+            }
+        })
         this.dispatchProductModelList({ offset: params.offset, limit: params.pageSize });
     }
 
@@ -208,6 +227,7 @@ export default class GoodsList extends Component {
     // 上下架商品
     handlePublishGood(gno, status) {
         const { dispatch } = this.props;
+        const { args, formValues } = this.state;
         if (status === 0) { // 如果是下架商品，需要填写下架原因
             this.setState({ isShowUnpublishModal: true, gno });
             return;
@@ -253,8 +273,8 @@ export default class GoodsList extends Component {
     }
     // 确定：价格设置Modal
     okPriceSettingModal = () => {
-        const { dispatch } = this.props;
-        const { prices, gno } = this.state;
+        const { dispatch, history } = this.props;
+        const { prices, gno, searchValues, args, formValues } = this.state;
         let isRight = true;
         prices.map((ele) => {
             for (let key in ele) {
@@ -276,12 +296,6 @@ export default class GoodsList extends Component {
             success: () => {
                 this.setState({ isShowPriceSettingModal: false });
                 message.success('操作成功');
-                // const { form, dispatch } = this.props;
-                // form.resetFields();
-                // this.setState({
-                //     formValues: {},
-                //     searchValues:{},
-                // });
                 this.dispatchDefaultList();
             },
             error: (res) => { message.error(handleServerMsg(res.msg)); },
@@ -300,8 +314,7 @@ export default class GoodsList extends Component {
             prices: obj.prices,
         });
     }
-
-    handleStandardTableChange = (pagination, filtersArg, sorter) => {
+    handleStandardTableChange = (pagination, filtersArg, sorter) => {// 商品列表页数改变
         const { dispatch, history } = this.props;
         const { searchValues } = this.state;
         const params = {
@@ -309,10 +322,12 @@ export default class GoodsList extends Component {
             pageSize: pagination.pageSize,
             offset: (pagination.current - 1) * (pagination.pageSize),
         };
-
+        this.setState({
+            args: { page: pagination.current, pageSize: pagination.pageSize }
+        })
         // 分页：将页数提取到url上
-        history.push({
-            search: `?page=${params.currentPage}`,
+        history.replace({
+            search: `?page=${params.currentPage}&pageSize=${pagination.pageSize}`,
         });
 
         dispatch({
@@ -324,13 +339,21 @@ export default class GoodsList extends Component {
     }
 
     handleFormReset = () => {
-        const { form, dispatch } = this.props;
+        const { form, dispatch, history } = this.props;
+        const { args } = this.state;
         form.resetFields();
         this.setState({
             formValues: {},
+            searchValues: {},
+            args: { page: 1, pageSize: args.pageSize }
         });
+        history.replace({
+            search: `?page=1&pageSize=${args.pageSize}`,
+        })
         dispatch({
             type: 'good/fetch',
+            limit: args.pageSize,
+            offset: 0
         });
     }
 
@@ -373,18 +396,16 @@ export default class GoodsList extends Component {
 
     jumpToPage = (url) => {
         const { history } = this.props;
-        history.push(url);
+        history.replace(url);
     }
 
     handleSearch = (e) => {
         e.preventDefault();
-
-        const { dispatch, form } = this.props;
-
+        const { dispatch, form, history } = this.props;
+        const { args } = this.state;
         form.validateFields((err, fieldsValue) => {
             console.log(fieldsValue)
             if (err) return;
-
             const createTime = {};
             if (fieldsValue.create_time && fieldsValue.create_time.length > 0) {
                 createTime.created_start = fieldsValue.create_time[0].format('YYYY-MM-DD');
@@ -394,7 +415,6 @@ export default class GoodsList extends Component {
                 ...fieldsValue,
                 ...createTime,
             };
-
             this.setState({ searchValues: values });
             const {
                 gno,
@@ -404,19 +424,20 @@ export default class GoodsList extends Component {
                 = values;
             this.setState({
                 formValues: values,
+                args: { page: 1, pageSize: args.pageSize }
             });
-
+            // 分页：将页数提取到url上
+            history.replace({
+                search: `?page=1&pageSize=${args.pageSize}`,
+            });
             dispatch({
                 type: 'good/fetch',
-                params: {
-                    gno,
-                    created_start,
-                    created_end,
-                },
+                params: values,
+                limit: args.pageSize,
+                offset: 0,
             });
         });
     }
-
     renderSimpleForm() {
         const { getFieldDecorator } = this.props.form;
         return (
@@ -444,9 +465,9 @@ export default class GoodsList extends Component {
                         <FormItem label="上下架状态">
                             {getFieldDecorator('publish_status')(
                                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                                    <Option value="0">全部</Option>
-                                    <Option value="1">下架中</Option>
-                                    <Option value="2">已上架</Option>
+                                    <Option value="">全部</Option>
+                                    <Option value="0">下架中</Option>
+                                    <Option value="1">上架中</Option>
                                 </Select>
                             )}
                         </FormItem>
@@ -501,18 +522,18 @@ export default class GoodsList extends Component {
                                 <Select placeholder="请选择" style={{ width: '100%' }}>
                                     <Option value="0">待审核</Option>
                                     <Option value="1">审核通过</Option>
-                                    <Option value="1">审核不通过</Option>
+                                    <Option value="2">审核不通过</Option>
                                 </Select>
                             )}
                         </FormItem>
                     </Col>
                     <Col xll={4} md={6} sm={24}>
-                        <FormItem label="上限架状态">
+                        <FormItem label="上下架状态">
                             {getFieldDecorator('publish_status')(
                                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                                    <Option value="0">全部</Option>
-                                    <Option value="1">下架中</Option>
-                                    <Option value="1">已上架</Option>
+                                    <Option value="">全部</Option>
+                                    <Option value="0">下架中</Option>
+                                    <Option value="1">上架中</Option>
                                 </Select>
                             )}
                         </FormItem>
@@ -595,10 +616,10 @@ export default class GoodsList extends Component {
     }
     render() {
         const { loading, good, productModel } = this.props;
-        const { selectedRows, isShowPriceSettingModal, isShowExportModal, prices, isImportModal } = this.state;
+        const { selectedRows, isShowPriceSettingModal, isShowExportModal, prices, isImportModal, args } = this.state;
         const data = good.list;
-        // console.log('商品列表页', this.state);
-
+        const page = parseInt(args.page);
+        const pageSize = parseInt(args.pageSize);
         return (
             <PageHeaderLayout title="商品列表">
                 <Card bordered={false} className={styles['search-wrap']} title="搜索条件">
@@ -691,6 +712,8 @@ export default class GoodsList extends Component {
                             loading={loading.models.good}
                             data={data}
                             total={good.total}
+                            current={page}
+                            pageSize={pageSize}
                             onSelectRow={this.handleSelectRows}
                             onChange={this.handleStandardTableChange}
                             onPublish={this.handlePublishGood}

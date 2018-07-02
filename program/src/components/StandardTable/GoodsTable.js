@@ -51,7 +51,7 @@ class GoodsTable extends PureComponent {
 
   render() {
     const { selectedRowKeys, totalCallNo } = this.state;
-    const { data, loading, onPublish, onPriceSetting, total } = this.props;
+    const { data, loading, onPublish, onPriceSetting, total,current,pageSize } = this.props;
 
     const columns = [{
       title: '商品ID',
@@ -162,6 +162,8 @@ class GoodsTable extends PureComponent {
       showSizeChanger: true,
       showQuickJumper: true,
       total,
+      current,
+      pageSize
     };
 
     const rowSelection = {

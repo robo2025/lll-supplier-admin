@@ -63,12 +63,11 @@ class InvoiceContent extends Component {
   }
 
   componentDidMount() {
-    console.log('发货单didmount');
     this.props.handleValidate(this.props.form);
   }
 
   handleChange = (value) => {
-    console.log(`selected ${value}`);
+    // console.log(`selected ${value}`);
   }
 
   handleDeliveryTypeChange = (value) => {

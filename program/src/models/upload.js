@@ -19,8 +19,6 @@ export default {
 
   reducers: {
     save(state, action) {
-      // console.log('action token', action);
-      // window.sessionStorage.setItem('upload_token',`${action.payload.data.id}`);
       return {
         ...state,
         upload_token: action.payload.upload_token,
