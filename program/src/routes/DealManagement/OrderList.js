@@ -37,7 +37,7 @@ export default class OrderList extends Component {
             exceptionInfo: {}, // 异常Form信息
             openReceipt: [], // 开票信息
             data: {},
-            args: qs.parse(props.location.search, { ignoreQueryPrefix: true }),
+            args: qs.parse(props.location.search || { page: 1, pageSize: 10 }, { ignoreQueryPrefix: true }),
             searchValues: {},
         };
     }
@@ -47,8 +47,8 @@ export default class OrderList extends Component {
         const { args } = this.state;
         dispatch({
             type: 'orders/fetch',
-            offset: (args.page - 1) * PAGE_SIZE,
-            limit: PAGE_SIZE,
+            offset: (args.page - 1) * args.pageSize,
+            limit: args.pageSize,
         });
         dispatch({
             type: 'upload/fetch',
@@ -86,12 +86,21 @@ export default class OrderList extends Component {
     takingOrder = ({ orderId, supplierId, status }) => {
         // console.log('接单', orderId, supplierId, status);
         const { dispatch } = this.props;
+        const { args, searchValues } = this.state;
         dispatch({
             type: 'orders/modifyStatus',
             orderId,
             supplierId,
             status,
-            success: () => { message.success('接单成功'); },
+            success: () => {
+                message.success('接单成功');
+                dispatch({
+                    type: "orders/fetch",
+                    params: searchValues,
+                    limit: args.pageSize,
+                    offset: (args.page - 1) * args.pageSize
+                })
+            },
             error: (res) => { message.error(handleServerMsgObj(res.msg)); },
         });
     }
@@ -104,7 +113,7 @@ export default class OrderList extends Component {
     // 发起开票请求
     dispatchOpenReceipt = () => {
         const { dispatch } = this.props;
-        const { orderId, receiptInfo } = this.state;
+        const { orderId, receiptInfo, args, searchValues } = this.state;
         const that = this;
         this.formObj.validateFields((error) => {
             if (!error) {
@@ -114,7 +123,15 @@ export default class OrderList extends Component {
                     orderId,
                     ...receiptInfo,
                     error: (res) => { message.error(handleServerMsgObj(res.msg)); },
-                    succuess: () => { message.success('开票成功'); },
+                    succuess: () => {
+                        message.success('开票成功');
+                        dispatch({
+                            type: "orders/fetch",
+                            params: searchValues,
+                            limit: args.pageSize,
+                            offset: (args.page - 1) * args.pageSize
+                        })
+                    },
 
                 });
             }
@@ -129,7 +146,7 @@ export default class OrderList extends Component {
     // 发起发货请求
     dispatchDelivery = () => {
         const { dispatch } = this.props;
-        const { deliveryInfo, orderId } = this.state;
+        const { deliveryInfo, orderId, args, searchValues } = this.state;
         // console.log('表单对象', this.formObj);
         const that = this;
         this.formObj.validateFields((error, values) => {
@@ -140,6 +157,14 @@ export default class OrderList extends Component {
                     type: 'orders/fetchDeliveryGoods',
                     data: { ...deliveryInfo, order_sn: orderId },
                     error: (res) => { message.error(handleServerMsgObj(res.msg)); },
+                    success: () => {
+                        dispatch({
+                            type: "orders/fetch",
+                            params: searchValues,
+                            limit: args.pageSize,
+                            offset: (args.page - 1) * args.pageSize
+                        })
+                    },
                 });
             }
         });
@@ -153,7 +178,7 @@ export default class OrderList extends Component {
     // 发起异常申请请求
     dispatchException = () => {
         const { dispatch } = this.props;
-        const { exceptionInfo, orderId } = this.state;
+        const { exceptionInfo, orderId,args,searchValues } = this.state;
         const that = this;
         this.formObj.validateFields((error, values) => {
             //   console.log('异常校验结果：', exceptionInfo);
@@ -172,7 +197,16 @@ export default class OrderList extends Component {
                     type: 'orders/fetchException',
                     orderId,
                     data: newExceptionInfo,
-                    success: () => { message.success('订单异常申请提交成功'); },
+                    success: () => {
+                        message.success('订单异常申请提交成功');
+                        dispatch({
+                            type: "orders/fetch",
+                            params: searchValues,
+                            limit: args.pageSize,
+                            offset: (args.page - 1) * args.pageSize
+                        })
+
+                    },
                     error: (res) => { message.error(handleServerMsgObj(res.msg)); },
                 });
             }
@@ -191,15 +225,34 @@ export default class OrderList extends Component {
     }
 
     handleFormReset = () => {
-        const { form } = this.props;
+        const { form, dispatch ,history} = this.props;
+        const {args} = this.state;
         form.resetFields();
+        this.setState({
+            searchValues:{},
+            args:{
+                page:1,
+                pageSize:args.pageSize
+            }
+        })
+        history.replace({
+            pathname: '/deal/orders',
+            search: `?page=1&pageSize=${args.pageSize}`,
+        });
+        dispatch({
+            type:"orders/fetch",
+            params:{},
+            offset:0,
+            limit: args.pageSize
+        })
     }
 
     // 处理表单搜索
     handleSearch = (e) => {
         e.preventDefault();
         e.preventDefault();
-        const { dispatch, form } = this.props;
+        const { dispatch, form ,history} = this.props;
+        const {args} = this.state;
         form.validateFields((err, fieldsValue) => {
             if (err) return;
             const values = {
@@ -208,11 +261,22 @@ export default class OrderList extends Component {
                 end_time: fieldsValue.create_time && fieldsValue.create_time.length > 0 ? fieldsValue.create_time[1].format('YYYY-MM-DD') : '',
             };
             delete values.create_time;
-            this.setState({ searchValues: values });
-              console.log('123', values);
+            this.setState({ 
+                searchValues: values,
+                args:{
+                    page:1,
+                    pageSize:args.pageSize
+                }
+                });
+                history.replace({
+                    pathname: '/deal/orders',
+                    search: `?page=1&pageSize=${args.pageSize}`,
+                });
             dispatch({
                 type: 'orders/fetchSearch',
                 params: values,
+                offset:0,
+                limit: args.pageSize
             });
         });
     }
@@ -223,21 +287,24 @@ export default class OrderList extends Component {
         const { searchValues } = this.state;
 
         const params = {
-            currentPage: page,
             offset: (page - 1) * pageSize,
             limit: pageSize,
         };
-        this.setState(params);
+        this.setState({
+            args:{
+                page,
+                pageSize
+            }
+        });
 
         // 分页：将页数提取到url上
-        history.push({
+        history.replace({
             pathname: '/deal/orders',
-            search: `?page=${params.currentPage}`,
+            search: `?page=${page}&pageSize=${pageSize}`,
         });
 
         dispatch({
             type: 'orders/fetch',
-            supplierId: 100,
             offset: params.offset,
             limit: params.limit,
             params: searchValues,
@@ -391,21 +458,23 @@ export default class OrderList extends Component {
     render() {
         const { orders, loading, upload } = this.props;
         const { total } = orders;
-        const { args } = this.state;
         const {
             isShowDeliveryModal,
             isShowOpenModal,
             isShowExceptionModal,
             openReceipt,
             data,
+            args
         } = this.state;
+        const current = parseInt(args.page);
+        const pageSize = parseInt(args.pageSize);
         const uploadToken = upload.upload_token;
-
         const paginationOptions = {
             showSizeChanger: true,
             showQuickJumper: true,
-            defaultCurrent: args.page ? args.page >> 0 : 1,
-            defaultPageSize: this.state.limit || 10,
+            defaultPageSize: 10,
+            current,
+            pageSize,
             total,
         };
 
@@ -453,6 +522,7 @@ export default class OrderList extends Component {
                         className="pull-right"
                         {...paginationOptions}
                         onChange={this.handlePaginationChange}
+                        onShowSizeChange={this.handlePaginationChange}
                     />
                 </Card>
                 {/* 发货单Modal */}

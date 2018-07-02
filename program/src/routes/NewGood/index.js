@@ -158,6 +158,7 @@ export default class NewGood extends Component {
 
     // 当商品列表数据改变时：分页
     handleProductTableChange = (pagination, filtersArg, sorter) => {
+        console.log(pagination,filtersArg,sorter,123456)
         const { dispatch } = this.props;
         const { associationTableParams } = this.state;
         const params = {
@@ -167,8 +168,9 @@ export default class NewGood extends Component {
         };
         this.setState({
             associationTableParams: {
-                offset: params.offset,
-                limit: params.pageSize,
+                offset: pagination.current - 1,
+                limit: pagination.pageSize,
+                params: associationTableParams.params
             }
         })
         dispatch({
@@ -180,21 +182,21 @@ export default class NewGood extends Component {
     }
 
     handleFormReset = () => {
-        console.log(123)
-        console.log(this.state.associationTableParams)
         const { form, dispatch } = this.props;
+        const { associationTableParams } = this.state;
         form.resetFields();
         this.setState({
             formValues: {},
             associationTableParams: {
                 offset: 0,
+                limit: associationTableParams.limit,
                 params: {}
             }
         });
         dispatch({
             type: 'good/fetchAassociatedProduct',
             offset: 0,
-            limit: this.state.associationTableParams.limit,
+            limit: associationTableParams.limit,
             params: {}
         });
     }
@@ -204,7 +206,7 @@ export default class NewGood extends Component {
         e.preventDefault();
 
         const { dispatch, form } = this.props;
-
+        const { associationTableParams } = this.state;
         form.validateFields((err, fieldsValue) => {
             if (err) return;
             const createTime = {};
@@ -227,6 +229,7 @@ export default class NewGood extends Component {
                 formValues: values,
                 associationTableParams: {
                     offset: 0,
+                    limit: associationTableParams.limit,
                     params: values
                 }
             });
@@ -235,7 +238,7 @@ export default class NewGood extends Component {
                 type: 'good/fetchAassociatedProduct',
                 params: values,
                 offset: 0,
-                limit: this.state.associationTableParams.limit
+                limit: associationTableParams.limit
             });
         });
     }
@@ -254,7 +257,6 @@ export default class NewGood extends Component {
         if (this.$formObj) {
             this.$formObj.validateFields((err, values) => {
                 if (!err) {
-                    console.log('提交数据', { ...fields }, values);
                     dispatch({
                         type: 'good/add',
                         data: {
@@ -343,12 +345,13 @@ export default class NewGood extends Component {
     }
 
     render() {
-        const { isShowModal, fields, args,associationTableParams } = this.state;
+        const { isShowModal, fields, args, associationTableParams } = this.state;
         const { good, loading } = this.props;
         const total = good.productTotal;
         const { getFieldDecorator } = this.props.form;
-        // const current = associationTableParams.offset +1;
-        console.log('新建props和state', this.props.product, this.state);
+        const current = associationTableParams.offset + 1;
+        // console.log(associationTableParams);
+        // console.log('新建props和state', this.props.product, this.state);
 
         return (
             <PageHeaderLayout title="新增商品信息" >
@@ -372,7 +375,7 @@ export default class NewGood extends Component {
                             onAssociate={this.handleAssociate}
                             onChange={this.handleProductTableChange}
                             total={total}
-                            // current={current}
+                            current={current}
                         />
                     </Modal>
                     <NewGoodForm

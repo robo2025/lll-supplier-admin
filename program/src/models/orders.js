@@ -58,13 +58,13 @@ export default {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); return; }
 
-      const response = yield call(queryOrders, { supplierId });
-      const { headers } = response;
-      yield put({
-        type: 'save',
-        payload: response.data,
-        headers,
-      });
+    //   const response = yield call(queryOrders, { supplierId });
+    //   const { headers } = response;
+    //   yield put({
+    //     type: 'save',
+    //     payload: response.data,
+    //     headers,
+    //   });
     },
     *fetchOpenReceipt({ orderId, receiptId, images, remarks, success, error }, { call, put }) {
       const res = yield call(openReceipt, { orderId, receiptId, images, remarks });
@@ -72,13 +72,13 @@ export default {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); }
 
-      const response = yield call(queryOrders, {});
-      const { headers } = response;
-      yield put({
-        type: 'save',
-        payload: response.data,
-        headers,
-      });
+    //   const response = yield call(queryOrders, {});
+    //   const { headers } = response;
+    //   yield put({
+    //     type: 'save',
+    //     payload: response.data,
+    //     headers,
+    //   });
     },
     *fetchDeliveryGoods({ data, success, error }, { call, put }) {
       const res = yield call(deliveryGood, { data });
@@ -86,13 +86,13 @@ export default {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); }
 
-      const response = yield call(queryOrders, {});
-      const { headers } = response;
-      yield put({
-        type: 'save',
-        payload: response.data,
-        headers,
-      });
+    //   const response = yield call(queryOrders, {});
+    //   const { headers } = response;
+    //   yield put({
+    //     type: 'save',
+    //     payload: response.data,
+    //     headers,
+    //   });
     },
     *fetchException({ orderId, supplierId, data, success, error }, { call, put }) {
       const res = yield call(submitException, { orderId, supplierId, data });
@@ -100,13 +100,13 @@ export default {
         if (typeof success === 'function') { success(res); }
       } else if (typeof error === 'function') { error(res); }
 
-      const response = yield call(queryOrders, {});
-      const { headers } = response;
-      yield put({
-        type: 'save',
-        payload: response.data,
-        headers,
-      });
+    //   const response = yield call(queryOrders, {});
+    //   const { headers } = response;
+    //   yield put({
+    //     type: 'save',
+    //     payload: response.data,
+    //     headers,
+    //   });
     },
     *fetchReturns({ offset, limit, params, success, error }, { call, put }) {
       const res = yield call(getReturnsOrders, { offset, limit, params });
