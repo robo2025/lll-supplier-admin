@@ -15,7 +15,18 @@ const formItemLayout2 = {
     labelCol: { span: 3 },
     wrapperCol: { span: 6 },
 };
+function getStanrdCatalog(data) {
+    data.forEach((val) => {
+        val.value = val.id;
+        val.label = val.category_name;
 
+        if (val.children && val.children.length > 0 && val.level < 3) {
+            getStanrdCatalog(val.children);
+        } else {
+            delete val.children;
+        }
+    });
+}
 @connect(({ loading, product, good }) => ({
     product,
     good,
@@ -67,6 +78,9 @@ export default class NewGood extends Component {
             offset: 0,
             limit: 6
         });
+        dispatch({
+            type: 'good/fetchLevel',
+        })
         if (args.mno) {
             dispatch({
                 type: 'good/fetchAassociatedProductDetail',
@@ -158,7 +172,7 @@ export default class NewGood extends Component {
 
     // 当商品列表数据改变时：分页
     handleProductTableChange = (pagination, filtersArg, sorter) => {
-        console.log(pagination,filtersArg,sorter,123456)
+        console.log(pagination, filtersArg, sorter, 123456)
         const { dispatch } = this.props;
         const { associationTableParams } = this.state;
         const params = {
@@ -209,22 +223,18 @@ export default class NewGood extends Component {
         const { associationTableParams } = this.state;
         form.validateFields((err, fieldsValue) => {
             if (err) return;
-            const createTime = {};
-            if (fieldsValue.create_time && fieldsValue.create_time.length > 0) {
-                createTime.created_start = fieldsValue.create_time[0].format('YYYY-MM-DD');
-                createTime.created_end = fieldsValue.create_time[1].format('YYYY-MM-DD');
+            const category = {};
+            if(fieldsValue.category&&fieldsValue.category.length > 0) {
+                category.category_id_1 = fieldsValue.category[0];
+                category.category_id_2 = fieldsValue.category[1];
+                category.category_id_3 = fieldsValue.category[2];
             }
             const values = {
                 ...fieldsValue,
-                ...createTime,
+                ...category,
             };
-
-            const {
-                mno,
-                partnumber,
-                created_start,
-                created_end,
-            } = values;
+            delete values.category;
+            console.log(values,1234566788);
             this.setState({
                 formValues: values,
                 associationTableParams: {
@@ -277,27 +287,32 @@ export default class NewGood extends Component {
 
     renderSimpleForm() {
         const { getFieldDecorator } = this.props.form;
+        const {good} = this.props;
+        const {level} = good;
+        getStanrdCatalog(level);
         return (
             <Form onSubmit={this.handleSearch} layout="inline">
                 <Row gutter={{ md: 8, lg: 8, xl: 16 }}>
-                    <Col xll={6} md={8} sm={24}>
+                    <Col xll={9} md={9} sm={24}>
                         <FormItem label="所属分类">
-                            {getFieldDecorator('catalog')(
+                            {getFieldDecorator('category')(
                                 <Cascader
-                                    options={[]}
-                                    placeholder="请您选择类目"
+                                style={{ width: 250 }}
+                                    options={level}
+                                    placeholder="请选择类目"
+                                    changeOnSelect
                                 />
                             )}
                         </FormItem>
                     </Col>
-                    <Col xll={6} md={8} sm={24}>
+                    <Col xll={8} md={8} sm={24}>
                         <FormItem label="产品型号">
                             {getFieldDecorator('partnumber')(
                                 <Input placeholder="请输入" />
                             )}
                         </FormItem>
                     </Col>
-                    <Col xll={6} md={8} sm={24}>
+                    <Col xll={7} md={7} sm={24}>
                         <FormItem label="品牌">
                             {getFieldDecorator('brand_name')(
                                 <Input placeholder="请输入" />
@@ -306,10 +321,10 @@ export default class NewGood extends Component {
                     </Col>
                 </Row>
                 <Row gutter={{ md: 8, lg: 8, xl: 16 }}>
-                    <Col xll={8} md={8} sm={24}>
+                    <Col xll={9} md={9} sm={24}>
                         <FormItem label="产品型号ID">
                             {getFieldDecorator('mno')(
-                                <Input placeholder="请输入" />
+                                <Input placeholder="请输入" style={{ width: 238 }}/>
                             )}
                         </FormItem>
                     </Col>
@@ -320,15 +335,13 @@ export default class NewGood extends Component {
                             )}
                         </FormItem>
                     </Col>
-                    <Col xll={8} md={8} sm={24}>
+                    <Col xll={7} md={7} sm={24}>
                         <FormItem label="是否已关联">
-                            {getFieldDecorator('Association', {
-                                initialValue: '全部',
-                            })(
-                                <Select placeholder="请选择" style={{ width: '100%' }}>
-                                    <Option value="0">全部</Option>
+                            {getFieldDecorator('has_goods')(
+                                <Select placeholder="请选择" style={{ width: 130 }}>
+                                    <Option value="">全部</Option>
                                     <Option value="1">是</Option>
-                                    <Option value="2">否</Option>
+                                    <Option value="0">否</Option>
                                 </Select>
                             )}
                         </FormItem>
@@ -350,9 +363,6 @@ export default class NewGood extends Component {
         const total = good.productTotal;
         const { getFieldDecorator } = this.props.form;
         const current = associationTableParams.offset + 1;
-        // console.log(associationTableParams);
-        // console.log('新建props和state', this.props.product, this.state);
-
         return (
             <PageHeaderLayout title="新增商品信息" >
                 <Card bordered={false} className={styles['new-good-wrap']}>

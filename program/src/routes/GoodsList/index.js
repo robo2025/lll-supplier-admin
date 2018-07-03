@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import qs from 'qs';
 import Cookies from 'js-cookie';
-import { Row, Upload, Col, Card, Form, Input, Checkbox, Select, Icon, Button, DatePicker, Modal, message } from 'antd';
+import { Row, Upload, Col, Card, Form, Input, Checkbox, Select, Icon, Button, DatePicker, Modal, message, Cascader } from 'antd';
 import GoodsTable from '../../components/StandardTable/GoodsTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import GoodCheckboxGroup from '../../components/Checkbox/GoodCheckboxGroup';
 import EditableTable from '../../components/CustomTable/EditTable';
 import ModelContent from './ModelContent';
 import { handleServerMsg, handleServerMsgObj, checkFile } from '../../utils/tools';
-import { PAGE_SIZE, SUCCESS_STATUS, FAIL_STATUS } from '../../constant/config';
+import { PAGE_SIZE, SUCCESS_STATUS, FAIL_STATUS,MAIN_URL } from '../../constant/config';
 import styles from './index.less';
 
 const FormItem = Form.Item;
@@ -19,6 +19,18 @@ const { RangePicker } = DatePicker;
 const plainOptions = ['gno', 'product_name', 'brand_name', 'english_name', 'partnumber', 'prodution_place', 'category', 'stock', 'price', 'supplier_name', 'min_buy', 'audit_status', 'publish_status', 'created_time'];// 所有选项
 const { TextArea } = Input;
 
+function getStanrdCatalog(data) {
+    data.forEach((val) => {
+        val.value = val.id;
+        val.label = val.category_name;
+
+        if (val.children && val.children.length > 0 && val.level < 3) {
+            getStanrdCatalog(val.children);
+        } else {
+            delete val.children;
+        }
+    });
+}
 // 商品列表
 @connect(({ loading, good }) => ({
     good,
@@ -57,8 +69,12 @@ export default class GoodsList extends Component {
     }
 
     componentDidMount() {
+        const { dispatch } = this.props;
         this.dispatchDefaultList();
         this.dispatchProductModelList({});
+        dispatch({
+            type: 'good/fetchLevel',
+        });
     }
 
 
@@ -155,7 +171,7 @@ export default class GoodsList extends Component {
         })
         dispatch({
             type: 'good/fetchAassociatedProduct',
-            offset,
+            offset:offset*limit,
             limit,
             params,
         });
@@ -168,18 +184,19 @@ export default class GoodsList extends Component {
 
     // 处理下载模板产品列表改变
     handleModelTableChange = (pagination, filtersArg, sorter) => {
+        const {downloadModalParams}  = this.state;
         const params = {
-            currentPage: pagination.current,
             pageSize: pagination.pageSize,
-            offset: (pagination.current - 1) * (pagination.pageSize),
+            offset: pagination.current - 1,
         };
         this.setState({
             downloadModalParams: {
-                offset: (pagination.current - 1) * (pagination.pageSize),
+                offset: pagination.current - 1,
                 limit: pagination.pageSize,
+                params:downloadModalParams.params,
             }
         })
-        this.dispatchProductModelList({ offset: params.offset, limit: params.pageSize });
+        this.dispatchProductModelList({ offset: params.offset, limit: params.pageSize,params:downloadModalParams.params });
     }
 
     // 是否显示modal
@@ -196,7 +213,7 @@ export default class GoodsList extends Component {
     }
 
     handleModelUploadChange = ({ file }) => {
-        const DOWNLOAD_URL = 'https://testapi.robo2025.com/scm-service/download';
+        const DOWNLOAD_URL = `${MAIN_URL}/scm-service/download`;
         if (file.status === 'done' && file.response) {
             const { data, msg, rescode } = file.response;
             if (rescode >> 0 === SUCCESS_STATUS) {
@@ -213,12 +230,11 @@ export default class GoodsList extends Component {
     }
 
     handleModelOk = () => {
-        // console.log('$ModelThis', this.$ModelThis, this.$ModelThis.state);
         const { modelList } = this.$ModelThis.state;
         const mnos = modelList.map(val => val.mno);
         if (mnos.length > 0) {
             this.setState({ isImportModal: false });
-            window.open(`https://testapi.robo2025.com/scm-service/goods/template?${qs.stringify({ mnos }, { indices: false })}`);
+            window.open(`${MAIN_URL}/scm-service/goods/template?${qs.stringify({ mnos }, { indices: false })}`);
         } else {
             this.setState({ isImportModal: false });
         }
@@ -404,24 +420,28 @@ export default class GoodsList extends Component {
         const { dispatch, form, history } = this.props;
         const { args } = this.state;
         form.validateFields((err, fieldsValue) => {
-            console.log(fieldsValue)
+            // console.log(fieldsValue, 'fieldValues')
             if (err) return;
             const createTime = {};
             if (fieldsValue.create_time && fieldsValue.create_time.length > 0) {
                 createTime.created_start = fieldsValue.create_time[0].format('YYYY-MM-DD');
                 createTime.created_end = fieldsValue.create_time[1].format('YYYY-MM-DD');
             }
+
+            const categoryId = {};
+            if (fieldsValue.category && fieldsValue.category.length > 0) {
+                categoryId.category_id_1 = fieldsValue.category[0];
+                categoryId.category_id_2 = fieldsValue.category[1];
+                categoryId.category_id_3 = fieldsValue.category[2];
+            }
             const values = {
                 ...fieldsValue,
                 ...createTime,
+                ...categoryId
             };
+            delete values.create_time;
+            delete values.category;
             this.setState({ searchValues: values });
-            const {
-                gno,
-                created_start,
-                created_end,
-            }
-                = values;
             this.setState({
                 formValues: values,
                 args: { page: 1, pageSize: args.pageSize }
@@ -440,57 +460,44 @@ export default class GoodsList extends Component {
     }
     renderSimpleForm() {
         const { getFieldDecorator } = this.props.form;
+        const { good } = this.props;
+        const { level } = good;
+        getStanrdCatalog(level);
         return (
             <Form onSubmit={this.handleSearch} layout="inline">
                 <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-                    <Col xll={4} md={6} sm={24}>
-                        <FormItem label="商品ID编号">
+                    <Col xxl={7} md={12} sm={24} lg={12}>
+                        <FormItem label="所属分类">
+                            {getFieldDecorator('category', )(
+                                <Cascader
+                                    options={level}
+                                    placeholder="请选择类目"
+                                    changeOnSelect
+                                />
+                            )}
+                        </FormItem>
+                    </Col>
+                    <Col xxl={6} md={12} sm={24} lg={12}>
+                        <FormItem label="商品ID">
                             {getFieldDecorator('gno')(
                                 <Input placeholder="请输入" />
                             )}
                         </FormItem>
                     </Col>
-                    <Col xll={4} md={6} sm={24}>
-                        <FormItem label="审核状态">
-                            {getFieldDecorator('audit_status')(
-                                <Select placeholder="请选择" style={{ width: '100%' }}>
-                                    <Option value="0">待审核</Option>
-                                    <Option value="1">审核通过</Option>
-                                    <Option value="2">审核不通过</Option>
-                                </Select>
-                            )}
-                        </FormItem>
-                    </Col>
-                    <Col xll={4} md={6} sm={24}>
-                        <FormItem label="上下架状态">
-                            {getFieldDecorator('publish_status')(
-                                <Select placeholder="请选择" style={{ width: '100%' }}>
-                                    <Option value="">全部</Option>
-                                    <Option value="0">下架中</Option>
-                                    <Option value="1">上架中</Option>
-                                </Select>
-                            )}
-                        </FormItem>
-                    </Col>
-                    <Col xll={4} md={6} sm={24}>
-                        <FormItem label="佣金比率">
-                            {getFieldDecorator('yj')(
+                    <Col xxl={6} md={12} sm={24} lg={12}>
+                        <FormItem label="商品名称">
+                            {getFieldDecorator('product_name')(
                                 <Input placeholder="请输入" />
                             )}
                         </FormItem>
                     </Col>
-                    <Col xll={4} md={8} sm={24}>
-                        <FormItem label="价格">
-                            {getFieldDecorator('price')(
-                                <InputGroup>
-                                    <Input style={{ width: 80, textAlign: 'center' }} placeholder="最低价" />
-                                    <Input style={{ width: 30, borderLeft: 0, pointerEvents: 'none', backgroundColor: '#fff' }} placeholder="~" disabled />
-                                    <Input style={{ width: 80, textAlign: 'center', borderLeft: 0 }} placeholder="最高价" />
-                                </InputGroup>
+                    <Col xxl={5} md={12} sm={24} lg={12}>
+                        <FormItem label="品牌">
+                            {getFieldDecorator('brand_name')(
+                                <Input placeholder="请输入" />
                             )}
                         </FormItem>
                     </Col>
-
                 </Row>
                 <div style={{ overflow: 'hidden' }}>
                     <span style={{ float: 'right', marginBottom: 24 }}>
@@ -506,20 +513,51 @@ export default class GoodsList extends Component {
     }
     renderAdvancedForm() {
         const { getFieldDecorator } = this.props.form;
+        const { good } = this.props;
+        const { level } = good;
+        getStanrdCatalog(level);
         return (
             <Form onSubmit={this.handleSearch} layout="inline">
                 <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-                    <Col xll={4} md={6} sm={24}>
-                        <FormItem label="商品ID编号">
+                    <Col xxl={7} md={12} sm={24} lg={12}>
+                        <FormItem label="所属分类">
+                            {getFieldDecorator('category', )(
+                                <Cascader
+                                    options={level}
+                                    placeholder="请选择类目"
+                                    changeOnSelect
+                                />
+                            )}
+                        </FormItem>
+                    </Col>
+                    <Col xxl={6} md={12} sm={24} lg={12}>
+                        <FormItem label="商品ID">
                             {getFieldDecorator('gno')(
                                 <Input placeholder="请输入" />
                             )}
                         </FormItem>
                     </Col>
-                    <Col xll={4} md={6} sm={24}>
+                    <Col xxl={6} md={12} sm={24} lg={12}>
+                        <FormItem label="商品名称">
+                            {getFieldDecorator('product_name')(
+                                <Input placeholder="请输入" />
+                            )}
+                        </FormItem>
+                    </Col>
+                    <Col xxl={5} md={12} sm={24} lg={12}>
+                        <FormItem label="品牌">
+                            {getFieldDecorator('brand_name')(
+                                <Input placeholder="请输入" />
+                            )}
+                        </FormItem>
+                    </Col>
+                </Row>
+                <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+                    <Col xxl={7} md={12} sm={24} lg={12}>
                         <FormItem label="审核状态">
                             {getFieldDecorator('audit_status')(
                                 <Select placeholder="请选择" style={{ width: '100%' }}>
+                                    <Option value="">全部</Option>
                                     <Option value="0">待审核</Option>
                                     <Option value="1">审核通过</Option>
                                     <Option value="2">审核不通过</Option>
@@ -527,7 +565,7 @@ export default class GoodsList extends Component {
                             )}
                         </FormItem>
                     </Col>
-                    <Col xll={4} md={6} sm={24}>
+                    <Col xxl={6} md={12} sm={24} lg={12}>
                         <FormItem label="上下架状态">
                             {getFieldDecorator('publish_status')(
                                 <Select placeholder="请选择" style={{ width: '100%' }}>
@@ -538,62 +576,17 @@ export default class GoodsList extends Component {
                             )}
                         </FormItem>
                     </Col>
-                    <Col xll={4} md={6} sm={24}>
-                        <FormItem label="佣金比率">
-                            {getFieldDecorator('yj')(
-                                <Input placeholder="请输入" />
-                            )}
-                        </FormItem>
-                    </Col>
-                    <Col xll={4} md={8} sm={24}>
-                        <FormItem label="价格">
-                            {getFieldDecorator('price')(
-                                <InputGroup>
-                                    <Input style={{ width: 80, textAlign: 'center' }} placeholder="最低价" />
-                                    <Input style={{ width: 30, borderLeft: 0, pointerEvents: 'none', backgroundColor: '#fff' }} placeholder="~" disabled />
-                                    <Input style={{ width: 80, textAlign: 'center', borderLeft: 0 }} placeholder="最高价" />
-                                </InputGroup>
-                            )}
-                        </FormItem>
-                    </Col>
-                </Row>
-                <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-                    <Col xll={4} md={6} sm={24}>
-                        <FormItem label="商品名称">
-                            {getFieldDecorator('good_name')(
-                                <Input placeholder="请输入" />
-                            )}
-                        </FormItem>
-                    </Col>
-                    <Col xll={4} md={6} sm={24}>
-                        <FormItem label="型号">
-                            {getFieldDecorator('model')(
-                                <Input placeholder="请输入" />
-                            )}
-                        </FormItem>
-                    </Col>
-                    <Col xll={4} md={6} sm={24}>
-                        <FormItem label="品牌">
-                            {getFieldDecorator('brand_name')(
-                                <Input placeholder="请输入" />
-                            )}
-                        </FormItem>
-                    </Col>
-                    <Col xll={4} md={6} sm={24}>
-                        <FormItem label="所属类目">
-                            {getFieldDecorator('cata')(
-                                <Select placeholder="请选择" style={{ width: '100%' }}>
-                                    <Option value="0">未知</Option>
-                                    <Option value="1">未知</Option>
-                                    <Option value="1">未知</Option>
-                                </Select>
-                            )}
-                        </FormItem>
-                    </Col>
-                    <Col xll={4} md={10} sm={24}>
+                    <Col xxl={6} md={12} sm={24} lg={12}>
                         <FormItem label="产品提交日期">
                             {getFieldDecorator('create_time')(
                                 <RangePicker onChange={this.onDatepickerChange} />
+                            )}
+                        </FormItem>
+                    </Col>
+                    <Col xxl={5} md={12} sm={24} lg={12}>
+                        <FormItem label="产地">
+                            {getFieldDecorator('registration_place')(
+                                <Input placeholder="请输入" />
                             )}
                         </FormItem>
                     </Col>
@@ -616,10 +609,14 @@ export default class GoodsList extends Component {
     }
     render() {
         const { loading, good, productModel } = this.props;
-        const { selectedRows, isShowPriceSettingModal, isShowExportModal, prices, isImportModal, args } = this.state;
+        const { selectedRows, isShowPriceSettingModal, isShowExportModal, prices, isImportModal, args,downloadModalParams } = this.state;
         const data = good.list;
+        const { level } = good;
+        getStanrdCatalog(level);
         const page = parseInt(args.page);
         const pageSize = parseInt(args.pageSize);
+        const current = parseInt(downloadModalParams.offset+1);
+        const currentPageSize = parseInt(downloadModalParams.limit);
         return (
             <PageHeaderLayout title="商品列表">
                 <Card bordered={false} className={styles['search-wrap']} title="搜索条件">
@@ -637,7 +634,7 @@ export default class GoodsList extends Component {
                                 <Upload
                                     className={styles.upload}
                                     name="file"
-                                    action="https://testapi.robo2025.com/scm-service/goods/template"
+                                    action={`${MAIN_URL}/scm-service/goods/template`}
                                     headers={{
                                         Authorization: Cookies.get('access_token') || 'null',
                                     }}
@@ -731,8 +728,11 @@ export default class GoodsList extends Component {
                         onOk={this.handleModelOk}
                     >
                         <ModelContent
+                            level={level}
                             dataSource={good.products}
                             total={good.productTotal}
+                            current={current}
+                            pageSize={currentPageSize}
                             loading={loading.models.good}
                             onModelTableChange={this.handleModelTableChange}
                             bindModelThis={this.bindModelThis}
