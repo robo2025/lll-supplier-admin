@@ -282,7 +282,7 @@ export default class GoodsList extends Component {
             val.gno === gno
         ));
         this.setState({
-            prices: selectedGood[0].prices.sort((a, b) => a.min_quantity - b.min_quantity),
+            prices: selectedGood[0].prices.sort((a, b) =>   b.min_quantity - a.min_quantity),
             isShowPriceSettingModal: true,
             gno,
         });
