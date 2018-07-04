@@ -62,10 +62,10 @@ export function logout() {
 
 // 登录操作
 export function login() {
-  window.location.href = `${LOGIN_URL}?next=${encodeURIComponent(VERIFY_PAGE)}`;
+  window.location.href = `${LOGIN_URL}?next=${encodeURIComponent(VERIFY_PAGE)}&from=supplier`;
 }
 
 
 export function jumpToLogin() {
-  window.location.href = `${LOGIN_URL}?next=${encodeURIComponent(VERIFY_PAGE)}&disable_redirect=1`;
+  window.location.href = `${LOGIN_URL}?next=${encodeURIComponent(VERIFY_PAGE)}&disable_redirect=1&from=supplier`;
 }

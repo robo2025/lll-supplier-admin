@@ -19,7 +19,6 @@ function getStanrdCatalog(data) {
     data.forEach((val) => {
         val.value = val.id;
         val.label = val.category_name;
-
         if (val.children && val.children.length > 0 && val.level < 3) {
             getStanrdCatalog(val.children);
         } else {
@@ -306,7 +305,7 @@ export default class NewGood extends Component {
                         </FormItem>
                     </Col>
                     <Col xll={8} md={8} sm={24}>
-                        <FormItem label="产品型号">
+                        <FormItem label="型号">
                             {getFieldDecorator('partnumber')(
                                 <Input placeholder="请输入" />
                             )}
@@ -329,7 +328,7 @@ export default class NewGood extends Component {
                         </FormItem>
                     </Col>
                     <Col xll={8} md={8} sm={24}>
-                        <FormItem label="产品名称">
+                        <FormItem label="商品名称">
                             {getFieldDecorator('product_name')(
                                 <Input placeholder="请输入" />
                             )}
