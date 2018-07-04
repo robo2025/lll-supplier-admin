@@ -205,8 +205,6 @@ export default class NewGoodForm extends Component {
                 ));
             }
         }
-
-        console.log('新建页面表单', args.origin_prdId);
         return (
             <div className={styles['good-info-wrap']} >
                 {/* 产品主要属性 */}
@@ -290,7 +288,6 @@ export default class NewGoodForm extends Component {
                         >
                             {getFieldDecorator('min_buy', {
                                 rules: [{
-                                    required: true,
                                     message: '请输入数值',
                                 }, {
                                     pattern: /^(\d+)$/,
@@ -298,9 +295,9 @@ export default class NewGoodForm extends Component {
                                 },{
                                     validator:this.handleMinBuy
                                 }],
-                                initialValue: data.min_buy >> 0,
+                                initialValue: data.min_buy >> 0 || 1,
                             })(
-                                <Input type="number" />
+                                <Input type="number"  min={1}/>
                             )}
                         </FormItem>
                         <FormItem

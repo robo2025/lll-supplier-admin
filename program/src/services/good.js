@@ -180,3 +180,12 @@ export async function exportGood({ fields }) {
     },
   });
 }
+// 获取分类数据
+export async function queryCatalogLevel({ pid = 0 }) {
+    const acessToken = Cookies.get('access_token');
+    return lyRequest(`${API_URL}/supplier/product_categories/level_selection?pid=${pid}`, {
+      headers: {
+        Authorization: acessToken,
+      },
+    });  
+  }

@@ -482,7 +482,7 @@ class SolutionPriceQuotation extends React.Component {
     if (!customer) {
       return <Spin />;
     }
-    const { sln_basic_info, sln_user_info } = customer;
+    const { sln_basic_info, sln_user_info, sewage_info } = customer;
     const {
       deviceListModalVisibal,
       coreDeviceListData,
@@ -655,6 +655,7 @@ class SolutionPriceQuotation extends React.Component {
             columns={coreDeviceTableColumns}
             dataSource={coreDeviceListData}
             pagination={false}
+            footer={() => (sewage_info ? <span style={{ color: 'red' }}>注（常规指标）：{sewage_info.general_norm}</span> : null)}
           />
         </Card>
         <Card

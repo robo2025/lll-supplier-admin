@@ -219,7 +219,9 @@ const DeliveryModal = Form.create()((props) => {
                 wrapperCol={{ span: 12 }}
                 label="送货人"
               >
-                {form.getFieldDecorator('sender')(<Input placeholder="请输入" />)}
+                {form.getFieldDecorator('sender')(
+                  <Input placeholder="请输入" />
+                )}
               </FormItem>
             </Col>
           </Row>
@@ -255,8 +257,14 @@ class SolutionOrderList extends React.Component {
     this.props.dispatch({
       type: 'solutionOrders/fetch',
       payload: {
-        start_time: rangeValue && rangeValue.length ? rangeValue[0].format('YYYY-MM-DD') : null,
-        end_time: rangeValue && rangeValue.length ? rangeValue[1].format('YYYY-MM-DD') : null,
+        start_time:
+          rangeValue && rangeValue.length
+            ? rangeValue[0].format('YYYY-MM-DD')
+            : null,
+        end_time:
+          rangeValue && rangeValue.length
+            ? rangeValue[1].format('YYYY-MM-DD')
+            : null,
         ...fieldsValue,
       },
     });
@@ -276,8 +284,14 @@ class SolutionOrderList extends React.Component {
       const rangeValue = fieldsValue['range-picker'];
       const { plan_order_sn, status, plan_name, plan_pay_status } = fieldsValue;
       const values = {
-        start_time: rangeValue && rangeValue.length ? rangeValue[0].format('YYYY-MM-DD') : null,
-        end_time: rangeValue && rangeValue.length ? rangeValue[1].format('YYYY-MM-DD') : null,
+        start_time:
+          rangeValue && rangeValue.length
+            ? rangeValue[0].format('YYYY-MM-DD')
+            : null,
+        end_time:
+          rangeValue && rangeValue.length
+            ? rangeValue[1].format('YYYY-MM-DD')
+            : null,
         plan_order_sn,
         status,
         plan_name,
@@ -295,6 +309,8 @@ class SolutionOrderList extends React.Component {
     });
   };
   handlePrepare = (plan_order_sn) => {
+    const fieldsValue = this.props.form.getFieldsValue();
+    const rangeValue = fieldsValue['range-picker'];
     this.props.dispatch({
       type: 'solutionOrders/handlePrepare',
       payload: { plan_order_sn },
@@ -303,6 +319,17 @@ class SolutionOrderList extends React.Component {
           message.success(data);
           this.props.dispatch({
             type: 'solutionOrders/fetch',
+            payload: {
+              start_time:
+                rangeValue && rangeValue.length
+                  ? rangeValue[0].format('YYYY-MM-DD')
+                  : null,
+              end_time:
+                rangeValue && rangeValue.length
+                  ? rangeValue[1].format('YYYY-MM-DD')
+                  : null,
+              ...fieldsValue,
+            },
           });
         } else {
           message.error(data);
@@ -315,7 +342,7 @@ class SolutionOrderList extends React.Component {
       modalVisible: flag,
     });
   };
-  handleDelivery=(fieldsValue, plan_order_sn) => {
+  handleDelivery = (fieldsValue, plan_order_sn) => {
     this.setState({ modalVisible: false });
     this.props.dispatch({
       type: 'solutionOrders/handleDelivery',
@@ -326,12 +353,13 @@ class SolutionOrderList extends React.Component {
           this.props.dispatch({
             type: 'solutionOrders/fetch',
           });
+          this.props.form.resetFields();
         } else {
           message.error(data);
         }
       },
     });
-  }
+  };
   showDeliveryModal = (plan_order_sn) => {
     this.setState({ modalVisible: true });
     this.props.dispatch({
@@ -495,9 +523,7 @@ class SolutionOrderList extends React.Component {
                 </Col>
                 <Col xll={4} md={8} sm={24}>
                   <FormItem label="创建时间">
-                    {getFieldDecorator('range-picker')(
-                      <RangePicker />
-                    )}
+                    {getFieldDecorator('range-picker')(<RangePicker />)}
                   </FormItem>
                 </Col>
               </Row>

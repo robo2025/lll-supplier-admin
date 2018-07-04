@@ -128,6 +128,14 @@ class CustomerOrder extends React.Component {
                       </a>
                     </Description>
                   );
+                } else if (item.file_type === 'doc') {
+                  return (
+                    <Description term="附件">
+                      <a href={item.file_url} key={item.id} target="_blank">
+                        {item.file_name}
+                      </a>
+                    </Description>
+                  );
                 }
                 return <div style={{ display: 'none' }} />;
               })}
