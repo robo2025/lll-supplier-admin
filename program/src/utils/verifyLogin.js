@@ -5,7 +5,7 @@ import { LOGIN_URL, NEXT_URL } from '../constant/config';
 export function verifyLogin() {
   if (!Cookies.get('access_token')) {
     console.log('用户未登录');
-    window.location.href = `${LOGIN_URL}?next=${NEXT_URL}`;
+    window.location.href = `${LOGIN_URL}?next=${NEXT_URL}&from=supplier`;
   } else {
     console.log('用户已登录', Cookies.get('access_token'));
   }

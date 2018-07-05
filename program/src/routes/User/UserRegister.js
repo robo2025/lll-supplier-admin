@@ -410,14 +410,14 @@ export default class UserRegister extends Component {
       >
         <Card title="基本信息" bordered={false} className={styles['register-wrap']}>
           <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
-            <FormItem {...formItemLayout} label="用户名">
+            <FormItem {...formItemLayout} label="登录用户名">
               {
                 getFieldDecorator('username', {
                   rules: [{
                     required: true,
-                    message: '请输入用户名',
+                    message: '请输入登录用户名',
                   }],
-                })(<Input placeholder="请输入用户名" />)
+                })(<Input placeholder="请输入登录用户名" />)
               }
             </FormItem>
             <FormItem {...formItemLayout} label="密码" help={this.state.help}>
