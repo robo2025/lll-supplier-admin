@@ -10,7 +10,7 @@ export function verifyLogin() {
     const accessToken = paramas.access_token.split('#/')[0];
     Cookies.set('access_token', accessToken, { expires: 7 });
   } else {
-    window.location.href = `${LOGIN_URL}?next=${VERIFY_PAGE}`;
+    window.location.href = `${LOGIN_URL}?next=${VERIFY_PAGE}&from=supplier`;
   }
   // 读取cookie，如果没有access_token,则跳转到登录页面
   /* if (!Cookies.get('access_token')) {
