@@ -188,7 +188,7 @@ const DeliveryModal = Form.create()((props) => {
               <FormItem
                 labelCol={{ span: 6 }}
                 wrapperCol={{ span: 12 }}
-                label="物流编号"
+                label="物流单号"
               >
                 {form.getFieldDecorator('logistics_number', {
                   rules: [
