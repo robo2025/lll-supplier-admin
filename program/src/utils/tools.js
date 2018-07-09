@@ -8,8 +8,12 @@ export function verifyLogin() {
   /* 判断url是否有access_token,如果有则将其存储到cookie */
   if (paramas.access_token) {
     const accessToken = paramas.access_token.split('#/')[0];
-    Cookies.set('access_token', accessToken, { expires: 7, path: '/', domain: '.robo2025.com' });
-  } else {
+    if (location.host.indexOf('robo2025') !== -1) {
+      Cookies.set('access_token', accessToken, { expires: 7, path: '/', domain: '.robo2025.com' });
+    } else {
+      Cookies.set('access_token', accessToken);
+    } 
+} else {
     window.location.href = `${LOGIN_URL}?next=${VERIFY_PAGE}&from=supplier`;
   }
   // 读取cookie，如果没有access_token,则跳转到登录页面
