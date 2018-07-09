@@ -173,7 +173,6 @@ class SolutionDetail extends React.Component {
               dataSource={coreDeviceTableData.map((item) => {
                 return { ...item, key: item.device_id };
               })}
-              footer={() => (sewage_info ? <span style={{ color: 'red' }}>注（常规指标）：{sewage_info.general_norm}</span> : null)}
               pagination={false}
             />
           </Card>

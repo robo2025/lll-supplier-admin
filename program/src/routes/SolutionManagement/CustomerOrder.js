@@ -59,6 +59,7 @@ class CustomerOrder extends React.Component {
       return <Spin />;
     }
     const {
+      sln_basic_info,
       sln_user_info,
       sln_device,
       welding_info,
@@ -160,7 +161,7 @@ class CustomerOrder extends React.Component {
             dataSource={sln_device.map((item) => {
               return { ...item, key: item.device_id };
             })}
-            footer={() => (sewage_info ? <span style={{ color: 'red' }}>注（常规指标）：{sewage_info.general_norm}</span> : null)}
+            footer={() => (sln_basic_info ? <span style={{ color: 'red' }}>注：{sln_basic_info.sln_msg + '平台未匹配到适合的传感器 '}</span> : null)}
           />
           <div className={styles.tabelFooter}>
             核心设备价格：
