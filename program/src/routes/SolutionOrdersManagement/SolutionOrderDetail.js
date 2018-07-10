@@ -18,7 +18,13 @@ const Tablefooter = (props) => {
       title={<span style={{ fontSize: 16 }}>技术支持</span>}
     >
       {sln_support.map(item => (
-        <Description term={item.name}>￥{item.price}元{item.note !== '' ? <span style={{ marginLeft: 8 }}>备注：{item.note}</span> : ''}</Description>
+        <Description term={item.name}>
+          ￥{item.price}元{item.note !== '' ? (
+            <span style={{ marginLeft: 8 }}>备注：{item.note}</span>
+          ) : (
+            ''
+          )}
+        </Description>
       ))}
     </DescriptionList>
   );
@@ -54,7 +60,7 @@ const logisticsColumns = [
     dataIndex: 'logistics_number',
     key: 'logistics_number',
   },
-  
+
   {
     title: '送货人',
     dataIndex: 'sender',
@@ -200,7 +206,7 @@ class SolutionOrderDetail extends React.Component {
               <DescriptionList size="small" col="4">
                 <Description term="首款">{pay_info[0].pay_ratio} %</Description>
                 <Description term="金额">
-                  ￥{order_info.total_money * (pay_info[0].pay_ratio / 100)}
+                  ￥{pay_info[0].pay_amount}
                 </Description>
                 <Description term="支付状态">
                   {pay_info[0].status === 2 ? '已支付' : '未支付'}
@@ -210,11 +216,9 @@ class SolutionOrderDetail extends React.Component {
                   // 1为已支付，2为未支付
                   }
                 </Description>
-                <Description term="尾款">
-                  {pay_info[1].pay_ratio} %
-                </Description>
+                <Description term="尾款">{pay_info[1].pay_ratio} %</Description>
                 <Description term="金额">
-                  ￥{order_info.total_money * (pay_info[1].pay_ratio / 100)}
+                  ￥{pay_info[1].pay_amount}
                 </Description>
                 <Description term="支付状态">
                   {pay_info[1].status === 2 ? '已支付' : '未支付'}
