@@ -3,7 +3,7 @@ const sln_config = {
     welding_metal: '母材',
     welding_gas: '气体成分',
     welding_method: '焊接方法',
-    max_height: '板材厚度',
+    max_height: '板厚',
     welding_efficiency: '生产效率',
     welding_splash: '飞溅',
     welding_model: '成型',
