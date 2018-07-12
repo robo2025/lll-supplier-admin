@@ -591,6 +591,15 @@ export default class GoodsList extends Component {
                         </FormItem>
                     </Col>
                 </Row>
+                <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+                <Col xxl={5} md={12} sm={24} lg={12}>
+                        <FormItem label="型号">
+                            {getFieldDecorator('partnumber')(
+                                <Input placeholder="请输入" />
+                            )}
+                        </FormItem>
+                    </Col>
+                </Row>
                 <div style={{ overflow: 'hidden' }}>
                     <span style={{ float: 'right', marginBottom: 24 }}>
                         <Button type="primary" htmlType="submit">查询</Button>
