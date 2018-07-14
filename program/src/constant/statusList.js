@@ -126,7 +126,11 @@ const SLN_PAY_STATUS = {
   3: '已全部支付',
   4: '订单已取消',
 };
-
+// 入库操作类型
+const STOCK_OPERATION_TYPE = {
+    I:"入库",
+    O:"调拨"
+}
 export {
   ACTION_STATUS,
   ACTION_FLAG,
@@ -142,4 +146,5 @@ export {
   AUDIT_STATUS,
   PUBLISH_STATUS,
   SLN_PAY_STATUS,
+  STOCK_OPERATION_TYPE
 };

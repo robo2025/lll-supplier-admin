@@ -77,6 +77,21 @@ const menuData = [
       },
     ],
   },
+  {
+    name: '库存管理',
+    path: 'stockManagement',
+    icon: 'api',
+    children: [
+      {
+        name: '商品库存列表',
+        path: 'goodsStockList',
+      },
+      {
+        name: '出入库记录',
+        path: 'GoodsInOutList',
+      },
+    ],
+  }
 ];
 
 function formatter(data, parentPath = '/', parentAuthority) {

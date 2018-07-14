@@ -69,7 +69,8 @@ export const IMAGE_TYPES = ['jpg', 'png', 'gif', 'jpeg'];
 // 分页：每页显示多少记录
 export const PAGE_SIZE = 10;
 
-
+// 供应商商品库存列表
+export const STOCKLIST_URL="//testapi.robo2025.com/stock";
 // 接口请求状态码
 export const SUCCESS_STATUS = 10000; // 操作成功
 export const FAIL_STATUS = 10001; // 操作失败

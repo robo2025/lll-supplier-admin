@@ -156,6 +156,12 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, ['solutionOrders'], () => import('../routes/SolutionOrdersManagement/SolutionOrderDetail')),
       name: '方案订单详情',
     },
+    '/stockManagement/goodsStockList': {
+        component: dynamicWrapper(app, ['stock'], () => import('../routes/StockManagement/GoodsStockList'))
+    },
+    '/stockManagement/GoodsInOutList':{
+        component: dynamicWrapper(app,['stock'],()=>import('../routes/StockManagement/GoodsInOutList'))
+    },
   };
 
   // Get name from ./menu.js or just set it in the router data.
