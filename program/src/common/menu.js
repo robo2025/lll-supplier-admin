@@ -69,6 +69,7 @@ const menuData = [
     name: '方案订单管理',
     icon: 'file-text',
     path: 'solutionOrders',
+    authority: '2',
     children: [
       {
         name: '方案订单列表',
@@ -91,6 +92,11 @@ const menuData = [
         path: 'GoodsInOutList',
       },
     ],
+  },
+  {
+    name: '企业信息',
+    icon: 'file-text',
+    path: 'setting/userInfo',
   },
 ];
 
