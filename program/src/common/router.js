@@ -72,31 +72,6 @@ export const getRouterData = (app) => {
     '/': {
       component: dynamicWrapper(app, ['user'], () => import('../layouts/BasicLayout')),
     },
-    '/exception/403': {
-      component: dynamicWrapper(app, [], () => import('../routes/Exception/403')),
-    },
-    '/exception/404': {
-      component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),
-    },
-    '/exception/500': {
-      component: dynamicWrapper(app, [], () => import('../routes/Exception/500')),
-    },
-    '/exception/trigger': {
-      component: dynamicWrapper(app, ['error'], () => import('../routes/Exception/triggerException')),
-    },
-    '/user': {
-      component: dynamicWrapper(app, [], () => import('../layouts/UserLayout')),
-    },
-    '/prsp': {
-      component: dynamicWrapper(app, [], () => import('../layouts/PRSPLayout')),
-    },
-    '/prsp/register': {
-      component: dynamicWrapper(app, ['upload', 'user'], () => import('../routes/User/UserRegister')),
-    },
-    '/setting/userinfo': {
-      component: dynamicWrapper(app, ['upload', 'user'], () => import('../routes/Setting/SupplierInfo')),
-      name: '企业信息审核',
-    },
     '/goods/list': {
       component: dynamicWrapper(app, ['good', 'product'], () => import('../routes/GoodsList')),
     },
@@ -157,11 +132,37 @@ export const getRouterData = (app) => {
       name: '方案订单详情',
     },
     '/stockManagement/goodsStockList': {
-        component: dynamicWrapper(app, ['stock'], () => import('../routes/StockManagement/GoodsStockList'))
+        component: dynamicWrapper(app, ['stock'], () => import('../routes/StockManagement/GoodsStockList')),
     },
-    '/stockManagement/GoodsInOutList':{
-        component: dynamicWrapper(app,['stock'],()=>import('../routes/StockManagement/GoodsInOutList'))
+    '/stockManagement/GoodsInOutList': {
+        component: dynamicWrapper(app, ['stock'], () => import('../routes/StockManagement/GoodsInOutList')),
     },
+    '/exception/403': {
+      component: dynamicWrapper(app, [], () => import('../routes/Exception/403')),
+    },
+    '/exception/404': {
+      component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),
+    },
+    '/exception/500': {
+      component: dynamicWrapper(app, [], () => import('../routes/Exception/500')),
+    },
+    '/exception/trigger': {
+      component: dynamicWrapper(app, ['error'], () => import('../routes/Exception/triggerException')),
+    },
+    '/user': {
+      component: dynamicWrapper(app, [], () => import('../layouts/UserLayout')),
+    },
+    '/prsp': {
+      component: dynamicWrapper(app, [], () => import('../layouts/PRSPLayout')),
+    },
+    '/prsp/register': {
+      component: dynamicWrapper(app, ['upload', 'user'], () => import('../routes/User/UserRegister')),
+    },
+    '/setting/userinfo': {
+      component: dynamicWrapper(app, ['upload', 'user'], () => import('../routes/Setting/SupplierInfo')),
+      name: '企业信息审核',
+    },
+    
   };
 
   // Get name from ./menu.js or just set it in the router data.

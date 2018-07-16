@@ -5,27 +5,25 @@ import { LOGIN_URL, HOME_PAGE, VERIFY_PAGE } from '../constant/config';
 export function verifyLogin() {
   const { href } = window.location;
   const paramas = queryString.parse(href);
-  /* 判断url是否有access_token,如果有则将其存储到cookie */
-  if (paramas.access_token) {
+  const token = Cookies.get('access_token');
+  if (token) {
+    window.location.href = HOME_PAGE;
+  } else if (paramas.access_token) {
+    /* 判断url是否有access_token,如果有则将其存储到cookie */
     const accessToken = paramas.access_token.split('#/')[0];
     if (location.host.indexOf('robo2025') !== -1) {
-      Cookies.set('access_token', accessToken, { expires: 7, path: '/', domain: '.robo2025.com' });
+      Cookies.set('access_token', accessToken, {
+        expires: 7,
+        path: '/',
+        domain: '.robo2025.com'
+      });
     } else {
       Cookies.set('access_token', accessToken);
-    } 
+    }
     window.location.href = HOME_PAGE;
-} else {
+  } else {
     window.location.href = `${LOGIN_URL}?next=${VERIFY_PAGE}&from=supplier`;
   }
-  // 读取cookie，如果没有access_token,则跳转到登录页面
-  /* if (!Cookies.get('access_token')) {
-    console.log('用户未登录');
-    // window.location.href = REGISTER_URL + '?next='+ LOGIN_URL + "?next=" + NEXT_URL;
-    window.location.href = LOGIN_URL + '?next=' + NEXT_URL;
-  } else {
-    console.log('用户已登录',Cookies.get('access_token'));
-    // window.location.href = HOME_PAGE;
-  } */
 }
 
 // 未登录状态跳转到验证页面
@@ -44,7 +42,7 @@ export const queryString = {
     if (url.split('?').length > 1) {
       argStr = url.split('?')[1];
       const argArr = argStr.split('&');
-      argArr.forEach((val) => {
+      argArr.forEach(val => {
         const args = val.split('=');
         if (args.length > 1) {
           parseObj[args[0]] = args[1];
@@ -60,14 +58,13 @@ export const queryString = {
       return '';
     }
     let queryStr = '';
-    Object.keys(params).forEach((key) => {
+    Object.keys(params).forEach(key => {
       queryStr += `${key}=${params[key] || ''}&`;
     });
     console.log('queryString---', queryStr);
     return queryStr.substring(0, queryStr.length - 1);
-  },
+  }
 };
-
 
 /**
  * 验证文件后缀是否符合要求
@@ -79,7 +76,6 @@ export function checkFile(fileName, fileNameArr) {
   return new RegExp(partter, 'i').test(fileName);
 }
 
-
 // 时间戳转年月日时分秒
 export function timeStampToDate(timeStamp) {
   const date = new Date(timeStamp);
@@ -90,11 +86,15 @@ export function timeStampToDate(timeStamp) {
     week: date.getDay(),
     H: date.getHours(),
     M: date.getMinutes(),
-    S: date.getSeconds(),
+    S: date.getSeconds()
   };
-  return { ...time, timeStr: `${time.year}-${time.month}-${time.day} ${time.H}:${time.M}:${time.S}` };
+  return {
+    ...time,
+    timeStr: `${time.year}-${time.month}-${time.day} ${time.H}:${time.M}:${
+      time.S
+    }`
+  };
 }
-
 
 // 获取文件的后缀名
 export function getFileSuffix(filename) {
@@ -108,10 +108,11 @@ export function getCategoryStr(category) {
     throw new Error('参数必须是一个json对象');
   }
   categoryStr += `-${category.category_name}`;
-  if (category.children) { getCategoryStr(category.children); }
+  if (category.children) {
+    getCategoryStr(category.children);
+  }
   return categoryStr;
 }
-
 
 /**
  * 根据指定key替换数组中的的某一个对象
@@ -130,7 +131,7 @@ export function replaceObjFromArr(obj, arr, key) {
     throw new Error('传参必须是数组');
   }
   let isExist = false;
-  const newArr = arr.map((val) => {
+  const newArr = arr.map(val => {
     if (val[key] === obj[key]) {
       isExist = true;
       return obj;
@@ -146,11 +147,8 @@ export function removeObjFromArr(obj, arr, key) {
   if (!Array.isArray(arr)) {
     throw new Error('传参必须是数组');
   }
-  return arr.filter(val => (
-    obj[key] !== val[key]
-  ));
+  return arr.filter(val => obj[key] !== val[key]);
 }
-
 
 // 处理服务器错误信息
 export function handleServerMsg(str) {
@@ -178,7 +176,7 @@ export function transformSecondsToHuman(seconds) {
     h: '', // 时
     m: '', // 分
     s: '', // 秒
-    str: '',
+    str: ''
   };
   if (seconds < 60) {
     data.h = 0;
@@ -194,7 +192,7 @@ export function transformSecondsToHuman(seconds) {
  * 给一个json数组中的每一个元素增加key-value
  */
 export function addKeyValToArr(arr, obj) {
-  return arr.map((val) => {
+  return arr.map(val => {
     return { ...val, ...obj };
   });
 }
