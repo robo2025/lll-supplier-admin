@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import { LOGIN_URL, HOME_PAGE, VERIFY_PAGE } from '../constant/config';
 
-// 验证是否登录
+// 验证是否登录 
 export function verifyLogin() {
   const { href } = window.location;
   const paramas = queryString.parse(href);
@@ -15,7 +15,7 @@ export function verifyLogin() {
       Cookies.set('access_token', accessToken, {
         expires: 7,
         path: '/',
-        domain: '.robo2025.com'
+        domain: '.robo2025.com',
       });
     } else {
       Cookies.set('access_token', accessToken);
@@ -42,7 +42,7 @@ export const queryString = {
     if (url.split('?').length > 1) {
       argStr = url.split('?')[1];
       const argArr = argStr.split('&');
-      argArr.forEach(val => {
+      argArr.forEach((val) => {
         const args = val.split('=');
         if (args.length > 1) {
           parseObj[args[0]] = args[1];
@@ -58,12 +58,12 @@ export const queryString = {
       return '';
     }
     let queryStr = '';
-    Object.keys(params).forEach(key => {
+    Object.keys(params).forEach((key) => {
       queryStr += `${key}=${params[key] || ''}&`;
     });
     console.log('queryString---', queryStr);
     return queryStr.substring(0, queryStr.length - 1);
-  }
+  },
 };
 
 /**
@@ -86,13 +86,13 @@ export function timeStampToDate(timeStamp) {
     week: date.getDay(),
     H: date.getHours(),
     M: date.getMinutes(),
-    S: date.getSeconds()
+    S: date.getSeconds(),
   };
   return {
     ...time,
     timeStr: `${time.year}-${time.month}-${time.day} ${time.H}:${time.M}:${
       time.S
-    }`
+    }`,
   };
 }
 
@@ -131,7 +131,7 @@ export function replaceObjFromArr(obj, arr, key) {
     throw new Error('传参必须是数组');
   }
   let isExist = false;
-  const newArr = arr.map(val => {
+  const newArr = arr.map((val) => {
     if (val[key] === obj[key]) {
       isExist = true;
       return obj;
@@ -176,7 +176,7 @@ export function transformSecondsToHuman(seconds) {
     h: '', // 时
     m: '', // 分
     s: '', // 秒
-    str: ''
+    str: '',
   };
   if (seconds < 60) {
     data.h = 0;
@@ -192,7 +192,7 @@ export function transformSecondsToHuman(seconds) {
  * 给一个json数组中的每一个元素增加key-value
  */
 export function addKeyValToArr(arr, obj) {
-  return arr.map(val => {
+  return arr.map((val) => {
     return { ...val, ...obj };
   });
 }
