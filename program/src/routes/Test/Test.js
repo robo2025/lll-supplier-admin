@@ -9,7 +9,9 @@ import { HOME_PAGE } from '../../constant/config';
 }))
 class Test extends React.Component {
   componentDidMount() {
-    verifyLogin();
+    this.props.dispatch({
+      type: 'user/verify',
+    });
   }
 
   render() {
