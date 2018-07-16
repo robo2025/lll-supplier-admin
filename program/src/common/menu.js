@@ -80,6 +80,7 @@ const menuData = [
     name: '库存管理',
     path: 'stockManagement',
     icon: 'api',
+    authority: '2',
     children: [
       {
         name: '商品库存列表',
@@ -90,7 +91,7 @@ const menuData = [
         path: 'GoodsInOutList',
       },
     ],
-  }
+  },
 ];
 
 function formatter(data, parentPath = '/', parentAuthority) {
