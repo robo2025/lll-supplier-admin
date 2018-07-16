@@ -12,7 +12,6 @@ export const API_URL = '//testapi.robo2025.com/scm';
 export const OPERATION_URL = '//testapi.robo2025.com/scm';
 
 
-
 // 上传文件获取token URL
 export const UPLOAD_URL = '//testapi.robo2025.com/common';
 
@@ -53,6 +52,9 @@ export const NEXT_URL = `${myHost}/#/test`;
 // 前端首页URL
 export const HOME_PAGE = `${myHost}/#/goods/list`;
 
+// 用户信息URL
+export const USER_INFO = `${myHost}/#/setting/userInfo`;
+
 // 前端验证URL
 export const VERIFY_PAGE = `${myHost}/#/test`;
 
@@ -70,11 +72,11 @@ export const IMAGE_TYPES = ['jpg', 'png', 'gif', 'jpeg'];
 export const PAGE_SIZE = 10;
 
 // 供应商商品库存列表
-export const STOCKLIST_URL="//testapi.robo2025.com/stock";
+export const STOCKLIST_URL = '//testapi.robo2025.com/stock';
 
 // ID生成器
 
-export const ID_GENERATION = "//testapi.robo2025.com/id-generator"
+export const ID_GENERATION = '//testapi.robo2025.com/id-generator';
 // 接口请求状态码
 export const SUCCESS_STATUS = 10000; // 操作成功
 export const FAIL_STATUS = 10001; // 操作失败
