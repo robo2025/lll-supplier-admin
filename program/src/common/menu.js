@@ -95,7 +95,7 @@ const menuData = [
   },
   {
     name: '企业信息',
-    icon: 'file-text',
+    icon: 'user',
     path: 'setting/userInfo',
   },
 ];
