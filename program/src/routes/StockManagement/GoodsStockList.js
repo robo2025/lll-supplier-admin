@@ -3,7 +3,7 @@ import qs from 'qs';
 import moment from 'moment';
 import { connect } from 'dva';
 import PageHeaderLayout from "../../layouts/PageHeaderLayout";
-import { Card, Form, Row, Col, Input, Select, Button, Icon, Modal, DatePicker, Table, InputNumber } from 'antd';
+import { Card, Form, Row, Col, Input, Select, Button, Icon, Modal, DatePicker, Table, InputNumber, Message, Spin } from 'antd';
 import GoodsStockListTable from "../../components/StockManagement/GoodsStockListTable.js";
 import styles from "./stock.less";
 import { STOCK_OPERATION_TYPE } from "../../constant/statusList";
@@ -25,21 +25,21 @@ const InOutOperationModal = Form.create()(
             }
         }
         onInOutOk = () => {
-            const {form,onInOutOk,recordType,recordInfo} = this.props;
-            form.validateFields((err,fieldsValue) => {
-                if(err) return;
-                const values = {...fieldsValue};
-                if(!values.change_info) {
+            const { form, onInOutOk, recordType, recordInfo,inOutLoading } = this.props;
+            form.validateFields((err, fieldsValue) => {
+                if (err) return;
+                const values = { ...fieldsValue };
+                if (!values.change_info) {
                     values.change_info = ""
                 }
                 values.change_option = recordType;
                 values.gno = recordInfo.gno;
                 const params_type = recordType === "I" ? "inbound" : "allocation";
-                onInOutOk({...values},params_type)
+                onInOutOk({ ...values }, params_type)
             })
         }
         render() {
-            const { visible, onInOutCancel,  form, recordType, recordInfo } = this.props;
+            const { visible, onInOutCancel, form, recordType, recordInfo,inOutLoading } = this.props;
             const { getFieldDecorator } = form;
             const formItemLayout = {
                 labelCol: {
@@ -58,46 +58,52 @@ const InOutOperationModal = Form.create()(
                     onCancel={onInOutCancel}
                     onOk={this.onInOutOk}
                 >
-                    <Row className={styles['recordInfo']}>
-                        <Col span={8}>
-                            <Col span={8}><span>商品ID :</span></Col><Col span={14}>{recordInfo.gno}</Col>
-                        </Col>
-                        <Col span={8}>
-                            <Col span={8}><span>商品名称 :</span></Col><Col span={14}>{recordInfo.product_name}</Col>
-                        </Col>
-                        <Col span={8}>
-                            <Col span={8}><span>商品型号 :</span></Col><Col span={14}>{recordInfo.partnumber}</Col>
-                        </Col>
-                    </Row>
-                    <Form>
-                        <Row>
-                            <Col span={12}>
-                                <FormItem label={recordType === "I" ? "入库数量" : "调拨数量"} {...formItemLayout}>
-                                    {getFieldDecorator('change_count', {
-                                        rules: [{ required: true, message: '请输入正整数' }, { validator: this.handleChangeNum }],
-                                    })(
-                                        <InputNumber precision={0} style={{width:"80%"}} placeholder="请输入正整数"/>
-                                    )}
-                                </FormItem>
+                    <Spin spinning={inOutLoading || false}>
+                        <Row className={styles['recordInfo']}>
+                            <Col span={8}>
+                                <Col span={8}><span>商品ID :</span></Col><Col span={14}>{recordInfo.gno}</Col>
                             </Col>
-                            <Col span={12}>
-                                <FormItem label="备注" {...formItemLayout}>
-                                    {getFieldDecorator('change_info')(
-                                        <Input type="textarea" style={{width:"80%"}} placeholder="请输入备注"/>
-                                    )}
-                                </FormItem>
+                            <Col span={8}>
+                                <Col span={8}><span>商品名称 :</span></Col><Col span={14}>{recordInfo.product_name}</Col>
+                            </Col>
+                            <Col span={8}>
+                                <Col span={8}><span>商品型号 :</span></Col><Col span={14}>{recordInfo.partnumber}</Col>
+                            </Col>
+                            <Col span={8}>
+                                <Col span={8}><span>品牌 :</span></Col><Col span={14}>{recordInfo.brand_name}</Col>
+                            </Col>
+                            <Col span={8}>
+                                <Col span={8}><span>产地 :</span></Col><Col span={14}>{recordInfo.registration_place}</Col>
                             </Col>
                         </Row>
-
-
-                    </Form>
+                        <Form>
+                            <Row>
+                                <Col span={12}>
+                                    <FormItem label={recordType === "I" ? "入库数量" : "调拨数量"} {...formItemLayout}>
+                                        {getFieldDecorator('change_count', {
+                                            rules: [{ required: true, message: '请输入正整数' }, { validator: this.handleChangeNum }],
+                                        })(
+                                            <InputNumber precision={0} style={{ width: "80%" }} placeholder="请输入正整数" />
+                                        )}
+                                    </FormItem>
+                                </Col>
+                                <Col span={12}>
+                                    <FormItem label="备注" {...formItemLayout}>
+                                        {getFieldDecorator('change_info')(
+                                            <Input type="textarea" style={{ width: "80%" }} placeholder="请输入备注" />
+                                        )}
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                        </Form>
+                    </Spin>
                 </Modal>
             )
         }
     }
 )
 @Form.create()
-@connect(({ stock, loading }) => ({ stock, loading: loading.effects["stock/fetch"], recordLoading: loading.effects['stock/fetchRecord'] }))
+@connect(({ stock, loading }) => ({ stock, loading: loading.effects["stock/fetch"], recordLoading: loading.effects['stock/fetchRecord'], inOutLoading: loading.effects['stock/inOutOperation'] }))
 export default class GoodsStockList extends React.Component {
     constructor(props) {
         super(props)
@@ -186,7 +192,8 @@ export default class GoodsStockList extends React.Component {
         this.setState({
             recordArgs: {
                 page: 1
-            }
+            },
+            recordSearchValues:{}
         });
         dispatch({
             type: "stock/fetchRecord",
@@ -198,7 +205,7 @@ export default class GoodsStockList extends React.Component {
     // 查看记录页数改变
     onRecordChange = (pagination) => {
         const { dispatch } = this.props;
-        const { recordInfo, searchValues } = this.state;
+        const { recordInfo, recordSearchValues } = this.state;
         this.setState({
             recordArgs: {
                 page: pagination.current
@@ -208,7 +215,7 @@ export default class GoodsStockList extends React.Component {
             type: "stock/fetchRecord",
             params: {
                 gno: recordInfo.gno,
-                ...searchValues
+                ...recordSearchValues
             },
             offset: (pagination.current - 1) * pagination.pageSize
         })
@@ -297,21 +304,21 @@ export default class GoodsStockList extends React.Component {
                     <Col xxl={8} md={8} sm={24}>
                         <FormItem label="商品ID">
                             {getFieldDecorator('gno')(
-                                <Input placeholder="请输入商品ID" />
+                                <Input placeholder="请输入" />
                             )}
                         </FormItem>
                     </Col>
                     <Col xxl={8} md={8} sm={24}>
                         <FormItem label="商品名称">
                             {getFieldDecorator('product_name')(
-                                <Input placeholder="请输入产品名称" />
+                                <Input placeholder="请输入" />
                             )}
                         </FormItem>
                     </Col>
                     <Col xxl={8} md={8} sm={24}>
-                        <FormItem label="商品型号">
+                        <FormItem label="型号">
                             {getFieldDecorator('partnumber')(
-                                <Input placeholder="请输入产品型号" />
+                                <Input placeholder="请输入" />
                             )}
                         </FormItem>
                     </Col>
@@ -336,21 +343,21 @@ export default class GoodsStockList extends React.Component {
                     <Col xxl={8} md={8} sm={24}>
                         <FormItem label="商品ID">
                             {getFieldDecorator('gno')(
-                                <Input placeholder="请输入商品ID" />
+                                <Input placeholder="请输入" />
                             )}
                         </FormItem>
                     </Col>
                     <Col xxl={8} md={8} sm={24}>
                         <FormItem label="商品名称">
                             {getFieldDecorator('product_name')(
-                                <Input placeholder="请输入产品名称" />
+                                <Input placeholder="请输入" />
                             )}
                         </FormItem>
                     </Col>
                     <Col xxl={8} md={8} sm={24}>
-                        <FormItem label="商品型号">
+                        <FormItem label="型号">
                             {getFieldDecorator('partnumber')(
-                                <Input placeholder="请输入产品型号" />
+                                <Input placeholder="请输入" />
                             )}
                         </FormItem>
                     </Col>
@@ -423,32 +430,56 @@ export default class GoodsStockList extends React.Component {
     }
     // 出入库操作面板取消
     onInOutCancel = () => {
+        const form = this.formRef.props.form;
+        form.resetFields();
         this.setState({
-            inOutOperationModalShow: false
+            inOutOperationModalShow: false,
+            recordType: "",
+            recordInfo: ""
         })
     }
     // 出入库操作面板确认
-    onInOutOk = (params,paramsType) => {
-        const {dispatch} = this.props;
-        // dispatch({
-        //     type:"stock/inOutIDGeneration",
-        
-        // })
-        console.log(params,paramsType)
-    }   
+    onInOutOk = (values, paramsType) => {
+        const { dispatch } = this.props;
+        const form = this.formRef.props.form;
+        dispatch({
+            type: "stock/fetchIDGeneration",
+            params: paramsType,
+            success: (res) => {
+                dispatch({
+                    type: "stock/inOutOperation",
+                    params: {
+                        ...values,
+                        order_id: Object.values(res.data)[0]
+                    },
+                    success: () => {
+                        form.resetFields();
+                        this.setState({
+                            inOutOperationModalShow: false,
+                            recordType: "",
+                            recordInfo: ""
+                        })
+                    },
+                    error: (res) => {
+                        Message.warning(res.msg)
+                    }
+                })
+            },
+            error: (res) => {
+                Message.warning(res.msg)
+            }
+        })
+    }
     // 点击出入库按钮执行
     onInOutOperation = (record, type) => {
-        console.log(record)
         this.setState({
             inOutOperationModalShow: true,
             recordInfo: record,
             recordType: type,
         })
-
-
     }
     render() {
-        const { stock, loading, form, recordLoading } = this.props;
+        const { stock, loading, form, recordLoading, inOutLoading } = this.props;
         const { args, recordModalShow, recordInfo, recordArgs, inOutOperationModalShow, recordType } = this.state;
         const { goodsStockList, total, stockRecord, recordTotal } = stock;
         const { page, pageSize } = args;
@@ -552,6 +583,7 @@ export default class GoodsStockList extends React.Component {
                             recordType={recordType}
                             onInOutCancel={this.onInOutCancel}
                             onInOutOk={this.onInOutOk}
+                            inOutLoading={inOutLoading}
                         />
                     </div>
                 </Card>
