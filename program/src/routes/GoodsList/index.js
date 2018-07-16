@@ -504,114 +504,10 @@ export default class GoodsList extends Component {
         createTime.created_start = fieldsValue.create_time[0].format(
           'YYYY-MM-DD'
         );
-<<<<<<< HEAD
         createTime.created_end = fieldsValue.create_time[1].format(
           'YYYY-MM-DD'
-=======
-    }
-    renderAdvancedForm() {
-        const { getFieldDecorator } = this.props.form;
-        const { good } = this.props;
-        const { level } = good;
-        getStanrdCatalog(level);
-        return (
-            <Form onSubmit={this.handleSearch} layout="inline">
-                <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-                    <Col xxl={7} md={12} sm={24} lg={12}>
-                        <FormItem label="所属分类">
-                            {getFieldDecorator('category', )(
-                                <Cascader
-                                    options={level}
-                                    placeholder="请选择类目"
-                                    changeOnSelect
-                                />
-                            )}
-                        </FormItem>
-                    </Col>
-                    <Col xxl={6} md={12} sm={24} lg={12}>
-                        <FormItem label="商品ID">
-                            {getFieldDecorator('gno')(
-                                <Input placeholder="请输入" />
-                            )}
-                        </FormItem>
-                    </Col>
-                    <Col xxl={6} md={12} sm={24} lg={12}>
-                        <FormItem label="商品名称">
-                            {getFieldDecorator('product_name')(
-                                <Input placeholder="请输入" />
-                            )}
-                        </FormItem>
-                    </Col>
-                    <Col xxl={5} md={12} sm={24} lg={12}>
-                        <FormItem label="品牌">
-                            {getFieldDecorator('brand_name')(
-                                <Input placeholder="请输入" />
-                            )}
-                        </FormItem>
-                    </Col>
-                </Row>
-                <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-                    <Col xxl={7} md={12} sm={24} lg={12}>
-                        <FormItem label="审核状态">
-                            {getFieldDecorator('audit_status')(
-                                <Select placeholder="请选择" style={{ width: '100%' }}>
-                                    <Option value="">全部</Option>
-                                    <Option value="0">待审核</Option>
-                                    <Option value="1">审核通过</Option>
-                                    <Option value="2">审核不通过</Option>
-                                </Select>
-                            )}
-                        </FormItem>
-                    </Col>
-                    <Col xxl={6} md={12} sm={24} lg={12}>
-                        <FormItem label="上下架状态">
-                            {getFieldDecorator('publish_status')(
-                                <Select placeholder="请选择" style={{ width: '100%' }}>
-                                    <Option value="">全部</Option>
-                                    <Option value="0">下架中</Option>
-                                    <Option value="1">上架中</Option>
-                                </Select>
-                            )}
-                        </FormItem>
-                    </Col>
-                    <Col xxl={6} md={12} sm={24} lg={12}>
-                        <FormItem label="产品提交日期">
-                            {getFieldDecorator('create_time')(
-                                <RangePicker onChange={this.onDatepickerChange} />
-                            )}
-                        </FormItem>
-                    </Col>
-                    <Col xxl={5} md={12} sm={24} lg={12}>
-                        <FormItem label="产地">
-                            {getFieldDecorator('registration_place')(
-                                <Input placeholder="请输入" />
-                            )}
-                        </FormItem>
-                    </Col>
-                </Row>
-                <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-                <Col xxl={5} md={12} sm={24} lg={12}>
-                        <FormItem label="型号">
-                            {getFieldDecorator('partnumber')(
-                                <Input placeholder="请输入" />
-                            )}
-                        </FormItem>
-                    </Col>
-                </Row>
-                <div style={{ overflow: 'hidden' }}>
-                    <span style={{ float: 'right', marginBottom: 24 }}>
-                        <Button type="primary" htmlType="submit">查询</Button>
-                        <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>重置</Button>
-                        <a style={{ marginLeft: 8 }} onClick={this.toggleForm} className="unfold">
-                            收起 <Icon type="up" />
-                        </a>
-                    </span>
-                </div>
-            </Form>
->>>>>>> fbd9ec590d7415b10d5f6fa0c071506184f21123
         );
       }
-
       const categoryId = {};
       if (fieldsValue.category && fieldsValue.category.length > 0) {
         categoryId.category_id_1 = fieldsValue.category[0];
@@ -642,6 +538,7 @@ export default class GoodsList extends Component {
       });
     });
   };
+
   renderSimpleForm() {
     const { getFieldDecorator } = this.props.form;
     const { good } = this.props;
