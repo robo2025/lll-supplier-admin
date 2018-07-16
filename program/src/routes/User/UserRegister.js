@@ -143,7 +143,7 @@ export default class UserRegister extends Component {
 
   handleModalCanle = () => {
     message.warning('不同意就注册不了哦');
-    this.props.history.push('/goods/list');
+    this.props.history.go(-1);
   }
 
   // 提交注册
@@ -410,14 +410,14 @@ export default class UserRegister extends Component {
       >
         <Card title="基本信息" bordered={false} className={styles['register-wrap']}>
           <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
-            <FormItem {...formItemLayout} label="登录用户名">
+            <FormItem {...formItemLayout} label="帐户名">
               {
                 getFieldDecorator('username', {
                   rules: [{
                     required: true,
-                    message: '请输入登录用户名',
+                    message: '请输入帐户名',
                   }],
-                })(<Input placeholder="请输入登录用户名" />)
+                })(<Input placeholder="请输入帐户名" />)
               }
             </FormItem>
             <FormItem {...formItemLayout} label="密码" help={this.state.help}>
