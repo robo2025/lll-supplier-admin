@@ -67,6 +67,9 @@ enquireScreen((b) => {
   isMobile = b;
 });
 
+@connect(({ user }) => ({
+  currentUser: user.currentUser,
+}))
 class BasicLayout extends React.PureComponent {
   static childContextTypes = {
     location: PropTypes.object,
@@ -89,10 +92,9 @@ class BasicLayout extends React.PureComponent {
       });
     });
 
-    /*  this.props.dispatch({
-       type: 'user/fetch',
-     }); */
-    // console.log('基础也渲染好了', Cookies.get('userinfo'));
+    this.props.dispatch({
+      type: 'user/fetchCurrent',
+    });
   }
   getPageTitle() {
     const { routerData, location } = this.props;
@@ -164,9 +166,8 @@ class BasicLayout extends React.PureComponent {
   }
   render() {
     const {
-      collapsed, fetchingNotices, notices, routerData, match, location,
+      collapsed, fetchingNotices, notices, routerData, match, location, currentUser,
     } = this.props;
-    const currentUser = Cookies.get('userinfo') ? JSON.parse(Cookies.get('userinfo')) : {};
     const bashRedirect = this.getBashRedirect();
 
     const layout = (

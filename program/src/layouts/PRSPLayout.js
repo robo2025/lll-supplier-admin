@@ -65,7 +65,9 @@ let isMobile;
 enquireScreen((b) => {
   isMobile = b;
 });
-
+@connect(({ user }) => ({
+  currentUser: user.currentUser,
+}))
 class PRSPLayout extends React.PureComponent {
   static childContextTypes = {
     location: PropTypes.object,
@@ -163,9 +165,8 @@ class PRSPLayout extends React.PureComponent {
   }
   render() {
     const {
-      collapsed, fetchingNotices, notices, routerData, match, location,
+      collapsed, fetchingNotices, notices, routerData, match, location, currentUser,
     } = this.props;
-    const currentUser = Cookies.get('userinfo') ? JSON.parse(Cookies.get('userinfo')) : {};
     const bashRedirect = this.getBashRedirect();
     const layout = (
       <Layout>

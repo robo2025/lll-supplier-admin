@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import { LOGIN_URL, VERIFY_PAGE } from '../constant/config';
+import { LOGIN_URL, HOME_PAGE, VERIFY_PAGE } from '../constant/config';
 
 // 验证是否登录
 export function verifyLogin() {
@@ -13,6 +13,7 @@ export function verifyLogin() {
     } else {
       Cookies.set('access_token', accessToken);
     } 
+    window.location.href = HOME_PAGE;
 } else {
     window.location.href = `${LOGIN_URL}?next=${VERIFY_PAGE}&from=supplier`;
   }

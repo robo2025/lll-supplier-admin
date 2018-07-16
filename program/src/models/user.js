@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie';
 import { queryCurrent, getUserInfo, registerUser, getSMSCode, getSupplierInfo } from '../services/user';
 import { setAuthority } from '../utils/authority';
 import { SUCCESS_STATUS } from '../constant/config.js';
@@ -34,11 +35,12 @@ export default {
       });
     },
     *fetchCurrent(_, { call, put }) {
-      const response = yield call(queryCurrent);
+      const response = yield call(getUserInfo);
       yield put({
         type: 'saveCurrentUser',
-        payload: response,
+        payload: response.data,
       });
+      Cookies.set('userinfo', JSON.stringify(response.data), { expires: 7 });
     },
     *register({ data, success, error }, { call }) {
       const response = yield call(registerUser, { data });
