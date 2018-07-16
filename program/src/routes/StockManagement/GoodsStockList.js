@@ -3,13 +3,99 @@ import qs from 'qs';
 import moment from 'moment';
 import { connect } from 'dva';
 import PageHeaderLayout from "../../layouts/PageHeaderLayout";
-import { Card, Form, Row, Col, Input, Select, Button, Icon, Modal, DatePicker, Table } from 'antd';
+import { Card, Form, Row, Col, Input, Select, Button, Icon, Modal, DatePicker, Table, InputNumber } from 'antd';
 import GoodsStockListTable from "../../components/StockManagement/GoodsStockListTable.js";
 import styles from "./stock.less";
 import { STOCK_OPERATION_TYPE } from "../../constant/statusList";
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
+const InOutOperationModal = Form.create()(
+    class extends React.Component {
+        handleChangeNum = (rule, value, callback) => {
+            const { recordInfo, recordType } = this.props;
+            const checkValue = recordType === "I" ? recordInfo.goods_max_in : recordInfo.goods_max_out;
+            const tipValue = recordType === "I" ? `不能超过最大入库值${recordInfo.goods_max_in}` : `不能超过最大调拨值${recordInfo.goods_max_out}`;
+            if (value < 0) {
+                callback("请输入正整数")
+            } else if (value > checkValue) {
+                callback(tipValue)
+            } else {
+                callback()
+            }
+        }
+        onInOutOk = () => {
+            const {form,onInOutOk,recordType,recordInfo} = this.props;
+            form.validateFields((err,fieldsValue) => {
+                if(err) return;
+                const values = {...fieldsValue};
+                if(!values.change_info) {
+                    values.change_info = ""
+                }
+                values.change_option = recordType;
+                values.gno = recordInfo.gno;
+                const params_type = recordType === "I" ? "inbound" : "allocation";
+                onInOutOk({...values},params_type)
+            })
+        }
+        render() {
+            const { visible, onInOutCancel,  form, recordType, recordInfo } = this.props;
+            const { getFieldDecorator } = form;
+            const formItemLayout = {
+                labelCol: {
+                    md: { span: 6 },
+                },
+                wrapperCol: {
+                    md: { span: 18 },
+                },
+            };
+            return (
+                <Modal
+                    width="800px"
+                    visible={visible}
+                    title={recordType === "I" ? "商品入库面板操作" : "商品调拨面板操作"}
+                    okText="确定"
+                    onCancel={onInOutCancel}
+                    onOk={this.onInOutOk}
+                >
+                    <Row className={styles['recordInfo']}>
+                        <Col span={8}>
+                            <Col span={8}><span>商品ID :</span></Col><Col span={14}>{recordInfo.gno}</Col>
+                        </Col>
+                        <Col span={8}>
+                            <Col span={8}><span>商品名称 :</span></Col><Col span={14}>{recordInfo.product_name}</Col>
+                        </Col>
+                        <Col span={8}>
+                            <Col span={8}><span>商品型号 :</span></Col><Col span={14}>{recordInfo.partnumber}</Col>
+                        </Col>
+                    </Row>
+                    <Form>
+                        <Row>
+                            <Col span={12}>
+                                <FormItem label={recordType === "I" ? "入库数量" : "调拨数量"} {...formItemLayout}>
+                                    {getFieldDecorator('change_count', {
+                                        rules: [{ required: true, message: '请输入正整数' }, { validator: this.handleChangeNum }],
+                                    })(
+                                        <InputNumber precision={0} style={{width:"80%"}} placeholder="请输入正整数"/>
+                                    )}
+                                </FormItem>
+                            </Col>
+                            <Col span={12}>
+                                <FormItem label="备注" {...formItemLayout}>
+                                    {getFieldDecorator('change_info')(
+                                        <Input type="textarea" style={{width:"80%"}} placeholder="请输入备注"/>
+                                    )}
+                                </FormItem>
+                            </Col>
+                        </Row>
+
+
+                    </Form>
+                </Modal>
+            )
+        }
+    }
+)
 @Form.create()
 @connect(({ stock, loading }) => ({ stock, loading: loading.effects["stock/fetch"], recordLoading: loading.effects['stock/fetchRecord'] }))
 export default class GoodsStockList extends React.Component {
@@ -25,6 +111,8 @@ export default class GoodsStockList extends React.Component {
                 page: 1 // 查看记录页面当前页
             },
             recordSearchValues: {},// 查看记录页面搜索条件
+            inOutOperationModalShow: false,// 入库出库操作面板是否显示
+            recordType: "", //执行入库还是调拨操作 I 入库 O 调拨
         }
     }
     componentDidMount() {
@@ -64,7 +152,8 @@ export default class GoodsStockList extends React.Component {
         form.resetFields(['create_time']);
     }
     // 查看记录搜索条件
-    viewRecordSearch = () => {
+    viewRecordSearch = (e) => {
+        e.preventDefault();
         const { dispatch, form } = this.props;
         const { recordInfo } = this.state;
         form.validateFields((err, fieldsValue) => {
@@ -148,7 +237,8 @@ export default class GoodsStockList extends React.Component {
             params: searchValues
         })
     }
-    handleSearch = () => {
+    handleSearch = (e) => {
+        e.preventDefault();
         const { form, history, dispatch } = this.props;
         const { args } = this.state;
         form.validateFields((err, filedsValue) => {
@@ -168,8 +258,8 @@ export default class GoodsStockList extends React.Component {
                 searchValues: values
             })
             history.replace({
-                search: `?page=1&pageSize=${args.pageSize}`
-            })
+                search: `?page=1&pageSize=${args.pageSize}`,
+            });
             dispatch({
                 type: "stock/fetch",
                 offset: 0,
@@ -328,9 +418,38 @@ export default class GoodsStockList extends React.Component {
     renderForm() {
         return this.state.expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
     }
+    saveFormRef = (formRef) => {
+        this.formRef = formRef;
+    }
+    // 出入库操作面板取消
+    onInOutCancel = () => {
+        this.setState({
+            inOutOperationModalShow: false
+        })
+    }
+    // 出入库操作面板确认
+    onInOutOk = (params,paramsType) => {
+        const {dispatch} = this.props;
+        // dispatch({
+        //     type:"stock/inOutIDGeneration",
+        
+        // })
+        console.log(params,paramsType)
+    }   
+    // 点击出入库按钮执行
+    onInOutOperation = (record, type) => {
+        console.log(record)
+        this.setState({
+            inOutOperationModalShow: true,
+            recordInfo: record,
+            recordType: type,
+        })
+
+
+    }
     render() {
         const { stock, loading, form, recordLoading } = this.props;
-        const { args, recordModalShow, recordInfo, recordArgs } = this.state;
+        const { args, recordModalShow, recordInfo, recordArgs, inOutOperationModalShow, recordType } = this.state;
         const { goodsStockList, total, stockRecord, recordTotal } = stock;
         const { page, pageSize } = args;
         const current = recordArgs.page >> 0;
@@ -387,6 +506,7 @@ export default class GoodsStockList extends React.Component {
                             pageSize={pageSize >> 0}
                             onTableChange={this.onTableChange}
                             onviewRecord={this.onviewRecord}
+                            onInOutOperation={this.onInOutOperation}
                         />
                         <Modal
                             visible={recordModalShow}
@@ -425,6 +545,14 @@ export default class GoodsStockList extends React.Component {
                                 onChange={this.onRecordChange}
                             />
                         </Modal>
+                        <InOutOperationModal
+                            wrappedComponentRef={this.saveFormRef}
+                            visible={inOutOperationModalShow}
+                            recordInfo={recordInfo}
+                            recordType={recordType}
+                            onInOutCancel={this.onInOutCancel}
+                            onInOutOk={this.onInOutOk}
+                        />
                     </div>
                 </Card>
             </PageHeaderLayout>

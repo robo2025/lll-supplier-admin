@@ -71,6 +71,10 @@ export const PAGE_SIZE = 10;
 
 // 供应商商品库存列表
 export const STOCKLIST_URL="//testapi.robo2025.com/stock";
+
+// ID生成器
+
+export const ID_GENERATION = "//testapi.robo2025.com/id-generator"
 // 接口请求状态码
 export const SUCCESS_STATUS = 10000; // 操作成功
 export const FAIL_STATUS = 10001; // 操作失败

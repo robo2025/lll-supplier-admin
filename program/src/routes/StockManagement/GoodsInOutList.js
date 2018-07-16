@@ -47,7 +47,8 @@ export default class GoodsInOutList extends React.Component {
             params: searchValues
         })
     }
-    handleSearch = () => {
+    handleSearch = (e) => {
+        e.preventDefault();
         const { form, history, dispatch } = this.props;
         const { args } = this.state;
         form.validateFields((err, filedsValue) => {

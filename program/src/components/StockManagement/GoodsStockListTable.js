@@ -11,7 +11,7 @@ export default class GoodsStockListTable extends React.Component {
         super(props)
     }
     render() {
-        const { data,loading,current,pageSize,total,onTableChange,onviewRecord } = this.props;
+        const { data,loading,current,pageSize,total,onTableChange,onviewRecord,onInOutOperation } = this.props;
         data.map((ele, idx) => {
             ele.idx = idx + 1;
         })
@@ -64,9 +64,13 @@ export default class GoodsStockListTable extends React.Component {
             fixed: "right",
             render: (record) => (
                 <span>
-                    <a href="javascript:;" disabled={record.audit_status !== 1} style={{ textDecoration: "none" }}>入库</a>
+                    <a href="javascript:;" disabled={record.audit_status !== 1} style={{ textDecoration: "none" }}
+                    onClick = {() => onInOutOperation(record,'I')}
+                    >入库</a>
                     <Divider type="vertical" />
-                    <a href="javascript:;" disabled={record.audit_status !== 1} style={{ textDecoration: "none" }}>调拨</a>
+                    <a href="javascript:;" disabled={record.audit_status !== 1} style={{ textDecoration: "none" }} 
+                     onClick = {() => onInOutOperation(record,"O")}
+                    >调拨</a>
                     <Divider type="vertical" />
                     <a href="javascript:;" style={{ textDecoration: "none" }} onClick={()=>onviewRecord(record)}>查看记录</a>
                 </span>
