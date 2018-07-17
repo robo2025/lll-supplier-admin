@@ -108,6 +108,7 @@ export default {
         const {
           data: { id },
         } = userinfo;
+        // TODO：在本地token与线上token同名冲突的时候报403
         const response = yield call(getSupplierInfo, { supplierId: id });
         if (response.data.profile.audit_status !== 1) {
           setAuthority('1'); // 1为账号未通过审核的权限
