@@ -51,7 +51,7 @@ export function register() {
 // 登出
 export function logout() {
   localStorage.removeItem('antd-pro-authority');
-  Cookies.remove('user_info');
+  Cookies.remove('userinfo');
   const accessToken = Cookies.get('access_token');
   if (accessToken) {
     Cookies.remove('access_token');

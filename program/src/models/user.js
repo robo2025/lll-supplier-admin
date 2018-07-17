@@ -30,30 +30,30 @@ export default {
   },
 
   effects: {
-    *fetch({ success, error }, { call, put }) {
-      yield put({
-        type: 'changeLoading',
-        payload: true,
-      });
-      const response = yield call(getUserInfo);
-      if (response.rescode >> 0 === SUCCESS_STATUS) {
-        if (typeof success === 'function') {
-          success(response);
-        }
-      } else if (typeof error === 'function') {
-        error(response);
-        return;
-      }
+    // *fetch({ success, error }, { call, put }) {
+    //   yield put({
+    //     type: 'changeLoading',
+    //     payload: true,
+    //   });
+    //   const response = yield call(getUserInfo);
+    //   if (response.rescode >> 0 === SUCCESS_STATUS) {
+    //     if (typeof success === 'function') {
+    //       success(response);
+    //     }
+    //   } else if (typeof error === 'function') {
+    //     error(response);
+    //     return;
+    //   }
 
-      yield put({
-        type: 'save',
-        payload: response.data,
-      });
-      yield put({
-        type: 'changeLoading',
-        payload: false,
-      });
-    },
+    //   yield put({
+    //     type: 'save',
+    //     payload: response.data,
+    //   });
+    //   yield put({
+    //     type: 'changeLoading',
+    //     payload: false,
+    //   });
+    // },
     *fetchCurrent(_, { call, put }) {
       const response = yield call(getUserInfo);
       yield put({
@@ -103,12 +103,8 @@ export default {
         payload: response.data,
       });
     },
-    *verify(_, { call, put }) {
-      const { href } = window.location;
-      const paramas = queryString.parse(href);
-      const token = Cookies.get('access_token');
-      if (token) {
-        const userinfo = yield call(getUserInfo);
+    *changeAuthorityUrl(_, { call }) {
+      const userinfo = yield call(getUserInfo);
         const {
           data: { id },
         } = userinfo;
@@ -120,6 +116,13 @@ export default {
           setAuthority('2'); // 2为账号通过审核的权限
           window.location.href = HOME_PAGE;
         }
+    },
+    *verify(_, { call, put }) {
+      const { href } = window.location;
+      const paramas = queryString.parse(href);
+      const token = Cookies.get('access_token');
+      if (token) {
+        yield put({ type: 'changeAuthorityUrl' });
       } else if (paramas.access_token) {
         /* 判断url是否有access_token,如果有则将其存储到cookie */
         const accessToken = paramas.access_token.split('#/')[0];
@@ -132,22 +135,12 @@ export default {
         } else {
           Cookies.set('access_token', accessToken);
         }
-        const userinfo = yield call(getUserInfo);
-        const {
-          data: { id },
-        } = userinfo;
-        const response = yield call(getSupplierInfo, { supplierId: id });
-        if (response.data.profile.audit_status !== 1) {
-          setAuthority('1'); // 1为账号未通过审核的权限
-          location.href = `${USER_INFO}`;
-        } else {
-          setAuthority('2'); // 2为账号通过审核的权限
-          window.location.href = HOME_PAGE;
-        }
+        yield put({ type: 'changeAuthorityUrl' });
       } else {
         window.location.href = `${LOGIN_URL}?next=${VERIFY_PAGE}&from=supplier`;
       }
     },
+    
   },
 
   reducers: {

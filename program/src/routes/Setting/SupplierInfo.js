@@ -34,10 +34,10 @@ const COMPANY_TYPE = {
 }))
 export default class SupplierInfo extends Component {
   componentDidMount() {
-    const { dispatch } = this.props;
-    console.log(Cookies.getJSON('userinfo').id);
+    const { dispatch, user } = this.props;
+    const { supplierInfo } = user;
     const userId = Cookies.getJSON('userinfo').id;
-    if (userId) {
+    if (!supplierInfo.profile) {
       dispatch({
         type: 'user/fetchSupplierInfo',
         supplierId: userId,
