@@ -39,7 +39,7 @@ export default {
                 if (typeof success === 'function') { success(res) }
             } else if (typeof error === 'function') { error(res) }
         },
-        *inOutIDGeneration({ params }, { call, put }) {
+        *fetchIDGeneration({ params,success,error }, { call }) {
             const res = yield call(inOutIDGeneration, { params });
             if (res.rescode >> 0 === SUCCESS_STATUS) {
                 if (typeof success === 'function') { success(res) }

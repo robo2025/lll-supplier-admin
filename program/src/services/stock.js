@@ -15,7 +15,7 @@ export async function queryGoodsStockRecord({params, offset = 0, limit = 10}) {
 // 进出库操作
 export async function inOutOperation({params}) {
     return lyRequest(`${STOCKLIST_URL}/v1/inout`,{
-        methods:"post",
+        method: 'post',
         data:params
     })
 }
@@ -23,8 +23,7 @@ export async function inOutOperation({params}) {
 // ID生成器生成ID
 export async function inOutIDGeneration({params}){
     return lyRequest(`${ID_GENERATION}/api/${params}`,{
-        methods:"post",
-        data:{}
+        method: 'post',
     }) 
 }
 
