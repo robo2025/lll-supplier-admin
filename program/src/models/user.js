@@ -1,4 +1,6 @@
 import Cookies from 'js-cookie';
+import Services from '../utils/customerService';
+
 import {
   queryCurrent,
   getUserInfo,
@@ -59,6 +61,12 @@ export default {
         payload: response.data,
       });
       Cookies.set('userinfo', JSON.stringify(response.data), { expires: 7 });
+      // 注册客服;
+      Services.service.initService({
+        username: response.data.username,
+        mobile: response.data.mobile,
+        email: response.data.email,
+      });
     },
     *register({ data, success, error }, { call }) {
       const response = yield call(registerUser, { data });
