@@ -50,14 +50,17 @@ export function register() {
 }
 // 登出
 export function logout() {
+  localStorage.removeItem('antd-pro-authority');
+  Cookies.remove('user_info');
   const accessToken = Cookies.get('access_token');
   if (accessToken) {
     Cookies.remove('access_token');
-    Cookies.remove('userinfo');
-    window.location.href = `${LOGOUT_URL}?access_token=${accessToken}&next=${HOME_PAGE}`;
+    window.location.href = `${LOGOUT_URL}?access_token=${accessToken}&next=${encodeURIComponent(
+      VERIFY_PAGE
+    )}`;
   } else {
     window.location.href = `${LOGOUT_URL}`;
-  }
+  } 
 }
 
 // 登录操作
