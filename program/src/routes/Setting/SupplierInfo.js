@@ -83,7 +83,7 @@ export default class SupplierInfo extends Component {
                   </a>
             </div>
           }
-          style={{ marginTop: 35 }}
+          style={supplierInfo.profile.audit_status === 1 ? { display: 'none' } : { marginTop: 35 }}// 已通过的不显示
         >
           <Steps current={supplierInfo.profile.audit_status === 2 ? 2 : 1}>
             <Step key={0} title="创建账号" />
