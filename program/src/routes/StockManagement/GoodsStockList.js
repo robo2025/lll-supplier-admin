@@ -25,7 +25,7 @@ const InOutOperationModal = Form.create()(
             }
         }
         onInOutOk = () => {
-            const { form, onInOutOk, recordType, recordInfo,inOutLoading } = this.props;
+            const { form, onInOutOk, recordType, recordInfo } = this.props;
             form.validateFields((err, fieldsValue) => {
                 if (err) return;
                 const values = { ...fieldsValue };
@@ -434,8 +434,6 @@ export default class GoodsStockList extends React.Component {
         form.resetFields();
         this.setState({
             inOutOperationModalShow: false,
-            recordType: "",
-            recordInfo: ""
         })
     }
     // 出入库操作面板确认
@@ -456,8 +454,6 @@ export default class GoodsStockList extends React.Component {
                         form.resetFields();
                         this.setState({
                             inOutOperationModalShow: false,
-                            recordType: "",
-                            recordInfo: ""
                         })
                     },
                     error: (res) => {
