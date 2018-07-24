@@ -130,6 +130,11 @@ const SLN_PAY_STATUS = {
 const STOCK_OPERATION_TYPE = {
     I:"入库",
     O:"调拨"
+};
+const CONTRACT_STATUS = {
+    1:'未过期',
+    2:'即将过期',
+    3:'已过期'
 }
 export {
   ACTION_STATUS,
@@ -146,5 +151,6 @@ export {
   AUDIT_STATUS,
   PUBLISH_STATUS,
   SLN_PAY_STATUS,
-  STOCK_OPERATION_TYPE
+  STOCK_OPERATION_TYPE,
+  CONTRACT_STATUS
 };

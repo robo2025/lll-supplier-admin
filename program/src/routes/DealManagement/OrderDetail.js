@@ -247,7 +247,8 @@ export default class OrderDetail extends Component {
             style={{ marginBottom: 24 }}
             pagination={false}
             loading={false}
-            dataSource={logistics.length > 0 ? [{ ...logistics[0], ...orderInfo }] : []}
+            // dataSource={logistics.length > 0 ? [{ ...logistics[0], ...orderInfo }] : []}
+            dataSource={logistics.length > 0 ? [{ ...orderInfo,...logistics[0]}] : []}
             columns={logisticsColumns}
             rowKey="add_time"
             locale={{
