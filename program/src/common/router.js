@@ -162,6 +162,10 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, ['upload', 'user'], () => import('../routes/Setting/SupplierInfo')),
       name: '企业信息审核',
     },
+    '/contractManagement/contractList': {
+        component: dynamicWrapper(app, ['contract'], () => import('../routes/ContractManagement/ContractList')),
+        name: '合同列表',
+      },
     
   };
 

@@ -155,7 +155,7 @@ export default class GoodsInOutList extends React.Component {
                         {this.renderForm()}
                     </div>
                 </Card>
-                <Card bordered={false} className={styles['search-wrap']} title="搜索条件">
+                <Card bordered={false} className={styles['search-wrap']}>
                     <div className={styles.tableListForm}>
                         <StockInOutTable 
                         data={stockRecord}

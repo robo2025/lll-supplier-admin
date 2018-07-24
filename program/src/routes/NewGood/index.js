@@ -217,7 +217,6 @@ export default class NewGood extends Component {
     // 搜索
     handleSearch = (e) => {
         e.preventDefault();
-
         const { dispatch, form } = this.props;
         const { associationTableParams } = this.state;
         form.validateFields((err, fieldsValue) => {
@@ -233,7 +232,6 @@ export default class NewGood extends Component {
                 ...category,
             };
             delete values.category;
-            console.log(values,1234566788);
             this.setState({
                 formValues: values,
                 associationTableParams: {
