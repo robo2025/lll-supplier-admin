@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 import Services from '../utils/customerService';
 
 import {
-  queryCurrent,
+  audit,
   getUserInfo,
   registerUser,
   getSMSCode,
@@ -141,7 +141,18 @@ export default {
         window.location.href = `${LOGIN_URL}?next=${VERIFY_PAGE}&from=supplier`;
       }
     },
-    
+    // 提交审核
+    *audit({ payload, callback }, { call, put }) {
+      const response = yield call(audit, { ...payload });
+      const { rescode, data, msg } = response;
+      if (rescode === '10000') {
+        if (callback) {
+          callback(true, data);
+        }
+      } else if (callback) {
+        callback(false, msg);
+      }
+    },
   },
 
   reducers: {

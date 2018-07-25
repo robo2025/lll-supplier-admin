@@ -72,3 +72,10 @@ export function login() {
 export function jumpToLogin() {
   window.location.href = `${LOGIN_URL}?next=${encodeURIComponent(VERIFY_PAGE)}&disable_redirect=1&from=supplier`;
 }
+// 提交审核
+export function audit({ formData, supplierId }) {
+  return lyRequest(`${USERS_SERVER}/supplier/profiles/${supplierId}`, {
+    method: 'put',
+    data: formData,
+  });
+}

@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import Cookies from 'js-cookie';
 import { connect } from 'dva';
-import { Card, Form, Steps, Spin } from 'antd';
+import { Card, Form, Steps, Spin, message } from 'antd';
 import { getAreaBycode } from '../../utils/cascader-address-options';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import UserRegister from '../User/UserRegister';
@@ -44,7 +44,20 @@ export default class SupplierInfo extends Component {
       });
     }
   }
-
+  handleSubmit=(formData) => {
+    const { supplierInfo } = this.props.user;
+    this.props.dispatch({
+      type: 'user/audit',
+      payload: { formData, supplierId: supplierInfo.main_user_id },
+      callback: (success, data) => {
+        if (success & success === true) {
+          message.success('操作成功！');
+        } else {
+          message.error(data);
+        }
+      },
+    });
+  }
   render() {
     const { supplierInfo } = this.props.user;
     const { profile, ...others } = supplierInfo;
@@ -97,7 +110,7 @@ export default class SupplierInfo extends Component {
           </Steps>
         </Card>
         {supplierInfo.profile.audit_status === 2 ? (
-          <UserRegister type="update" modalVisible={false} style={{ marginTop: 35 }} data={{ ...profile, ...others }} />
+          <UserRegister type="update" modalVisible={false} style={{ marginTop: 35 }} data={{ ...profile, ...others }} handleSubmit={formData => this.handleSubmit(formData)} />
         ) : (
           <Fragment>
             <Card title="基本信息" bordered style={{ marginTop: 35 }} hoverable>

@@ -52,8 +52,7 @@ const passwordProgressMap = {
 @Form.create({
   mapPropsToFields(props) {
     const { data } = props;
-    console.log(data);
-    if (Object.keys(data).length === 0) {
+    if (!data) {
       return {};
     }
     let formData = {};
@@ -289,15 +288,27 @@ export default class UserRegister extends Component {
         },
         qualifications
       );
-
-      this.dispatchRegister({
-        // 发起注册操作
-        ...values,
-        qualifications,
-        ...place,
-        password: sha256(values.password),
-        confirm: sha256(values.confirm),
-      });
+     if (this.props.handleSubmit && typeof (this.props.handleSubmit) === 'function') {
+      this.props.handleSubmit(
+        {
+          // 发起注册操作
+          ...values,
+          qualifications,
+          ...place,
+          password: sha256(values.password),
+          confirm: sha256(values.confirm),
+        }
+      );
+      } else {
+        this.dispatchRegister({
+          // 发起注册操作
+          ...values,
+          qualifications,
+          ...place,
+          password: sha256(values.password),
+          confirm: sha256(values.confirm),
+        });
+      }
     });
   };
 
@@ -515,7 +526,6 @@ export default class UserRegister extends Component {
                     type="password"
                     placeholder="输入密码"
                     onBlur={this.handlePasswordBlur}
-                    disabled={type === 'update'}
                   />
                 )}
               </Popover>
@@ -569,7 +579,7 @@ export default class UserRegister extends Component {
                     message: '请输入正确的手机号码',
                   },
                 ],
-              })(<Input disabled={type === 'update'} />)}
+              })(<Input />)}
             </FormItem>
             <FormItem {...formItemLayout} label="短信验证码">
               {getFieldDecorator('captcha', {
@@ -1075,7 +1085,7 @@ export default class UserRegister extends Component {
             ) : null}
             <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
               <Button type="primary" htmlType="submit" loading={false}>
-                提交
+              {this.props.buttonText || '提交'}
               </Button>
               {/* <Button style={{ marginLeft: 8 }}>保存</Button> */}
             </FormItem>
