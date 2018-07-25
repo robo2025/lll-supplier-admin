@@ -97,7 +97,7 @@ export default class NewGoodForm extends Component {
 
     // cad和图片上传时处理
     handleUploaderChange(key, fileList) {
-        console.log('文件上传', key, fileList);
+        // console.log('文件上传', key, fileList);
         const { pics, cad_url } = this.state;
         const { onAttrChange } = this.props;
         // 如果上传的是cad文件
@@ -142,7 +142,7 @@ export default class NewGoodForm extends Component {
                 return file;
             });
         } else if (this.state.isCad) {
-            console.log('cad fileList', fileList);
+            // console.log('cad fileList', fileList);
         }
     }
     handleStock = (rule, value, callback) => {// 校验库存数量
@@ -151,7 +151,7 @@ export default class NewGoodForm extends Component {
         }
         callback();
     }
-    handleMinBuy = (rule, value, callback) => {// 校验最低采购量
+    handleMinBuy = (rule, value, callback) => {// 校验采购量
         if (value > 9999) {
             callback('最低采购量不能超过9999个');
         }
@@ -287,17 +287,16 @@ export default class NewGoodForm extends Component {
                             {...formItemLayout}
                         >
                             {getFieldDecorator('min_buy', {
-                                rules: [{
-                                    message: '请输入数值',
-                                }, {
+                                rules: [ 
+                                {
                                     pattern: /^(\d+)$/,
                                     message: '库存数量必须是整数',
                                 },{
                                     validator:this.handleMinBuy
                                 }],
-                                initialValue: data.min_buy >> 0 || 1,
+                                initialValue: data.min_buy >> 0,
                             })(
-                                <Input type="number"  min={1}/>
+                                <Input type="number"/>
                             )}
                         </FormItem>
                         <FormItem

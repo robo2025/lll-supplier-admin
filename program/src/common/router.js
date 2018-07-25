@@ -166,6 +166,9 @@ export const getRouterData = (app) => {
         component: dynamicWrapper(app, ['contract'], () => import('../routes/ContractManagement/ContractList')),
         name: '合同列表',
       },
+      '/accountManagement/accountList': {
+        component: dynamicWrapper(app, ['account'], () => import('../routes/AccountManagement/AccountList')),
+      },
     
   };
 

@@ -43,13 +43,13 @@ export default class NewGood extends Component {
                 shelf_life: '', // 质保期
                 sales_unit: '', // 销售单位
                 stock: '', // 库存
-                min_buy: '', // 最小采购量 (可选)
+                min_buy: 1, // 最小采购量 (可选)
                 prices: [ // 价格
                     {
                         id: -100,
                         min_quantity: 1, // 最小数量
                         max_quantity: 1, // 最大数量
-                        price: '0', // 价格
+                        price: 1, // 价格
                         shipping_fee_type: 1, // 包邮
                         lead_time: '0', // 货期
                     },
@@ -171,7 +171,6 @@ export default class NewGood extends Component {
 
     // 当商品列表数据改变时：分页
     handleProductTableChange = (pagination, filtersArg, sorter) => {
-        console.log(pagination, filtersArg, sorter, 123456)
         const { dispatch } = this.props;
         const { associationTableParams } = this.state;
         const params = {
@@ -264,10 +263,14 @@ export default class NewGood extends Component {
         if (this.$formObj) {
             this.$formObj.validateFields((err, values) => {
                 if (!err) {
+                    let values = {...fields}
+                    if(!fields.min_buy) {
+                        values = {...values,min_buy:1}
+                    }
                     dispatch({
                         type: 'good/add',
                         data: {
-                            ...fields,
+                            ...values,
                             mno: args.mno,
                         },
                         success: () => { message.success('提交成功'); history.push('/goods/list'); },

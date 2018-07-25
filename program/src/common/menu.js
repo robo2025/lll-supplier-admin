@@ -109,6 +109,17 @@ const menuData = [
       },
     ],
   },
+  {
+    name: '帐号管理',
+    path: 'accountManagement',
+    icon: 'bar-chart',
+    children: [
+      {
+        name: '帐号列表',
+        path: 'accountList',
+      },
+    ],
+  },
 ];
 
 function formatter(data, parentPath = '/', parentAuthority) {
