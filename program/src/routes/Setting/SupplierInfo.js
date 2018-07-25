@@ -51,6 +51,11 @@ export default class SupplierInfo extends Component {
       payload: { formData, supplierId: supplierInfo.main_user_id },
       callback: (success, data) => {
         if (success & success === true) {
+          const userId = Cookies.getJSON('userinfo').id;
+          this.props.dispatch({
+            type: 'user/fetchSupplierInfo',
+            supplierId: userId,
+          });
           message.success('操作成功！');
         } else {
           message.error(data);
@@ -110,7 +115,7 @@ export default class SupplierInfo extends Component {
           </Steps>
         </Card>
         {supplierInfo.profile.audit_status === 2 ? (
-          <UserRegister type="update" modalVisible={false} style={{ marginTop: 35 }} data={{ ...profile, ...others }} handleSubmit={formData => this.handleSubmit(formData)} />
+          <UserRegister type="update" modalVisible={false} style={{ marginTop: 35 }} handleSubmit={formData => this.handleSubmit(formData)} />
         ) : (
           <Fragment>
             <Card title="基本信息" bordered style={{ marginTop: 35 }} hoverable>

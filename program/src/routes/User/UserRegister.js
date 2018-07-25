@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'dva';
+import moment from 'moment';
 import { sha256 } from 'js-sha256';
 import {
   Form,
@@ -51,19 +52,74 @@ const passwordProgressMap = {
 }))
 @Form.create({
   mapPropsToFields(props) {
-    const { data } = props;
-    if (!data) {
+    const { user } = props;
+    const { supplierInfo } = user;
+    const { profile, ...others } = supplierInfo;
+    const { qualifies, ...basic_info } = profile;
+    if (!profile) {
       return {};
     }
     let formData = {};
-    Object.keys(data).map((item) => {
+    Object.keys(profile).map((item) => {
       formData = {
         ...formData,
-        [item]: Form.createFormField({ value: data[item] }),
+        [item]: Form.createFormField({ value: profile[item] }),
       };
       return null;
     });
-    return formData;
+    Object.keys(others).map((item) => {
+      formData = {
+        ...formData,
+        [item]: Form.createFormField({ value: others[item] }),
+      };
+      return null;
+    });
+    // 日期
+    let dateData = {};
+    qualifies.map((item) => {
+      dateData = {
+        ...dateData,
+        [`${item.qualifi_name}_date`]: Form.createFormField({
+          value: [moment(item.effective_date), moment(item.expire_date)],
+        }),
+        [item.qualifi_name]: Form.createFormField({
+          value: item.qualifi_url,
+        }),
+      };
+      return null;
+    });
+    formData = {
+      ...formData,
+      ...dateData,
+      place: Form.createFormField({
+        value: [
+          `${basic_info.province_id}`,
+          `${basic_info.city_id}`,
+          `${basic_info.district_id}`,
+        ],
+      }),
+    };
+    const licenseData = qualifies.filter(
+      item => item.qualifi_name === 'license'
+    );
+    if (!licenseData.length) {
+      return {
+        ...formData,
+      };
+    }
+    return {
+      ...formData,
+      ...dateData,
+      qualifi_code: Form.createFormField({
+        value: licenseData[0].qualifi_code,
+      }),
+      date: Form.createFormField({
+        value: [
+          moment(licenseData[0].effective_date),
+          moment(licenseData[0].expire_date),
+        ],
+      }),
+    };
   },
 })
 export default class UserRegister extends Component {
@@ -88,10 +144,68 @@ export default class UserRegister extends Component {
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch, user } = this.props;
+    const { supplierInfo } = user;
     dispatch({
       type: 'upload/fetch',
     });
+    const { profile } = supplierInfo;
+    const { qualifies, ...others } = profile;
+    // TODO 优化
+    this.setState({ companyType: profile.company_type });
+    const flagArray = qualifies.filter(
+      item =>
+        item.qualifi_name === 'production' ||
+        item.qualifi_name === 'certification' ||
+        item.qualifi_name === 'other'
+    );
+    if (flagArray.length > 0) {
+      this.setState({
+        isFlag: true,
+      });
+    }
+    // 一般纳税人照片
+    const isGeneralTaxpayerArray = qualifies.filter(
+      item => item.qualifi_name === 'taxpayer'
+    );
+    if (isGeneralTaxpayerArray.length > 0) {
+      this.setState({
+        isGeneralTaxpayer: true,
+      });
+    }
+    qualifies.map((item) => {
+      this.setState({
+        [item.qualifi_name]: [
+          {
+            uid: item.effective_date + item.qualifi_url, // 时间+url做为ID
+            status: 'done',
+            url: item.qualifi_url,
+            response: {
+              key: item.qualifi_url,
+            },
+          },
+        ],
+      });
+      return null;
+    });
+    let licenseData = [];
+    if (qualifies) {
+      licenseData = qualifies.filter(item => item.qualifi_name === 'license');
+    }
+    if (licenseData.length) {
+      this.setState({
+        photos: [
+          {
+            uid: licenseData[0].effective_date + licenseData[0].qualifi_url, // 时间+url做为ID
+            status: 'done',
+            url: licenseData[0].qualifi_url,
+            response: {
+              key: licenseData[0].qualifi_url,
+            },
+          },
+        ],
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -147,6 +261,10 @@ export default class UserRegister extends Component {
   // 文件上传状态改变时处理
   handleUploadChange = (key, fileList) => {
     this.setState({ [key]: fileList });
+    // 删除license的值触发表单校验
+    if (key === 'photos' && !fileList.length) {
+      this.props.form.setFieldsValue({ license: undefined });
+    }
   };
 
   // 图片预览
@@ -288,17 +406,18 @@ export default class UserRegister extends Component {
         },
         qualifications
       );
-     if (this.props.handleSubmit && typeof (this.props.handleSubmit) === 'function') {
-      this.props.handleSubmit(
-        {
+      if (
+        this.props.handleSubmit &&
+        typeof this.props.handleSubmit === 'function'
+      ) {
+        this.props.handleSubmit({
           // 发起注册操作
           ...values,
           qualifications,
           ...place,
           password: sha256(values.password),
           confirm: sha256(values.confirm),
-        }
-      );
+        });
       } else {
         this.dispatchRegister({
           // 发起注册操作
@@ -496,7 +615,12 @@ export default class UserRegister extends Component {
                     message: '请输入帐户名',
                   },
                 ],
-              })(<Input placeholder="请输入帐户名" disabled={type === 'update'} />)}
+              })(
+                <Input
+                  placeholder="请输入帐户名"
+                  disabled={type === 'update'}
+                />
+              )}
             </FormItem>
             <FormItem {...formItemLayout} label="密码" help={this.state.help}>
               <Popover
@@ -579,7 +703,7 @@ export default class UserRegister extends Component {
                     message: '请输入正确的手机号码',
                   },
                 ],
-              })(<Input />)}
+              })(<Input disabled={type === 'update'} />)}
             </FormItem>
             <FormItem {...formItemLayout} label="短信验证码">
               {getFieldDecorator('captcha', {
@@ -666,7 +790,7 @@ export default class UserRegister extends Component {
               })(<Input />)}
             </FormItem>
             <FormItem {...formItemLayout} label="营业执照照片">
-              {getFieldDecorator('qualifications', {
+              {getFieldDecorator('license', {
                 rules: [
                   {
                     required: true,
@@ -679,6 +803,7 @@ export default class UserRegister extends Component {
                     name="file"
                     action={QINIU_SERVER}
                     listType="picture-card"
+                    fileList={this.state.photos}
                     className="avatar-uploader"
                     beforeUpload={currFile =>
                       this.handleBeforeUpload('photos', currFile)
@@ -751,6 +876,7 @@ export default class UserRegister extends Component {
                       name="file"
                       action={QINIU_SERVER}
                       listType="picture-card"
+                      fileList={this.state.agency}
                       className="avatar-uploader"
                       beforeUpload={currFile =>
                         this.handleBeforeUpload('agency', currFile)
@@ -806,6 +932,7 @@ export default class UserRegister extends Component {
                       name="file"
                       action={QINIU_SERVER}
                       listType="picture-card"
+                      fileList={this.state.integrator}
                       className="avatar-uploader"
                       beforeUpload={currFile =>
                         this.handleBeforeUpload('integrator', currFile)
@@ -873,6 +1000,7 @@ export default class UserRegister extends Component {
                       name="file"
                       action={QINIU_SERVER}
                       listType="picture-card"
+                      fileList={this.state.taxpayer}
                       className="avatar-uploader"
                       beforeUpload={currFile =>
                         this.handleBeforeUpload('taxpayer', currFile)
@@ -948,6 +1076,7 @@ export default class UserRegister extends Component {
                         name="file"
                         action={QINIU_SERVER}
                         listType="picture-card"
+                        fileList={this.state.production}
                         className="avatar-uploader"
                         beforeUpload={currFile =>
                           this.handleBeforeUpload('production', currFile)
@@ -1004,6 +1133,7 @@ export default class UserRegister extends Component {
                         name="file"
                         action={QINIU_SERVER}
                         listType="picture-card"
+                        fileList={this.state.certification}
                         className="avatar-uploader"
                         beforeUpload={currFile =>
                           this.handleBeforeUpload('certification', currFile)
@@ -1061,6 +1191,7 @@ export default class UserRegister extends Component {
                         name="file"
                         action={QINIU_SERVER}
                         listType="picture-card"
+                        fileList={this.state.other}
                         className="avatar-uploader"
                         beforeUpload={currFile =>
                           this.handleBeforeUpload('other', currFile)
@@ -1085,7 +1216,7 @@ export default class UserRegister extends Component {
             ) : null}
             <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
               <Button type="primary" htmlType="submit" loading={false}>
-              {this.props.buttonText || '提交'}
+                {this.props.buttonText || '提交'}
               </Button>
               {/* <Button style={{ marginLeft: 8 }}>保存</Button> */}
             </FormItem>
@@ -1134,6 +1265,6 @@ export default class UserRegister extends Component {
     if (type === 'update') {
       return content;
     }
-    return <PageHeaderLayout title="企业用户注册" >{content}</PageHeaderLayout>;
+    return <PageHeaderLayout title="企业用户注册">{content}</PageHeaderLayout>;
   }
 }
