@@ -55,10 +55,10 @@ const passwordProgressMap = {
     const { user } = props;
     const { supplierInfo } = user;
     const { profile, ...others } = supplierInfo;
-    const { qualifies, ...basic_info } = profile;
     if (!profile) {
       return {};
     }
+    const { qualifies, ...basic_info } = profile;
     let formData = {};
     Object.keys(profile).map((item) => {
       formData = {
@@ -125,8 +125,10 @@ const passwordProgressMap = {
 export default class UserRegister extends Component {
   constructor(props) {
     super(props);
-    const { modalVisible } = props;
-    this.state = {
+    const { modalVisible, user, type } = props;
+    const { supplierInfo } = user;
+    const { profile } = supplierInfo;
+    const initState = {
       count: 0,
       loading: false,
       visible: false,
@@ -141,71 +143,71 @@ export default class UserRegister extends Component {
       companyType: '', // 公司性质
       isGeneralTaxpayer: false,
     };
+    // 注册
+    if (!profile) {
+      this.state = initState;
+    } else {
+      const { qualifies } = profile;
+      const flagArray = qualifies.filter(
+        item =>
+          item.qualifi_name === 'production' ||
+          item.qualifi_name === 'certification' ||
+          item.qualifi_name === 'other'
+      );
+      // 一般纳税人照片
+      const isGeneralTaxpayerArray = qualifies.filter(
+        item => item.qualifi_name === 'taxpayer'
+      );
+      let licenseData = [];
+      // 其他照片
+      let otherDatata = [];
+      if (qualifies) {
+        licenseData = qualifies.filter(item => item.qualifi_name === 'license');
+        qualifies.map((item) => {
+          otherDatata = {
+            ...otherDatata,
+            [item.qualifi_name]: [
+              {
+                uid: item.effective_date + item.qualifi_url, // 时间+url做为ID
+                status: 'done',
+                url: item.qualifi_url,
+                response: {
+                  key: item.qualifi_url,
+                },
+              },
+            ],
+          };
+          return null;
+        });
+      }
+      this.state = {
+        ...initState,
+        photos:
+          licenseData.length > 0
+            ? [
+                {
+                  uid: licenseData[0].effective_date + licenseData[0].qualifi_url, // 时间+url做为ID
+                  status: 'done',
+                  url: licenseData[0].qualifi_url,
+                  response: {
+                    key: licenseData[0].qualifi_url,
+                  },
+                },
+              ]
+            : [],
+        isFlag: flagArray.length > 0, // 是否立即上传产品资质
+        companyType: profile.company_type, // 公司性质
+        isGeneralTaxpayer: isGeneralTaxpayerArray.length > 0,
+        ...otherDatata,
+      };
+    }
   }
 
   componentDidMount() {
-    const { dispatch, user } = this.props;
-    const { supplierInfo } = user;
+    const { dispatch } = this.props;
     dispatch({
       type: 'upload/fetch',
     });
-    const { profile } = supplierInfo;
-    const { qualifies, ...others } = profile;
-    // TODO 优化
-    this.setState({ companyType: profile.company_type });
-    const flagArray = qualifies.filter(
-      item =>
-        item.qualifi_name === 'production' ||
-        item.qualifi_name === 'certification' ||
-        item.qualifi_name === 'other'
-    );
-    if (flagArray.length > 0) {
-      this.setState({
-        isFlag: true,
-      });
-    }
-    // 一般纳税人照片
-    const isGeneralTaxpayerArray = qualifies.filter(
-      item => item.qualifi_name === 'taxpayer'
-    );
-    if (isGeneralTaxpayerArray.length > 0) {
-      this.setState({
-        isGeneralTaxpayer: true,
-      });
-    }
-    qualifies.map((item) => {
-      this.setState({
-        [item.qualifi_name]: [
-          {
-            uid: item.effective_date + item.qualifi_url, // 时间+url做为ID
-            status: 'done',
-            url: item.qualifi_url,
-            response: {
-              key: item.qualifi_url,
-            },
-          },
-        ],
-      });
-      return null;
-    });
-    let licenseData = [];
-    if (qualifies) {
-      licenseData = qualifies.filter(item => item.qualifi_name === 'license');
-    }
-    if (licenseData.length) {
-      this.setState({
-        photos: [
-          {
-            uid: licenseData[0].effective_date + licenseData[0].qualifi_url, // 时间+url做为ID
-            status: 'done',
-            url: licenseData[0].qualifi_url,
-            response: {
-              key: licenseData[0].qualifi_url,
-            },
-          },
-        ],
-      });
-    }
   }
 
   componentWillUnmount() {
