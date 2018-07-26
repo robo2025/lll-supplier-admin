@@ -102,6 +102,7 @@ const menuData = [
     name: '合同管理',
     path: 'contractManagement',
     icon: 'code-o',
+    authority: '2',
     children: [
       {
         name: '合同列表',

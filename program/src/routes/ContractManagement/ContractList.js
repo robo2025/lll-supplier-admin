@@ -1,39 +1,37 @@
-import React, { Fragment } from "react";
-import qs from "qs";
-import moment from "moment";
-import PageHeaderLayout from "../../layouts/PageHeaderLayout";
+import React from 'react';
+import qs from 'qs';
+import moment from 'moment';
 import {
-  Form,
-  Row,
-  Col,
-  Button,
-  Icon,
-  Badge,
-  Select,
-  Input,
-  InputNumber,
-  Card,
-  Divider,
-  Table,
-  Modal,
-  message,
-  Spin,
-  DatePicker
-} from "antd";
-import DescriptionList from "../../components/DescriptionList";
-import { CONTRACT_STATUS } from "../../constant/statusList";
-import styles from "./contract.less";
-import { connect } from "dva";
+    Form,
+    Row,
+    Col,
+    Button,
+    Icon,
+    Badge,
+    Select,
+    Input,
+    Card,
+    Table,
+    Modal,
+    message,
+    Spin,
+    DatePicker,
+  } from 'antd';
+  import { connect } from 'dva';
+import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import { CONTRACT_STATUS } from '../../constant/statusList';
+import styles from './contract.less';
+
+
 const FormItem = Form.Item;
-const Option = Select.Option;
+const { Option } = Select;
 const { RangePicker } = DatePicker;
-const { Description } = DescriptionList;
-const contractBadge = ["default", "success", "warning", "error"];
+const contractBadge = ['default', 'success', 'warning', 'error'];
 @Form.create()
 @connect(({ contract, loading }) => ({
   contract,
-  loading: loading.effects["contract/fetch"],
-  detailLoading: loading.effects["contract/fetchContractDetail"]
+  loading: loading.effects['contract/fetch'],
+  detailLoading: loading.effects['contract/fetchContractDetail'],
 }))
 export default class ContractList extends React.Component {
   constructor(props) {
@@ -41,96 +39,80 @@ export default class ContractList extends React.Component {
     this.state = {
       expandForm: false,
       args: qs.parse(props.location.search || { page: 1, pageSize: 10 }, {
-        ignoreQueryPrefix: true
+        ignoreQueryPrefix: true,
       }),
       searchValues: {},
       visible: false, // 查看模态
-      viewInfo: {} // 保存查看的对象
     };
   }
   componentDidMount() {
     const { args } = this.state;
     const { dispatch } = this.props;
     dispatch({
-      type: "contract/fetch",
+      type: 'contract/fetch',
       offset: (args.page - 1) * args.pageSize,
-      limit: args.pageSize
+      limit: args.pageSize,
     });
   }
   onCancel = () => {
-    //取消查看模态框
+    // 取消查看模态框
     this.setState({
-      visible: false
+      visible: false,
     });
   };
-  viewInfo = record => {
-    // 确定查看详情
-    const { dispatch } = this.props;
-    dispatch({
-      type: "contract/fetchContractDetail",
-      id: record.id,
-      success: res => {},
-      error: res => {
-        message.error(res.msg);
-      }
-    });
-    this.setState({
-      visible: true
-    });
-  };
-  onTableChange = pagination => {
-    //表格页码发生改变
+  onTableChange = (pagination) => {
+    // 表格页码发生改变
     const { dispatch, history } = this.props;
     const { searchValues } = this.state;
     this.setState({
       args: {
         page: pagination.current,
-        pageSize: pagination.pageSize
-      }
+        pageSize: pagination.pageSize,
+      },
     });
     history.replace({
-      search: `?page=${pagination.current}&pageSize=${pagination.pageSize}`
+      search: `?page=${pagination.current}&pageSize=${pagination.pageSize}`,
     });
     dispatch({
-      type: "contract/fetch",
+      type: 'contract/fetch',
       offset: pagination.pageSize * (pagination.current - 1),
       limit: pagination.pageSize,
-      params: searchValues
+      params: searchValues,
     });
   };
   // 搜索条件
-  handleSearch = e => {
+  handleSearch = (e) => {
     e.preventDefault();
     const { form, dispatch, history } = this.props;
     const { args } = this.state;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      const values = {};
-      if (fieldsValue.create_time && fieldsValue.create_time.length > 0) {
-        values.start_time = fieldsValue.create_time[0].format("YYYY-MM-DD");
-        values.end_time = fieldsValue.create_time[1].format("YYYY-MM-DD");
+      const { create_time, ...values } = fieldsValue;
+      if (create_time && create_time.length > 0) {
+        values.start_time = create_time[0].format('YYYY-MM-DD');
+        values.end_time = create_time[1].format('YYYY-MM-DD');
       }
-      delete fieldsValue.create_time;
-      for (var key in fieldsValue) {
-        if (fieldsValue[key]) {
-          values[key] = fieldsValue[key].trim();
+      const searchValues = {};
+      for (const key in values) {
+        if (values[key]) {
+          searchValues[key] = values[key].trim();
         }
       }
       this.setState({
-        searchValues: values,
+        searchValues,
         args: {
           page: 1,
-          pageSize: args.pageSize
-        }
+          pageSize: args.pageSize,
+        },
       });
       history.replace({
-        search: `?page=1&pageSize=${args.pageSize}`
+        search: `?page=1&pageSize=${args.pageSize}`,
       });
       dispatch({
-        type: "contract/fetch",
+        type: 'contract/fetch',
         offset: 0,
         limit: args.pageSize,
-        params: values
+        params: searchValues,
       });
     });
   };
@@ -141,17 +123,32 @@ export default class ContractList extends React.Component {
     this.setState({
       args: {
         page: 1,
-        pageSize: args.pageSize
+        pageSize: args.pageSize,
       },
-      searchValues: {}
+      searchValues: {},
     });
     history.replace({
-      search: `?page=1&pageSize=${args.pageSize}`
+      search: `?page=1&pageSize=${args.pageSize}`,
     });
     dispatch({
-      type: "contract/fetch",
+      type: 'contract/fetch',
       offset: 0,
-      limit: args.pageSize
+      limit: args.pageSize,
+    });
+  };
+  viewInfo = (record) => {
+    // 确定查看详情
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'contract/fetchContractDetail',
+      id: record.id,
+      success: () => {},
+      error: (res) => {
+        message.error(res.msg);
+      },
+    });
+    this.setState({
+      visible: true,
     });
   };
   renderForm() {
@@ -163,19 +160,19 @@ export default class ContractList extends React.Component {
         <Row gutter={{ md: 24, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
             <FormItem label="合同编号">
-              {getFieldDecorator("contract_no")(<Input placeholder="请输入" />)}
+              {getFieldDecorator('contract_no')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
             <FormItem label="合同类型">
-              {getFieldDecorator("contract_type")(
+              {getFieldDecorator('contract_type')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
             <FormItem label="合同状态">
-              {getFieldDecorator("contract_status")(
+              {getFieldDecorator('contract_status')(
                 <Select placeholder="请选择">
                   <Option value="">全部</Option>
                   <Option value="1">未过期</Option>
@@ -190,13 +187,13 @@ export default class ContractList extends React.Component {
           <Row gutter={{ md: 24, lg: 24, xl: 48 }}>
             <Col md={9} sm={24}>
               <FormItem label="创建时间">
-                {getFieldDecorator("create_time")(<RangePicker />)}
+                {getFieldDecorator('create_time')(<RangePicker />)}
               </FormItem>
             </Col>
           </Row>
         ) : null}
-        <div style={{ overflow: "hidden" }}>
-          <span style={{ float: "right", marginBottom: 24 }}>
+        <div style={{ overflow: 'hidden' }}>
+          <span style={{ float: 'right', marginBottom: 24 }}>
             <Button type="primary" htmlType="submit">
               查询
             </Button>
@@ -234,7 +231,7 @@ export default class ContractList extends React.Component {
     );
   }
   render() {
-    const { contract, loading,detailLoading } = this.props;
+    const { contract, loading, detailLoading } = this.props;
     const { contractList, contractTotal, contractDetail } = contract;
     const { contract_info, supplier_info } = contractDetail;
     const {
@@ -243,7 +240,7 @@ export default class ContractList extends React.Component {
       start_time,
       end_time,
       contract_urls,
-      contract_status
+      contract_status,
     } =
       contract_info || {};
     const { mobile, username, profile } = supplier_info || {};
@@ -252,83 +249,83 @@ export default class ContractList extends React.Component {
     const { page, pageSize } = args;
     const columns = [
       {
-        title: "序号",
-        width:60,
-        key: "idx",
-        dataIndex: "idx",
-        render: (text, record, index) => index + 1
+        title: '序号',
+        width: 60,
+        key: 'idx',
+        dataIndex: 'idx',
+        render: (text, record, index) => index + 1,
       },
       {
-        title: "合同编号",
+        title: '合同编号',
         // width:"240px",
-        dataIndex: "contract_no",
-        key: "contract_no"
+        dataIndex: 'contract_no',
+        key: 'contract_no',
       },
       {
-        title: "合同类型",
+        title: '合同类型',
         // width:"240px",
-        dataIndex: "contract_type",
-        key: "contract_type"
+        dataIndex: 'contract_type',
+        key: 'contract_type',
       },
       {
-        title: "合同有效期",
+        title: '合同有效期',
         // width:"180px",
-        key: "startAndEnd",
-        render: record => `${record.start_time} ~ ${record.end_time}`
+        key: 'startAndEnd',
+        render: record => `${record.start_time} ~ ${record.end_time}`,
       },
       {
-        title: "合同状态",
-        width:"120px",
-        dataIndex: "contract_status",
-        key: "contract_status",
+        title: '合同状态',
+        width: '120px',
+        dataIndex: 'contract_status',
+        key: 'contract_status',
         render: val => (
           <Badge status={contractBadge[val]} text={CONTRACT_STATUS[val]} />
-        )
+        ),
       },
       {
-        title: "创建时间",
+        title: '创建时间',
         // width:"180px",
-        key: "created_time",
-        dataIndex: "created_time",
-        render: val => moment(val * 1000).format("YYYY-MM-DD HH:mm:ss")
+        key: 'created_time',
+        dataIndex: 'created_time',
+        render: val => moment(val * 1000).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
-        title: "操作",
-        key: "operation",
+        title: '操作',
+        key: 'operation',
         width: 80,
-        render: record => {
+        render: (record) => {
           return (
             <a
-              style={{ textDecoration: "none" }}
-              href="javascript:;"
+              style={{ textDecoration: 'none' }}
+              href=" javascript:;"
               onClick={() => this.viewInfo(record)}
             >
               查看
             </a>
           );
-        }
-      }
+        },
+      },
     ];
     const paginationOptions = {
       total: contractTotal,
       showSizeChanger: true,
       showQuickJumper: true,
       current: page >> 0,
-      pageSize: pageSize >> 0
+      pageSize: pageSize >> 0,
     };
     const FormItemLayout = {
       labelCol: {
         xs: { span: 12 },
-        sm: { span: 8 }
+        sm: { span: 8 },
       },
       wrapperCol: {
         xs: { span: 12 },
-        sm: { span: 16 }
-      }
+        sm: { span: 16 },
+      },
     };
     return (
       <PageHeaderLayout title="供应商合同列表">
-        <Card title="搜索条件" className={styles["search-wrap"]}>
+        <Card title="搜索条件" className={styles['search-wrap']}>
           <div className={styles.tableListForm}>{this.renderForm()}</div>
         </Card>
         <Card>
@@ -401,8 +398,8 @@ export default class ContractList extends React.Component {
                   <Col span={12}>
                     <FormItem label="合同电子档" {...FormItemLayout}>
                       {contract_urls ? (
-                        <a href={contract_urls.split("@")[1]} target="_blank">
-                          {contract_urls.split("@")[0]}
+                        <a href={contract_urls.split('@')[1]} target=" _blank">
+                          {contract_urls.split('@')[0]}
                         </a>
                       ) : null}
                     </FormItem>

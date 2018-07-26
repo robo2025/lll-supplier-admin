@@ -64,7 +64,7 @@ export default class NewGood extends Component {
                 attr_name: '检测物体',
             }],
             otherAttrs: [],
-            associationTableParams: { offset: 0, limit: 6, params: {} },// 存储关联modal数据
+            associationTableParams: { offset: 0, limit: 6, params: {} }, // 存储关联modal数据
         };
     }
 
@@ -75,11 +75,11 @@ export default class NewGood extends Component {
         dispatch({
             type: 'good/fetchAassociatedProduct',
             offset: 0,
-            limit: 6
+            limit: 6,
         });
         dispatch({
             type: 'good/fetchLevel',
-        })
+        });
         if (args.mno) {
             dispatch({
                 type: 'good/fetchAassociatedProductDetail',
@@ -182,9 +182,9 @@ export default class NewGood extends Component {
             associationTableParams: {
                 offset: pagination.current - 1,
                 limit: pagination.pageSize,
-                params: associationTableParams.params
-            }
-        })
+                params: associationTableParams.params,
+            },
+        });
         dispatch({
             type: 'good/fetchAassociatedProduct',
             offset: params.offset,
@@ -202,14 +202,14 @@ export default class NewGood extends Component {
             associationTableParams: {
                 offset: 0,
                 limit: associationTableParams.limit,
-                params: {}
-            }
+                params: {},
+            },
         });
         dispatch({
             type: 'good/fetchAassociatedProduct',
             offset: 0,
             limit: associationTableParams.limit,
-            params: {}
+            params: {},
         });
     }
 
@@ -221,7 +221,7 @@ export default class NewGood extends Component {
         form.validateFields((err, fieldsValue) => {
             if (err) return;
             const category = {};
-            if(fieldsValue.category&&fieldsValue.category.length > 0) {
+            if (fieldsValue.category && fieldsValue.category.length > 0) {
                 category.category_id_1 = fieldsValue.category[0];
                 category.category_id_2 = fieldsValue.category[1];
                 category.category_id_3 = fieldsValue.category[2];
@@ -236,15 +236,15 @@ export default class NewGood extends Component {
                 associationTableParams: {
                     offset: 0,
                     limit: associationTableParams.limit,
-                    params: values
-                }
+                    params: values,
+                },
             });
 
             dispatch({
                 type: 'good/fetchAassociatedProduct',
                 params: values,
                 offset: 0,
-                limit: associationTableParams.limit
+                limit: associationTableParams.limit,
             });
         });
     }
@@ -263,9 +263,9 @@ export default class NewGood extends Component {
         if (this.$formObj) {
             this.$formObj.validateFields((err, values) => {
                 if (!err) {
-                    let values = {...fields}
-                    if(!fields.min_buy) {
-                        values = {...values,min_buy:1}
+                    let values = { ...fields };
+                    if (!fields.min_buy) {
+                        values = { ...values, min_buy: 1 };
                     }
                     dispatch({
                         type: 'good/add',
@@ -287,8 +287,8 @@ export default class NewGood extends Component {
 
     renderSimpleForm() {
         const { getFieldDecorator } = this.props.form;
-        const {good} = this.props;
-        const {level} = good;
+        const { good } = this.props;
+        const { level } = good;
         getStanrdCatalog(level);
         return (
             <Form onSubmit={this.handleSearch} layout="inline">
@@ -324,7 +324,7 @@ export default class NewGood extends Component {
                     <Col xll={9} md={9} sm={24}>
                         <FormItem label="产品型号ID">
                             {getFieldDecorator('mno')(
-                                <Input placeholder="请输入" style={{ width: 238 }}/>
+                                <Input placeholder="请输入" style={{ width: 238 }} />
                             )}
                         </FormItem>
                     </Col>

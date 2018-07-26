@@ -128,16 +128,16 @@ const SLN_PAY_STATUS = {
 };
 // 入库操作类型
 const STOCK_OPERATION_TYPE = {
-    I:"入库",
-    S:"订单出库",
-    O:"调拨",
-    N:"第一次入库"
+    I: '入库',
+    S: '订单出库',
+    O: '调拨',
+    N: '第一次入库',
 };
 const CONTRACT_STATUS = {
-    1:'未过期',
-    2:'即将过期',
-    3:'已过期'
-}
+    1: '未过期',
+    2: '即将过期',
+    3: '已过期',
+};
 export {
   ACTION_STATUS,
   ACTION_FLAG,
@@ -154,5 +154,5 @@ export {
   PUBLISH_STATUS,
   SLN_PAY_STATUS,
   STOCK_OPERATION_TYPE,
-  CONTRACT_STATUS
+  CONTRACT_STATUS,
 };

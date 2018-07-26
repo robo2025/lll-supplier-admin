@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 import Services from '../utils/customerService';
 
 import {
-  queryCurrent,
+  audit,
   getUserInfo,
   registerUser,
   getSMSCode,
@@ -106,10 +106,10 @@ export default {
     *changeAuthorityUrl(_, { call }) {
       const userinfo = yield call(getUserInfo);
         const {
-          data: { id },
+          data: { main_user_id },
         } = userinfo;
         // TODO：在本地token与线上token同名冲突的时候报403
-        const response = yield call(getSupplierInfo, { supplierId: id });
+        const response = yield call(getSupplierInfo, { supplierId: main_user_id });
         if (response.data.profile.audit_status !== 1) {
           setAuthority('1'); // 1为账号未通过审核的权限
           location.href = `${USER_INFO}`;
@@ -141,7 +141,18 @@ export default {
         window.location.href = `${LOGIN_URL}?next=${VERIFY_PAGE}&from=supplier`;
       }
     },
-    
+    // 提交审核
+    *audit({ payload, callback }, { call, put }) {
+      const response = yield call(audit, { ...payload });
+      const { rescode, data, msg } = response;
+      if (rescode === '10000') {
+        if (callback) {
+          callback(true, data);
+        }
+      } else if (callback) {
+        callback(false, msg);
+      }
+    },
   },
 
   reducers: {

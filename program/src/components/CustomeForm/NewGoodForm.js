@@ -145,13 +145,13 @@ export default class NewGoodForm extends Component {
             // console.log('cad fileList', fileList);
         }
     }
-    handleStock = (rule, value, callback) => {// 校验库存数量
+    handleStock = (rule, value, callback) => { // 校验库存数量
         if (value > 9999) {
             callback('库存数量不能超过9999个');
         }
         callback();
     }
-    handleMinBuy = (rule, value, callback) => {// 校验采购量
+    handleMinBuy = (rule, value, callback) => { // 校验采购量
         if (value > 9999) {
             callback('最低采购量不能超过9999个');
         }
@@ -198,7 +198,7 @@ export default class NewGoodForm extends Component {
             if (data.product) {
                 uploaderCAD = data.product.cad_urls.map((val, idx) => (
                     <Col span={24} key={idx}>
-                        <a href={val} style={{ display: 'block' }} target="_blank">
+                        <a href={val} style={{ display: 'block' }} target=" _blank">
                             {val}
                         </a>
                     </Col>
@@ -291,12 +291,12 @@ export default class NewGoodForm extends Component {
                                 {
                                     pattern: /^(\d+)$/,
                                     message: '库存数量必须是整数',
-                                },{
-                                    validator:this.handleMinBuy
+                                }, {
+                                    validator: this.handleMinBuy,
                                 }],
                                 initialValue: data.min_buy >> 0,
                             })(
-                                <Input type="number"/>
+                                <Input type="number" />
                             )}
                         </FormItem>
                         <FormItem
@@ -352,8 +352,8 @@ export default class NewGoodForm extends Component {
                                     message: '库存数量必须是整数',
                                 },
                                 {
-                                    validator: this.handleStock
-                                }
+                                    validator: this.handleStock,
+                                },
                                 ],
                                 initialValue: data.stock,
                             })(

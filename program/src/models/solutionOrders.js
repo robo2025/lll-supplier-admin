@@ -47,7 +47,6 @@ export default {
       const newPagination = {
         ...pagination,
         total: parseInt(headers['x-content-total'], 10),
-        current: parseInt(headers['x-content-range'][0], 10) + 1,
       };
       yield put({
         type: 'savePagination',
