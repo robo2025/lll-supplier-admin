@@ -138,6 +138,12 @@ const CONTRACT_STATUS = {
     2: '即将过期',
     3: '已过期',
 };
+// 账单状态
+const FINANCIAL_STATUS = {
+    1: '待发布',
+    2: '待确认',
+    3: '已确认',
+};
 export {
   ACTION_STATUS,
   ACTION_FLAG,
@@ -155,4 +161,5 @@ export {
   SLN_PAY_STATUS,
   STOCK_OPERATION_TYPE,
   CONTRACT_STATUS,
+  FINANCIAL_STATUS,
 };

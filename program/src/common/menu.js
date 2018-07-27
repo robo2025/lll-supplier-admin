@@ -121,6 +121,23 @@ const menuData = [
       },
     ],
   },
+  {
+    name: '财务结算',
+    path: 'financialSettlement',
+    icon: 'credit-card',
+    children: [
+      {
+        name: '任务中心',
+        path: 'taskCenter',
+        children: [
+            {
+                name: '对账处理',
+                path: 'reconcileProcess',
+            },
+        ],
+      },
+    ],
+  },
 ];
 
 function formatter(data, parentPath = '/', parentAuthority) {
