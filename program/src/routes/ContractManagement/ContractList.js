@@ -1,6 +1,7 @@
 import React from 'react';
 import qs from 'qs';
 import moment from 'moment';
+import locale from 'antd/lib/date-picker/locale/zh_CN';
 import {
     Form,
     Row,
@@ -187,7 +188,7 @@ export default class ContractList extends React.Component {
           <Row gutter={{ md: 24, lg: 24, xl: 48 }}>
             <Col md={9} sm={24}>
               <FormItem label="创建时间">
-                {getFieldDecorator('create_time')(<RangePicker />)}
+                {getFieldDecorator('create_time')(<RangePicker locale={locale} />)}
               </FormItem>
             </Col>
           </Row>

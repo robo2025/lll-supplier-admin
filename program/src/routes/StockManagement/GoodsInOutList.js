@@ -1,32 +1,32 @@
 import React from 'react';
 import qs from 'qs';
-import moment from 'moment';
 import { connect } from 'dva';
-import { Card, Form, Row, Col, Input, Select, Button, Icon, Modal, DatePicker, Table } from 'antd';
-import PageHeaderLayout from "../../layouts/PageHeaderLayout";
-import styles from "./stock.less";
-import StockInOutTable from "../../components/StockManagement/StockInOutTable";
+import { Card, Form, Row, Col, Input, Select, Button, DatePicker } from 'antd';
+import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import styles from './stock.less';
+import StockInOutTable from '../../components/StockManagement/StockInOutTable';
+
 const FormItem = Form.Item;
-const Option = Select.Option;
+const { Option } = Select;
 const { RangePicker } = DatePicker;
 @Form.create()
-@connect(({ stock, loading }) => ({ stock, loading:loading.effects['stock/fetchRecord'] }))
+@connect(({ stock, loading }) => ({ stock, loading: loading.effects['stock/fetchRecord'] }))
 export default class GoodsInOutList extends React.Component {
     constructor(props) {
-        super(props)
-        this.state={
+        super(props);
+        this.state = {
             args: qs.parse(props.location.search || { page: 1, pageSize: 10 }, { ignoreQueryPrefix: true }),
             searchValues: {},
-        }
+        };
     }
     componentDidMount() {
         const { dispatch } = this.props;
         const { args } = this.state;
         dispatch({
-            type: "stock/fetchRecord",
+            type: 'stock/fetchRecord',
             offset: (args.page - 1) * args.pageSize,
-            limit: args.pageSize
-        })
+            limit: args.pageSize,
+        });
     }
     onTableChange = (pagination) => {
         const { history, dispatch } = this.props;
@@ -34,18 +34,18 @@ export default class GoodsInOutList extends React.Component {
         this.setState({
             args: {
                 page: pagination.current,
-                pageSize: pagination.pageSize
+                pageSize: pagination.pageSize,
             },
-        })
+        });
         history.replace({
-            search: `?page=${pagination.current}&pageSize=${pagination.pageSize}`
-        })
+            search: `?page=${pagination.current}&pageSize=${pagination.pageSize}`,
+        });
         dispatch({
-            type: "stock/fetchRecord",
+            type: 'stock/fetchRecord',
             offset: (pagination.current - 1) * pagination.pageSize,
             limit: pagination.pageSize,
-            params: searchValues
-        })
+            params: searchValues,
+        });
     }
     handleSearch = (e) => {
         e.preventDefault();
@@ -54,54 +54,53 @@ export default class GoodsInOutList extends React.Component {
         form.validateFields((err, filedsValue) => {
             if (err) return;
             const values = {};
-            for (var key in filedsValue) {
+            for (const key in filedsValue) {
                 if (filedsValue[key]) {
                     values[key] = filedsValue[key];
                 }
             }
-            if(values.create_time && values.create_time.length > 0) {
-                values.start_time = values.create_time[0].format("YYYY-MM-DD");
-                values.stop_time = values.create_time[1].format("YYYY-MM-DD");
+            if (values.create_time && values.create_time.length > 0) {
+                values.start_time = values.create_time[0].format('YYYY-MM-DD');
+                values.stop_time = values.create_time[1].format('YYYY-MM-DD');
             }
             delete values.create_time;
             this.setState({
                 args: {
                     page: 1,
-                    pageSize: args.pageSize
+                    pageSize: args.pageSize,
                 },
-                searchValues: values
-            })
+                searchValues: values,
+            });
             history.replace({
-                search: `?page=1&pageSize=${args.pageSize}`
-            })
+                search: `?page=1&pageSize=${args.pageSize}`,
+            });
             dispatch({
-                type: "stock/fetchRecord",
+                type: 'stock/fetchRecord',
                 offset: 0,
                 limit: args.pageSize,
-                params: values
-            })
-        })
+                params: values,
+            });
+        });
     }
     handleFormReset = () => {
         const { form, history, dispatch } = this.props;
         const { args } = this.state;
-        form.resetFields()
+        form.resetFields();
         this.setState({
             args: {
                 page: 1,
-                pageSize: args.pageSize
+                pageSize: args.pageSize,
             },
             searchValues: {},
-            viewRecordModalShow: false
-        })
+        });
         history.replace({
-            search: `?page=1&pageSize=${args.pageSize}`
-        })
+            search: `?page=1&pageSize=${args.pageSize}`,
+        });
         dispatch({
-            type: "stock/fetchRecord",
+            type: 'stock/fetchRecord',
             offset: 0,
             limit: args.pageSize,
-        })
+        });
     }
     renderForm() {
         const { getFieldDecorator } = this.props.form;
@@ -141,13 +140,13 @@ export default class GoodsInOutList extends React.Component {
                     </span>
                 </div>
             </Form>
-        )
+        );
     }
     render() {
-        const {stock,loading} = this.props;
-        const {args} = this.state;
-        const {page,pageSize} = args;
-        const {stockRecord,recordTotal} = stock;
+        const { stock, loading } = this.props;
+        const { args } = this.state;
+        const { page, pageSize } = args;
+        const { stockRecord, recordTotal } = stock;
         return (
             <PageHeaderLayout title="出入库存记录">
                 <Card bordered={false} className={styles['search-wrap']} title="搜索条件">
@@ -169,6 +168,6 @@ export default class GoodsInOutList extends React.Component {
                     </div>
                 </Card>
             </PageHeaderLayout>
-        )
+        );
     }
 }

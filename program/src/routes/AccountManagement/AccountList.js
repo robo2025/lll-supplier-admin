@@ -77,7 +77,7 @@ const ModifyPasswordModal = Form.create()((props) => {
       onCancel={() => modifyPasswordModalCancel(form)}
       visible={passwordModalVisible}
     >
-    <Spin spinning={modifyPasswordLoading}>
+    <Spin spinning={modifyPasswordLoading || false}>
     <Form>
         <FormItem label="旧密码" {...formItemLayout}>
           {getFieldDecorator('old_password', {
