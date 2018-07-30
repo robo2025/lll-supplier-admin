@@ -169,7 +169,9 @@ export const getRouterData = (app) => {
       '/accountManagement/accountList': {
         component: dynamicWrapper(app, ['account'], () => import('../routes/AccountManagement/AccountList')),
       },
-    
+      '/financialSettlement/taskCenter/reconcileProcess': {
+        component: dynamicWrapper(app, ['financial', 'user'], () => import('../routes/FinancialSettlementSystem/TaskCenter/ReconcileProcess')),
+      },
   };
 
   // Get name from ./menu.js or just set it in the router data.

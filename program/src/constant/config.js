@@ -82,6 +82,10 @@ export const CONTRACT_URL = `${OPERATION_URL}/supplier/contract`;
 
 // 账号列表参数
 export const ACCOUNT_URL = `${USERS_SERVER}/supplier/accounts`;
+
+// 财务接口
+ export const FINANCIAL_URL = `${MAIN_URL}/financial`;
+
 // 接口请求状态码
 export const SUCCESS_STATUS = 10000; // 操作成功
 export const FAIL_STATUS = 10001; // 操作失败
