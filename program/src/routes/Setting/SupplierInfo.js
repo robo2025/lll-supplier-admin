@@ -23,12 +23,21 @@ const style = {
   marginBottom: 10,
 };
 const COMPANY_TYPE = {
-  supplier: '供应商',
+  supplier: '厂家',
   integrator: '集成商',
   agency: '代理商',
   other: '其他',
 };
-
+const IMAGE_NAME = {
+  license: '营业执照照片',
+  production: '生产许可证',
+  certification: '产品合格证',
+  supplier: '厂家相关证书',
+  taxpayer: '纳税人相关证书',
+  integrator: '集成商相关证书',
+  agency: '代理商相关证书',
+  other: '其他证书',
+};
 @connect(({ user }) => ({
   user,
 }))
@@ -44,13 +53,13 @@ export default class SupplierInfo extends Component {
       });
     }
   }
-  handleSubmit=(formData) => {
+  handleSubmit = (formData) => {
     const { supplierInfo } = this.props.user;
     this.props.dispatch({
       type: 'user/audit',
       payload: { formData, supplierId: supplierInfo.main_user_id },
       callback: (success, data) => {
-        if (success & success === true) {
+        if (success & (success === true)) {
           const userId = Cookies.getJSON('userinfo').id;
           this.props.dispatch({
             type: 'user/fetchSupplierInfo',
@@ -62,13 +71,13 @@ export default class SupplierInfo extends Component {
         }
       },
     });
-  }
+  };
   render() {
     const { supplierInfo } = this.props.user;
     const { profile, ...others } = supplierInfo;
     if (!profile) {
       return <Spin />;
-    } 
+    }
     const qualifies = supplierInfo.profile
       ? supplierInfo.profile.qualifies
       : [];
@@ -76,13 +85,10 @@ export default class SupplierInfo extends Component {
       ? supplierInfo.profile.company_type
       : '';
     const license = qualifies.find(val => val.qualifi_name === 'license');
-    const companyTypeLicense = companyType
-      ? qualifies.find(val => val.qualifi_name === companyType)
-      : {};
     const areaAddress = getAreaBycode(
       supplierInfo.profile ? supplierInfo.profile.district_id.toString() : ''
     );
-    
+
     return (
       <PageHeaderLayout title="企业信息">
         <Card
@@ -96,12 +102,20 @@ export default class SupplierInfo extends Component {
                     您的资料正在审核中，我们将来1-3个工作日内完成审核。
                   </span>
                 ) : (
-                  <span style={{ color: 'red' }}>审核不通过，请重新提交资料或联系客服(原因：{supplierInfo.audit_remark})</span>
+                  <span style={{ color: 'red' }}>
+                    审核不通过，请重新提交资料或联系客服(原因：{
+                      supplierInfo.audit_remark
+                    })
+                  </span>
                 )}
                   </a>
             </div>
           }
-          style={supplierInfo.profile.audit_status === 1 ? { display: 'none' } : { marginTop: 35 }}// 已通过的不显示
+          style={
+            supplierInfo.profile.audit_status === 1
+              ? { display: 'none' }
+              : { marginTop: 35 }
+          } // 已通过的不显示
         >
           <Steps current={supplierInfo.profile.audit_status === 2 ? 2 : 1}>
             <Step key={0} title="创建账号" />
@@ -115,7 +129,12 @@ export default class SupplierInfo extends Component {
           </Steps>
         </Card>
         {supplierInfo.profile.audit_status === 2 ? (
-          <UserRegister type="update" modalVisible={false} style={{ marginTop: 35 }} handleSubmit={formData => this.handleSubmit(formData)} />
+          <UserRegister
+            type="update"
+            modalVisible={false}
+            style={{ marginTop: 35 }}
+            handleSubmit={formData => this.handleSubmit(formData)}
+          />
         ) : (
           <Fragment>
             <Card title="基本信息" bordered style={{ marginTop: 35 }} hoverable>
@@ -159,46 +178,33 @@ export default class SupplierInfo extends Component {
               <FormItem {...formItemLayout} label="营业执照号" style={style}>
                 <span>{license && license.qualifi_code}</span>
               </FormItem>
-              <FormItem {...formItemLayout} label="营业执照照片" style={style}>
-                <div>
-                  <img
-                    width={500}
-                    src={license ? license.qualifi_url : ''}
-                    alt="营业执照"
-                  />
-                  <div>
-                    有效期：{license && license.effective_date}~{license &&
-                      license.expire_date}
-                  </div>
-                </div>
-              </FormItem>
               <FormItem {...formItemLayout} label="企业性质" style={style}>
                 <span>{supplierInfo.profile && COMPANY_TYPE[companyType]}</span>
               </FormItem>
-              {companyTypeLicense &&
-              Object.keys(companyTypeLicense).length > 0 ? (
+              {qualifies.map(item => (
                 <FormItem
+                  key={item.id}
                   {...formItemLayout}
-                  label={`${COMPANY_TYPE[companyType]}证书`}
+                  label={`${IMAGE_NAME[item.qualifi_name]}`}
                   style={style}
                 >
                   <div>
                     <img
-                      width={500}
-                      src={
-                        companyTypeLicense ? companyTypeLicense.qualifi_url : ''
-                      }
-                      alt={`${COMPANY_TYPE[companyType]}证书`}
+                      width={100}
+                      height={100}
+                      src={item.qualifi_url}
+                      alt={`${IMAGE_NAME[item.qualifi_name]}`}
+                      onClick={() => { window.open(item.qualifi_url); }}
                     />
                     <div>
                       有效期：
-                      {companyTypeLicense && companyTypeLicense.effective_date}
+                      {item.effective_date}
                       ~
-                      {companyTypeLicense && companyTypeLicense.expire_date}
+                      {item.expire_date}
                     </div>
                   </div>
                 </FormItem>
-              ) : null}
+              ))}
             </Card>
           </Fragment>
         )}
