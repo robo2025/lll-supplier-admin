@@ -94,11 +94,6 @@ const menuData = [
     ],
   },
   {
-    name: '企业信息',
-    icon: 'user',
-    path: 'setting/userInfo',
-  },
-  {
     name: '合同管理',
     path: 'contractManagement',
     icon: 'code-o',
@@ -126,6 +121,7 @@ const menuData = [
     name: '财务结算',
     path: 'financialSettlement',
     icon: 'credit-card',
+    authority: '2',
     children: [
       {
         name: '任务中心',
@@ -138,6 +134,11 @@ const menuData = [
         ],
       },
     ],
+  },
+  {
+    name: '企业信息',
+    icon: 'user',
+    path: 'setting/userInfo',
   },
 ];
 
