@@ -42,6 +42,12 @@ const slnStatus = (status) => {
           <Badge status="default" />未发布
         </span>
       );
+    case 'E':
+      return (
+        <span>
+          <Badge status="error" />已失效
+        </span>
+      );
     default:
       return (
         <span>
@@ -74,8 +80,14 @@ class SolutionList extends React.Component {
     this.props.dispatch({
       type: 'solution/fetch',
       payload: {
-        start_time: rangeValue && rangeValue.length ? rangeValue[0].format('YYYY-MM-DD') : null,
-        end_time: rangeValue && rangeValue.length ? rangeValue[1].format('YYYY-MM-DD') : null,
+        start_time:
+          rangeValue && rangeValue.length
+            ? rangeValue[0].format('YYYY-MM-DD')
+            : null,
+        end_time:
+          rangeValue && rangeValue.length
+            ? rangeValue[1].format('YYYY-MM-DD')
+            : null,
         ...fieldsValue,
       },
     });
@@ -95,8 +107,14 @@ class SolutionList extends React.Component {
       const rangeValue = fieldsValue['range-picker'];
       const { sln_no, is_type } = fieldsValue;
       const values = {
-        start_time: rangeValue && rangeValue.length ? rangeValue[0].format('YYYY-MM-DD') : null,
-        end_time: rangeValue && rangeValue.length ? rangeValue[1].format('YYYY-MM-DD') : null,
+        start_time:
+          rangeValue && rangeValue.length
+            ? rangeValue[0].format('YYYY-MM-DD')
+            : null,
+        end_time:
+          rangeValue && rangeValue.length
+            ? rangeValue[1].format('YYYY-MM-DD')
+            : null,
         sln_no,
         is_type,
       };
@@ -209,9 +227,7 @@ class SolutionList extends React.Component {
               </Col>
               <Col xll={4} md={8} sm={24}>
                 <FormItem label="创建时间">
-                  {getFieldDecorator('range-picker')(
-                    <RangePicker />
-                  )}
+                  {getFieldDecorator('range-picker')(<RangePicker />)}
                 </FormItem>
               </Col>
             </Row>
