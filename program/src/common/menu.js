@@ -114,6 +114,7 @@ const menuData = [
     name: '帐号管理',
     path: 'accountManagement',
     icon: 'bar-chart',
+    authority: '2',
     children: [
       {
         name: '帐号列表',
