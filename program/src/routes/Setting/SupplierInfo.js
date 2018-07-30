@@ -96,7 +96,7 @@ export default class SupplierInfo extends Component {
                     您的资料正在审核中，我们将来1-3个工作日内完成审核。
                   </span>
                 ) : (
-                  <span style={{ color: 'red' }}>审核不通过，请重新提交资料或联系客服</span>
+                  <span style={{ color: 'red' }}>审核不通过，请重新提交资料或联系客服(原因：{supplierInfo.audit_remark})</span>
                 )}
                   </a>
             </div>
