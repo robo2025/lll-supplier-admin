@@ -106,7 +106,7 @@ const menuData = [
     ],
   },
   {
-    name: '帐号管理',
+    name: '账号管理',
     path: 'accountManagement',
     icon: 'bar-chart',
     authority: '2',
@@ -127,10 +127,10 @@ const menuData = [
         name: '任务中心',
         path: 'taskCenter',
         children: [
-            {
-                name: '对账处理',
-                path: 'reconcileProcess',
-            },
+          {
+            name: '对账处理',
+            path: 'reconcileProcess',
+          },
         ],
       },
     ],
@@ -157,7 +157,7 @@ function formatter(data, parentPath = '/', parentAuthority) {
       result.children = formatter(
         item.children,
         `${parentPath}${item.path}/`,
-        item.authority
+        // item.authority // 有子菜单权限校验再打开  
       );
     }
     return result;
