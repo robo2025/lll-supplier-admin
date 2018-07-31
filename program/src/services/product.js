@@ -1,4 +1,3 @@
-import Cookies from 'js-cookie';
 import lyRequest from '../utils/lyRequest';
 import { API_URL } from '../constant/config';
 
@@ -8,12 +7,7 @@ import { API_URL } from '../constant/config';
  *
 */
 export async function queryProducts({ offset = 0, limit = 10 }) {
-  const acess_token = Cookies.get('access_token');
-  return lyRequest(`${API_URL}/products?offset=${offset}&limit=${limit}`, {
-    headers: {
-      Authorization: acess_token,
-    },
-  });
+  return lyRequest(`${API_URL}/products?offset=${offset}&limit=${limit}`);
 }
 
 /**
@@ -22,12 +16,6 @@ export async function queryProducts({ offset = 0, limit = 10 }) {
  * @param {number} productId 产品id
 */
 export async function queryProductDetail({ productId }) {
-  const acess_token = Cookies.get('access_token');
-  return lyRequest(`${API_URL}/products/${productId}`, {
-    method: 'get',
-    headers: {
-      Authorization: acess_token,
-    },
-  });
+  return lyRequest(`${API_URL}/products/${productId}`);
 }
 

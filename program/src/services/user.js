@@ -13,22 +13,12 @@ export async function queryCurrent() {
 
 // 获取用户信息
 export async function getUserInfo() {
-  const accessToken = Cookies.get('access_token');
-  return lyRequest(`${URL}/server/verify`, {
-    headers: {
-      Authorization: accessToken,
-    },
-  });
+  return lyRequest(`${URL}/server/verify`);
 }
 
 // 获取供应商详细信息
 export async function getSupplierInfo({ supplierId }) {
-  const accessToken = Cookies.get('access_token');
-  return lyRequest(`${USERS_SERVER}/supplier/profiles/${supplierId}`, {
-    headers: {
-      Authorization: accessToken,
-    },
-  });
+  return lyRequest(`${USERS_SERVER}/supplier/profiles/${supplierId}`);
 }
 
 // 注册用户
