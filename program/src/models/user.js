@@ -105,18 +105,23 @@ export default {
     },
     *changeAuthorityUrl(_, { call }) {
       const userinfo = yield call(getUserInfo);
-        const {
-          data: { id },
-        } = userinfo;
+      const {
+        data: { id, main_user_id },
+      } = userinfo;
+      // 判断是子账号还是主账号
+      if (id === main_user_id) {
         // TODO：在本地token与线上token同名冲突的时候报403
         const response = yield call(getSupplierInfo, { supplierId: id });
-        if (response.data.profile.audit_status !== 1) {
+        const supplier = response.data;
+        if (supplier.profile.audit_status !== 1) {
           setAuthority('1'); // 1为账号未通过审核的权限
-          location.href = `${USER_INFO}`;
         } else {
-          setAuthority('2'); // 2为账号通过审核的权限
-          window.location.href = HOME_PAGE;
+          setAuthority('2'); // 2为账号未通过审核的权限
         }
+      } else {
+        setAuthority('3'); // 2为子账号通过审核的权限
+      }
+      location.href = `${USER_INFO}`;
     },
     *verify(_, { call, put }) {
       const { href } = window.location;
