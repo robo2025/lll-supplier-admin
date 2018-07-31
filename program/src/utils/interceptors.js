@@ -83,10 +83,10 @@ axios.interceptors.response.use((response) => {
     });
     return;
   }
-  notification.error({
-    message: `${response.status}错误`,
-    description: codeMessage[response.status],
-  });
+  // notification.error({
+  //   message: `${response.status}错误`,
+  //   description: codeMessage[response.status],
+  // });
 
   return Promise.reject(error);
 });

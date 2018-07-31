@@ -1,7 +1,7 @@
 import React from 'react';
 import Cookies from 'js-cookie';
 import PropTypes from 'prop-types';
-import { Layout, Icon, message } from 'antd';
+import { Layout, Icon, message, Spin } from 'antd';
 import DocumentTitle from 'react-document-title';
 import { connect } from 'dva';
 import { Route, Redirect, Switch, routerRedux } from 'dva/router';
@@ -17,9 +17,9 @@ import { getMenuData } from '../common/menu';
 import Authorized from '../utils/Authorized';
 import logo from '../assets/logo.svg';
 import { logout, login } from '../services/user';
+import { convertCodeToName } from '../constant/permissionDetail';
 
 const { AuthorizedRoute, check } = Authorized;
-
 
 /**
  * 根据菜单取得重定向地址.
@@ -74,7 +74,7 @@ class BasicLayout extends React.PureComponent {
   static childContextTypes = {
     location: PropTypes.object,
     breadcrumbNameMap: PropTypes.object,
-  }
+  };
   state = {
     isMobile,
   };
@@ -130,14 +130,14 @@ class BasicLayout extends React.PureComponent {
       type: 'global/changeLayoutCollapsed',
       payload: collapsed,
     });
-  }
+  };
   handleNoticeClear = (type) => {
     message.success(`清空了${type}`);
     this.props.dispatch({
       type: 'global/clearNotices',
       payload: type,
     });
-  }
+  };
   handleMenuClick = ({ key }) => {
     console.log('退出登录');
     if (key === 'triggerError') {
@@ -156,34 +156,73 @@ class BasicLayout extends React.PureComponent {
     if (key === 'user') {
       this.props.history.push('/setting/userinfo');
     }
-  }
+  };
   handleNoticeVisibleChange = (visible) => {
     if (visible) {
       this.props.dispatch({
         type: 'global/fetchNotices',
       });
     }
-  }
+  };
+  getAuthoritedMenuData = (permissions) => {
+    const menuData = getMenuData();
+    if (!permissions || !menuData) {
+      return [];
+    }
+    const findMenu = (name, data) => {
+      return data.map((item) => {
+        let result = { ...item };
+        if (item.name === name) {
+          result = { ...item, authority: '3' };
+        }
+        if (item.children) {
+          findMenu(name, item.children);
+        }
+        return result;
+      });
+    };
+    const findAuthoritedMenu = (data) => {
+      let result = [...data];
+      // convertCodeToName转成中文
+      convertCodeToName(Object.keys(permissions)).forEach((menuName) => {
+        result = findMenu(menuName, result);
+      });
+      return result;
+    };
+    const authoritedMenuData = findAuthoritedMenu(menuData);
+    return authoritedMenuData;
+  };
   render() {
     const {
-      collapsed, fetchingNotices, notices, routerData, match, location, currentUser,
+      collapsed,
+      fetchingNotices,
+      notices,
+      routerData,
+      match,
+      location,
+      currentUser,
     } = this.props;
     const bashRedirect = this.getBashRedirect();
-
+    const { permissions } = currentUser || [];
     const layout = (
       <Layout>
-        <SiderMenu
-          logo={logo}
-          // 不带Authorized参数的情况下如果没有权限,会强制跳到403界面
-          // If you do not have the Authorized parameter
-          // you will be forced to jump to the 403 interface without permission
-          Authorized={Authorized}
-          menuData={getMenuData()}
-          collapsed={collapsed}
-          location={location}
-          isMobile={this.state.isMobile}
-          onCollapse={this.handleMenuCollapse}
-        />
+        {permissions ? (
+          <SiderMenu
+            logo={logo}
+            // 不带Authorized参数的情况下如果没有权限,会强制跳到403界面
+            // If you do not have the Authorized parameter
+            // you will be forced to jump to the 403 interface without permission
+            Authorized={Authorized}
+            menuData={this.getAuthoritedMenuData(permissions)}
+            collapsed={collapsed}
+            location={location}
+            isMobile={this.state.isMobile}
+            onCollapse={this.handleMenuCollapse}
+          />
+        ) : (
+          null
+        )}
+
         <Layout>
           <GlobalHeader
             logo={logo}
@@ -202,7 +241,12 @@ class BasicLayout extends React.PureComponent {
             <div style={{ minHeight: 'calc(100vh - 260px)' }}>
               <Switch>
                 {redirectData.map(item => (
-                  <Redirect key={item.from} exact from={item.from} to={item.to} />
+                  <Redirect
+                    key={item.from}
+                    exact
+                    from={item.from}
+                    to={item.to}
+                  />
                 ))}
                 {getRoutes(match.path, routerData).map(item => (
                   <AuthorizedRoute

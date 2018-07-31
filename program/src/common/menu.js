@@ -94,11 +94,6 @@ const menuData = [
     ],
   },
   {
-    name: '企业信息',
-    icon: 'user',
-    path: 'setting/userInfo',
-  },
-  {
     name: '合同管理',
     path: 'contractManagement',
     icon: 'code-o',
@@ -111,9 +106,10 @@ const menuData = [
     ],
   },
   {
-    name: '帐号管理',
+    name: '账号管理',
     path: 'accountManagement',
     icon: 'bar-chart',
+    authority: '2',
     children: [
       {
         name: '帐号列表',
@@ -125,15 +121,16 @@ const menuData = [
     name: '财务结算',
     path: 'financialSettlement',
     icon: 'credit-card',
+    authority: '2',
     children: [
       {
         name: '任务中心',
         path: 'taskCenter',
         children: [
-            {
-                name: '对账处理',
-                path: 'reconcileProcess',
-            },
+          {
+            name: '对账处理',
+            path: 'reconcileProcess',
+          },
         ],
       },
       {
@@ -152,6 +149,11 @@ const menuData = [
       },
     ],
   },
+  {
+    name: '企业信息',
+    icon: 'user',
+    path: 'setting/userInfo',
+  },
 ];
 
 function formatter(data, parentPath = '/', parentAuthority) {
@@ -169,7 +171,7 @@ function formatter(data, parentPath = '/', parentAuthority) {
       result.children = formatter(
         item.children,
         `${parentPath}${item.path}/`,
-        item.authority
+        // item.authority // 有子菜单权限校验再打开  
       );
     }
     return result;
