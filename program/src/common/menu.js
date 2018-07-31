@@ -136,6 +136,20 @@ const menuData = [
             },
         ],
       },
+      {
+        name: '报表中心',
+        path: 'reportCenter',
+        children: [
+            {
+                name: '未对账查询',
+                path: 'notCheckList',
+            },
+            {
+                name: '已对账查询',
+                path: 'haveCheckList',
+            },
+        ],
+      },
     ],
   },
 ];

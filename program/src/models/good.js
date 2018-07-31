@@ -9,7 +9,7 @@ import {
     queryOperationLog,
     exportGood,
     queryAssociatedProductDetail,
-    queryCatalogLevel
+    queryCatalogLevel,
 } from '../services/good';
 import { SUCCESS_STATUS } from '../constant/config.js';
 
@@ -25,7 +25,7 @@ export default {
         productTotal: 0,
         products: [],
         productDetail: {},
-        level: []
+        level: [],
     },
 
     effects: {
@@ -197,9 +197,9 @@ export default {
         saveLevel(state, action) {
             return {
                 ...state,
-                level: action.payload
-            }
-        }
+                level: action.payload,
+            };
+        },
     },
     subscriptions: {
         setup({ dispatch, history }) {
