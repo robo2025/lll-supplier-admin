@@ -44,8 +44,8 @@ const IMAGE_NAME = {
 export default class SupplierInfo extends Component {
   componentDidMount() {
     const { dispatch, user } = this.props;
-    const { supplierInfo } = user;
-    const userId = Cookies.getJSON('userinfo').id;
+    const { currentUser, supplierInfo } = user;
+    const userId = currentUser.main_user_id;
     if (!supplierInfo.profile) {
       dispatch({
         type: 'user/fetchSupplierInfo',
@@ -54,13 +54,13 @@ export default class SupplierInfo extends Component {
     }
   }
   handleSubmit = (formData) => {
-    const { supplierInfo } = this.props.user;
+    const { currentUser, supplierInfo } = this.props.user;
     this.props.dispatch({
       type: 'user/audit',
       payload: { formData, supplierId: supplierInfo.main_user_id },
       callback: (success, data) => {
         if (success & (success === true)) {
-          const userId = Cookies.getJSON('userinfo').id;
+          const userId = currentUser.main_user_id;
           this.props.dispatch({
             type: 'user/fetchSupplierInfo',
             supplierId: userId,
