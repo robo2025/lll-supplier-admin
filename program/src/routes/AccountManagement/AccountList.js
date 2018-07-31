@@ -18,6 +18,7 @@ import {
 import { sha256 } from 'js-sha256';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import styles from './account.less';
+import permissionDetail from '../../constant/permissionDetail';
 
 const ModifyPasswordModal = Form.create()((props) => {
   const {
@@ -138,48 +139,6 @@ const ModifyPasswordModal = Form.create()((props) => {
   );
 });
 const FormItem = Form.Item;
-const permissionDetail = [
-  {
-    code: 'contract_all',
-    name: '合同管理',
-  },
-  {
-    code: 'goods_all',
-    name: '商品管理',
-  },
-  {
-    code: 'bus_scope_all',
-    name: '经营范围',
-  },
-  {
-    code: 'trande_all',
-    name: '交易管理',
-  },
-  {
-    code: 'stock_all',
-    name: '库存管理',
-  },
-  {
-    code: 'return_all',
-    name: '退货管理',
-  },
-  {
-    code: 'refund_all',
-    name: '退款管理',
-  },
-  {
-    code: 'sln_quote_all',
-    name: '方案询价管理',
-  },
-  {
-    code: 'sln_order_all',
-    name: '方案订单管理',
-  },
-  {
-    code: 'company_all',
-    name: '企业信息',
-  },
-];
 @Form.create()
 @connect(({ account, loading }) => ({
   account,
