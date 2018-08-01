@@ -118,7 +118,7 @@ class SolutionDetail extends React.Component {
     key: 'supplier',
   };
   componentDidMount() {
-    const userId = Cookies.getJSON('userinfo').id;
+    const userId = Cookies.getJSON('userinfo').main_user_id;
     if (userId) {
       this.props.dispatch({
         type: 'user/fetchSupplierInfo',
