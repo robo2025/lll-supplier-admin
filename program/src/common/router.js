@@ -163,15 +163,25 @@ export const getRouterData = (app) => {
       name: '企业信息审核',
     },
     '/contractManagement/contractList': {
-        component: dynamicWrapper(app, ['contract'], () => import('../routes/ContractManagement/ContractList')),
-        name: '合同列表',
-      },
-      '/accountManagement/accountList': {
-        component: dynamicWrapper(app, ['account'], () => import('../routes/AccountManagement/AccountList')),
-      },
-      '/financialSettlement/taskCenter/reconcileProcess': {
-        component: dynamicWrapper(app, ['financial', 'user'], () => import('../routes/FinancialSettlementSystem/TaskCenter/ReconcileProcess')),
-      },
+      component: dynamicWrapper(app, ['contract'], () => import('../routes/ContractManagement/ContractList')),
+      name: '合同列表',
+    },
+    '/accountManagement/accountList': {
+      component: dynamicWrapper(app, ['account'], () => import('../routes/AccountManagement/AccountList')),
+    },
+    '/financialSettlement/taskCenter/reconcileProcess': {
+      component: dynamicWrapper(app, ['financial', 'user'], () => import('../routes/FinancialSettlementSystem/TaskCenter/ReconcileProcess')),
+    },
+    '/financialSettlement/taskCenter/:reconcileProcess/billDeatil/:id': {
+        component: dynamicWrapper(app, ['financial'], () => import('../routes/FinancialSettlementSystem/TaskCenter/BillDeatil')),
+        name: '账单详情',
+    },
+    '/financialSettlement/reportCenter/notCheckList': {
+        component: dynamicWrapper(app, ['financial'], () => import('../routes/FinancialSettlementSystem/ReportCenter/NotCheckList')),
+    },
+    '/financialSettlement/reportCenter/haveCheckList': {
+        component: dynamicWrapper(app, ['financial'], () => import('../routes/FinancialSettlementSystem/ReportCenter/HaveCheckList')),
+    },
   };
 
   // Get name from ./menu.js or just set it in the router data.
