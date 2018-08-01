@@ -29,7 +29,7 @@ import {
   checkFile,
 } from '../../utils/tools';
 import {
-  PAGE_SIZE,
+  TOKEN_NAME,
   SUCCESS_STATUS,
   FAIL_STATUS,
   MAIN_URL,
@@ -743,7 +743,7 @@ export default class GoodsList extends Component {
                   name="file"
                   action={`${MAIN_URL}/scm-service/goods/template`}
                   headers={{
-                    Authorization: Cookies.get('access_token') || 'null',
+                    Authorization: Cookies.get(TOKEN_NAME) || 'null',
                   }}
                   showUploadList={false}
                   onChange={this.handleModelUploadChange}

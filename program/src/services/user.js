@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import lyRequest from '../utils/lyRequest';
 import { setAuthority } from '../utils/authority';
-import { URL, LOGIN_URL, LOGOUT_URL, REGISTER_URL, USERS_SERVER, VERIFY_PAGE, MAIN_URL, HOME_PAGE } from '../constant/config';
+import { URL, LOGIN_URL, LOGOUT_URL, REGISTER_URL, USERS_SERVER, VERIFY_PAGE, MAIN_URL, TOKEN_NAME } from '../constant/config';
 
 export async function query() {
   return lyRequest('/api/users');
@@ -42,9 +42,9 @@ export function register() {
 export function logout() {
   localStorage.removeItem('antd-pro-authority');
   Cookies.remove('userinfo');
-  const accessToken = Cookies.get('access_token');
+  const accessToken = Cookies.get(TOKEN_NAME);
   if (accessToken) {
-    Cookies.remove('access_token');
+    Cookies.remove(TOKEN_NAME);
     window.location.href = `${LOGOUT_URL}?access_token=${accessToken}&next=${encodeURIComponent(
       VERIFY_PAGE
     )}`;

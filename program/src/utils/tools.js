@@ -1,24 +1,24 @@
 import Cookies from 'js-cookie';
-import { LOGIN_URL, HOME_PAGE, VERIFY_PAGE } from '../constant/config';
+import { LOGIN_URL, HOME_PAGE, VERIFY_PAGE, TOKEN_NAME } from '../constant/config';
 
 // 验证是否登录 
 export function verifyLogin() {
   const { href } = window.location;
   const paramas = queryString.parse(href);
-  const token = Cookies.get('access_token');
+  const token = Cookies.get(TOKEN_NAME);
   if (token) {
     window.location.href = HOME_PAGE;
   } else if (paramas.access_token) {
     /* 判断url是否有access_token,如果有则将其存储到cookie */
     const accessToken = paramas.access_token.split('#/')[0];
     if (location.host.indexOf('robo2025') !== -1) {
-      Cookies.set('access_token', accessToken, {
+      Cookies.set(TOKEN_NAME, accessToken, {
         expires: 7,
         path: '/',
         domain: '.robo2025.com',
       });
     } else {
-      Cookies.set('access_token', accessToken);
+      Cookies.set(TOKEN_NAME, accessToken);
     }
     window.location.href = HOME_PAGE;
   } else {

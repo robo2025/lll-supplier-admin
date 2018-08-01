@@ -2,6 +2,7 @@ import axios from 'axios';
 import { notification } from 'antd';
 import Cookies from 'js-cookie';
 import './interceptors';
+import { TOKEN_NAME } from '../constant/config';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据',
@@ -43,7 +44,7 @@ function checkStatus(response) {
  * @return {object}           An object containing either "data" or "err"
  */
 export default function request(url, options) {
-  const token = Cookies.get('access_token');
+  const token = Cookies.get(TOKEN_NAME);
   const defaultOptions = {
     credentials: 'include',
     timeout: 5000,

@@ -1,13 +1,13 @@
 import Cookies from 'js-cookie';
-import { LOGIN_URL, NEXT_URL } from '../constant/config';
+import { LOGIN_URL, NEXT_URL, TOKEN_NAME } from '../constant/config';
 
 // 验证是否登录
 export function verifyLogin() {
-  if (!Cookies.get('access_token')) {
+  if (!Cookies.get(TOKEN_NAME)) {
     console.log('用户未登录');
     window.location.href = `${LOGIN_URL}?next=${NEXT_URL}&from=supplier`;
   } else {
-    console.log('用户已登录', Cookies.get('access_token'));
+    console.log('用户已登录', Cookies.get(TOKEN_NAME));
   }
 }
 

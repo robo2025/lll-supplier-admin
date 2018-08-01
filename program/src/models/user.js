@@ -15,6 +15,7 @@ import {
   HOME_PAGE,
   LOGIN_URL,
   VERIFY_PAGE,
+  TOKEN_NAME,
 } from '../constant/config.js';
 import { queryString } from '../utils/tools';
 
@@ -126,20 +127,20 @@ export default {
     *verify(_, { call, put }) {
       const { href } = window.location;
       const paramas = queryString.parse(href);
-      const token = Cookies.get('access_token');
+      const token = Cookies.get(TOKEN_NAME);
       if (token) {
         yield put({ type: 'changeAuthorityUrl' });
       } else if (paramas.access_token) {
         /* 判断url是否有access_token,如果有则将其存储到cookie */
         const accessToken = paramas.access_token.split('#/')[0];
         if (location.host.indexOf('robo2025') !== -1) {
-          Cookies.set('access_token', accessToken, {
+          Cookies.set(TOKEN_NAME, accessToken, {
             expires: 7,
             path: '/',
             domain: '.robo2025.com',
           });
         } else {
-          Cookies.set('access_token', accessToken);
+          Cookies.set(TOKEN_NAME, accessToken);
         }
         yield put({ type: 'changeAuthorityUrl' });
       } else {
