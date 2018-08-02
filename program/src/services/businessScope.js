@@ -12,8 +12,8 @@ export async function queryList(params) {
     },
   });
 }
-export async function queryDetail() {
-  return lyRequest(`${OPERATION_URL}/supplier/scope`);
+export async function queryDetail({ pno }) {
+  return lyRequest(`${OPERATION_URL}/supplier/products/${pno}`);
 }
 
 // 获取级联目录

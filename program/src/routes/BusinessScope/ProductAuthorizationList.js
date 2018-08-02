@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'dva';
+import { routerRedux } from 'dva/router';
 import moment from 'moment';
 import {
   Card,
@@ -189,7 +190,20 @@ export default class ProductAuthorizationList extends Component {
       {
         title: '操作',
         key: 'option',
-        render: row => <a onClick={() => null}>查看</a>,
+        render: row => (
+          <a
+            onClick={() =>
+              this.props.dispatch(
+                routerRedux.push({
+                  pathname: '/BusinessScope/ProductDetail',
+                  search: `?pno=${row.pno}`,
+                })
+              )
+            }
+          >
+            查看
+          </a>
+        ),
       },
     ];
     return (

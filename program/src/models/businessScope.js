@@ -53,7 +53,7 @@ import {
         });
       },
       *fetchDetail({ payload, callback }, { call, put }) {
-        const response = yield call(queryDetail, { id: payload });
+        const response = yield call(queryDetail, { ...payload });
         yield put({
           type: 'saveProfile',
           payload: { ...response.data },
