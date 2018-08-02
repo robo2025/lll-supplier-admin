@@ -36,7 +36,9 @@ const dynamicWrapper = (app, models, component) => {
   return dynamic({
     app,
     models: () =>
-      models.filter(model => modelNotExisted(app, model)).map(m => import(`../models/${m}.js`)),
+      models
+        .filter(model => modelNotExisted(app, model))
+        .map(m => import(`../models/${m}.js`)),
     // add routerData prop
     component: () => {
       if (!routerDataCache) {
@@ -70,84 +72,130 @@ function getFlatMenuData(menus) {
 export const getRouterData = (app) => {
   const routerConfig = {
     '/': {
-      component: dynamicWrapper(app, ['user'], () => import('../layouts/BasicLayout')),
+      component: dynamicWrapper(app, ['user'], () =>
+        import('../layouts/BasicLayout')
+      ),
     },
     '/goods/list': {
-      component: dynamicWrapper(app, ['good', 'product'], () => import('../routes/GoodsList')),
+      component: dynamicWrapper(app, ['good', 'product'], () =>
+        import('../routes/GoodsList')
+      ),
     },
     '/goods/new': {
-      component: dynamicWrapper(app, ['product', 'good'], () => import('../routes/NewGood')),
+      component: dynamicWrapper(app, ['product', 'good'], () =>
+        import('../routes/NewGood')
+      ),
     },
     '/goods/:list/modify': {
-      component: dynamicWrapper(app, ['product', 'good', 'logs'], () => import('../routes/ModifyGood')),
+      component: dynamicWrapper(app, ['product', 'good', 'logs'], () =>
+        import('../routes/ModifyGood')
+      ),
       name: '修改商品信息',
     },
     '/goods/:list/detail': {
-      component: dynamicWrapper(app, ['product', 'good', 'logs'], () => import('../routes/GoodDetail')),
+      component: dynamicWrapper(app, ['product', 'good', 'logs'], () =>
+        import('../routes/GoodDetail')
+      ),
     },
     '/deal/orders': {
-      component: dynamicWrapper(app, ['orders', 'upload'], () => import('../routes/DealManagement/OrderList')),
+      component: dynamicWrapper(app, ['orders', 'upload'], () =>
+        import('../routes/DealManagement/OrderList')
+      ),
     },
     '/deal/:orders/detail': {
-      component: dynamicWrapper(app, ['orders'], () => import('../routes/DealManagement/OrderDetail')),
+      component: dynamicWrapper(app, ['orders'], () =>
+        import('../routes/DealManagement/OrderDetail')
+      ),
       name: '订单详情',
     },
     '/returns/list': {
-      component: dynamicWrapper(app, ['orders'], () => import('../routes/ReturnsManagement/ReturnsList')),
+      component: dynamicWrapper(app, ['orders'], () =>
+        import('../routes/ReturnsManagement/ReturnsList')
+      ),
     },
     '/returns/:list/detail': {
-      component: dynamicWrapper(app, ['orders'], () => import('../routes/ReturnsManagement/ReturnsDetail')),
+      component: dynamicWrapper(app, ['orders'], () =>
+        import('../routes/ReturnsManagement/ReturnsDetail')
+      ),
       name: '退货单详情',
     },
     '/refunds/list': {
-      component: dynamicWrapper(app, ['orders'], () => import('../routes/RefundsManagement/RefundsList')),
+      component: dynamicWrapper(app, ['orders'], () =>
+        import('../routes/RefundsManagement/RefundsList')
+      ),
       name: '退款单列表',
     },
     '/refunds/:list/detail': {
-      component: dynamicWrapper(app, ['orders'], () => import('../routes/RefundsManagement/RefundDetail')),
+      component: dynamicWrapper(app, ['orders'], () =>
+        import('../routes/RefundsManagement/RefundDetail')
+      ),
       name: '退款单详情',
     },
     '/solution/list': {
-      component: dynamicWrapper(app, ['solution'], () => import('../routes/SolutionManagement')),
+      component: dynamicWrapper(app, ['solution'], () =>
+        import('../routes/SolutionManagement')
+      ),
       name: '方案询价列表',
     },
     '/solution/:list/detail': {
-      component: dynamicWrapper(app, ['solution'], () => import('../routes/SolutionManagement/SolutionOrderDetail')),
+      component: dynamicWrapper(app, ['solution'], () =>
+        import('../routes/SolutionManagement/SolutionOrderDetail')
+      ),
       name: '方案询价详情',
     },
     '/solution/:list/solutionPriceQuotation': {
-      component: dynamicWrapper(app, ['solution'], () => import('../routes/SolutionManagement/SolutionPriceQuotation')),
+      component: dynamicWrapper(app, ['solution'], () =>
+        import('../routes/SolutionManagement/SolutionPriceQuotation')
+      ),
       name: '方案报价',
     },
     '/solution/:list/solutionDetail': {
-      component: dynamicWrapper(app, ['solution'], () => import('../routes/SolutionManagement/SolutionDetail')),
+      component: dynamicWrapper(app, ['solution'], () =>
+        import('../routes/SolutionManagement/SolutionDetail')
+      ),
       name: '方案详情',
     },
     '/solutionOrders/list': {
-      component: dynamicWrapper(app, ['solutionOrders'], () => import('../routes/SolutionOrdersManagement')),
+      component: dynamicWrapper(app, ['solutionOrders'], () =>
+        import('../routes/SolutionOrdersManagement')
+      ),
       name: '方案订单列表',
     },
     '/solutionOrders/:list/detail': {
-      component: dynamicWrapper(app, ['solutionOrders'], () => import('../routes/SolutionOrdersManagement/SolutionOrderDetail')),
+      component: dynamicWrapper(app, ['solutionOrders'], () =>
+        import('../routes/SolutionOrdersManagement/SolutionOrderDetail')
+      ),
       name: '方案订单详情',
     },
     '/stockManagement/goodsStockList': {
-        component: dynamicWrapper(app, ['stock'], () => import('../routes/StockManagement/GoodsStockList')),
+      component: dynamicWrapper(app, ['stock'], () =>
+        import('../routes/StockManagement/GoodsStockList')
+      ),
     },
     '/stockManagement/GoodsInOutList': {
-        component: dynamicWrapper(app, ['stock'], () => import('../routes/StockManagement/GoodsInOutList')),
+      component: dynamicWrapper(app, ['stock'], () =>
+        import('../routes/StockManagement/GoodsInOutList')
+      ),
     },
     '/exception/403': {
-      component: dynamicWrapper(app, [], () => import('../routes/Exception/403')),
+      component: dynamicWrapper(app, [], () =>
+        import('../routes/Exception/403')
+      ),
     },
     '/exception/404': {
-      component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),
+      component: dynamicWrapper(app, [], () =>
+        import('../routes/Exception/404')
+      ),
     },
     '/exception/500': {
-      component: dynamicWrapper(app, [], () => import('../routes/Exception/500')),
+      component: dynamicWrapper(app, [], () =>
+        import('../routes/Exception/500')
+      ),
     },
     '/exception/trigger': {
-      component: dynamicWrapper(app, ['error'], () => import('../routes/Exception/triggerException')),
+      component: dynamicWrapper(app, ['error'], () =>
+        import('../routes/Exception/triggerException')
+      ),
     },
     '/user': {
       component: dynamicWrapper(app, [], () => import('../layouts/UserLayout')),
@@ -156,35 +204,58 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, [], () => import('../layouts/PRSPLayout')),
     },
     '/prsp/register': {
-      component: dynamicWrapper(app, ['upload', 'user'], () => import('../routes/User/UserRegister')),
+      component: dynamicWrapper(app, ['upload', 'user'], () =>
+        import('../routes/User/UserRegister')
+      ),
     },
     '/setting/userinfo': {
-      component: dynamicWrapper(app, ['upload', 'user'], () => import('../routes/Setting/SupplierInfo')),
+      component: dynamicWrapper(app, ['upload', 'user'], () =>
+        import('../routes/Setting/SupplierInfo')
+      ),
       name: '企业信息审核',
     },
     '/contractManagement/contractList': {
-      component: dynamicWrapper(app, ['contract'], () => import('../routes/ContractManagement/ContractList')),
+      component: dynamicWrapper(app, ['contract'], () =>
+        import('../routes/ContractManagement/ContractList')
+      ),
       name: '合同列表',
     },
     '/accountManagement/accountList': {
-      component: dynamicWrapper(app, ['account'], () => import('../routes/AccountManagement/AccountList')),
+      component: dynamicWrapper(app, ['account'], () =>
+        import('../routes/AccountManagement/AccountList')
+      ),
     },
     '/financialSettlement/taskCenter/reconcileProcess': {
-      component: dynamicWrapper(app, ['financial', 'user'], () => import('../routes/FinancialSettlementSystem/TaskCenter/ReconcileProcess')),
+      component: dynamicWrapper(app, ['financial', 'user'], () =>
+        import('../routes/FinancialSettlementSystem/TaskCenter/ReconcileProcess')
+      ),
     },
     '/financialSettlement/taskCenter/:reconcileProcess/billDeatil/:id': {
-        component: dynamicWrapper(app, ['financial'], () => import('../routes/FinancialSettlementSystem/TaskCenter/BillDeatil')),
-        name: '账单详情',
+      component: dynamicWrapper(app, ['financial'], () =>
+        import('../routes/FinancialSettlementSystem/TaskCenter/BillDeatil')
+      ),
+      name: '账单详情',
     },
     '/financialSettlement/reportCenter/notCheckList': {
-        component: dynamicWrapper(app, ['financial'], () => import('../routes/FinancialSettlementSystem/ReportCenter/NotCheckList')),
+      component: dynamicWrapper(app, ['financial'], () =>
+        import('../routes/FinancialSettlementSystem/ReportCenter/NotCheckList')
+      ),
     },
     '/financialSettlement/reportCenter/haveCheckList': {
-        component: dynamicWrapper(app, ['financial'], () => import('../routes/FinancialSettlementSystem/ReportCenter/HaveCheckList')),
+      component: dynamicWrapper(app, ['financial'], () =>
+        import('../routes/FinancialSettlementSystem/ReportCenter/HaveCheckList')
+      ),
     },
     '/businessScope/my': {
-      component: dynamicWrapper(app, ['businessScope'], () => import('../routes/BusinessScope/ProductAuthorizationList')),
-  },
+      component: dynamicWrapper(app, ['businessScope'], () =>
+        import('../routes/BusinessScope/ProductAuthorizationList')
+      ),
+    },
+    '/businessScope/productDetail': {
+      component: dynamicWrapper(app, ['businessScope'], () =>
+        import('../routes/BusinessScope/ProductDetail')
+      ),
+    },
   };
 
   // Get name from ./menu.js or just set it in the router data.
@@ -198,7 +269,9 @@ export const getRouterData = (app) => {
     // Regular match item name
     // eg.  router /user/:id === /user/chen
     const pathRegexp = pathToRegexp(path);
-    const menuKey = Object.keys(menuData).find(key => pathRegexp.test(`${key}`));
+    const menuKey = Object.keys(menuData).find(key =>
+      pathRegexp.test(`${key}`)
+    );
     let menuItem = {};
     // If menuKey is not empty
     if (menuKey) {
@@ -218,4 +291,3 @@ export const getRouterData = (app) => {
   });
   return routerData;
 };
-
