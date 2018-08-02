@@ -182,6 +182,9 @@ export const getRouterData = (app) => {
     '/financialSettlement/reportCenter/haveCheckList': {
         component: dynamicWrapper(app, ['financial'], () => import('../routes/FinancialSettlementSystem/ReportCenter/HaveCheckList')),
     },
+    '/businessScope/my': {
+      component: dynamicWrapper(app, ['businessScope'], () => import('../routes/BusinessScope/AuthorizationList')),
+  },
   };
 
   // Get name from ./menu.js or just set it in the router data.

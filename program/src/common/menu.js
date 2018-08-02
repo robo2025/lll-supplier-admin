@@ -150,6 +150,18 @@ const menuData = [
     ],
   },
   {
+    name: '经营范围',
+    path: 'businessScope',
+    icon: 'select',
+    authority: '2',
+    children: [
+      {
+        name: '我的经营范围',
+        path: 'my',
+      },
+    ],
+  },
+  {
     name: '企业信息',
     icon: 'user',
     path: 'setting/userInfo',
