@@ -183,7 +183,7 @@ export const getRouterData = (app) => {
         component: dynamicWrapper(app, ['financial'], () => import('../routes/FinancialSettlementSystem/ReportCenter/HaveCheckList')),
     },
     '/businessScope/my': {
-      component: dynamicWrapper(app, ['businessScope'], () => import('../routes/BusinessScope/AuthorizationList')),
+      component: dynamicWrapper(app, ['businessScope'], () => import('../routes/BusinessScope/ProductAuthorizationList')),
   },
   };
 

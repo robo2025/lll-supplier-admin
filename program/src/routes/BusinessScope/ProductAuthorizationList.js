@@ -36,7 +36,7 @@ function getStandardCategory(data) {
   loading: loading.effects['businessScope/fetch'],
 }))
 @Form.create()
-export default class AuthorizationList extends Component {
+export default class ProductAuthorizationList extends Component {
   state = {
     formExpand: false,
     selectedRowKeys: [],
