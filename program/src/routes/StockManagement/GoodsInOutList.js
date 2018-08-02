@@ -163,7 +163,6 @@ export default class GoodsInOutList extends React.Component {
                         current={page >> 0}
                         pageSize={pageSize >> 0}
                         onTableChange={this.onTableChange}
-
                         />
                     </div>
                 </Card>

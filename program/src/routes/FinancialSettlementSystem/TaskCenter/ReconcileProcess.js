@@ -36,7 +36,7 @@ export default class ReconcileProcess extends React.Component {
   onGetBillList({ params, offset, limit }) {
     const { dispatch, currentUser } = this.props;
     const values = {
-      status: 2,
+      status: 4,
       supplier_id: currentUser.id,
     };
     dispatch({

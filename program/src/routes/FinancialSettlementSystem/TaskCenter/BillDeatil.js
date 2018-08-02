@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { connect } from 'dva';
 import { Card, Button, Table, Spin, message, Icon } from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
