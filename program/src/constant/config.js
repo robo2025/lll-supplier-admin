@@ -4,7 +4,7 @@
 export const TOKEN_NAME = 'test_access_token';
 
 // 单点登录URL
-export const URL = '//testlogin.robo2025.com';
+export const URL = '//testapi.robo2025.com/sso';
 
 // 网站内容接口URL
 export const API_URL = '//testapi.robo2025.com/scm';
