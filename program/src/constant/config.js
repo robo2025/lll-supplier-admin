@@ -1,7 +1,7 @@
 /*
 * 后台管理系统常量：
 * */
-export const TOKEN_NAME = 'access_token';
+export const TOKEN_NAME = 'test_access_token';
 
 // 单点登录URL
 export const URL = '//testlogin.robo2025.com';
