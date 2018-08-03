@@ -56,11 +56,6 @@ export default class ProductForm extends Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    console.log('will reiceve', nextProps);
-  }
-
-
   handleCancel = () => this.setState({ previewVisible: false })
   handlePreview = (file) => {
     this.setState({

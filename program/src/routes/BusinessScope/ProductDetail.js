@@ -10,10 +10,6 @@ import { queryString } from '../../utils/tools';
 import styles from './ProductDetail.less';
 
 const FormItem = Form.Item;
-const formItemLayout = {
-  labelCol: { span: 3 },
-  wrapperCol: { span: 6 },
-};
 @connect(({ businessScope, loading }) => ({
   detail: businessScope.profile,
   loading: loading.models.businessScope,
@@ -46,24 +42,22 @@ export default class ProductDetail extends Component {
           <SectionHeader
             title="规格参数"
           />
-          <div className="spec-wrap" style={{ width: 800 }}>
-            <Form>
+            <Form layout="inline">
               {
                 detail.specs && detail.specs.map(val => (
                   <FormItem
+                   colon={false}
                     label={val.spec_name}
-                    {...formItemLayout}
                     key={val.id}
                   >
                     {getFieldDecorator(`spec_${val.spec_name}`, {
                     })(
-                      <span>{val.spec_value}{val.spec_unit}</span>
+                      <span>{val.spec_unit ? `(${val.spec_unit})` : null}</span>
                     )}
                   </FormItem>
                 ))
               }
             </Form>
-          </div>
           <div className={styles['submit-btn-wrap']}>
             <Button type="primary" onClick={() => { this.props.history.goBack(); }}>返回列表</Button>
           </div>
