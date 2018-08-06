@@ -1,5 +1,6 @@
 import React from 'react';
 import Cookies from 'js-cookie';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Layout, Icon, message, Spin } from 'antd';
 import DocumentTitle from 'react-document-title';
@@ -184,13 +185,14 @@ class BasicLayout extends React.PureComponent {
     const findAuthoritedMenu = (data) => {
       let result = [...data];
       // convertCodeToName转成中文
-      convertCodeToName(Object.keys(permissions)).forEach((menuName) => {
+      convertCodeToName(_.flattenDeep(Object.values(permissions))).forEach((menuName) => {
         result = findMenu(menuName, result);
       });
       return result;
     };
     const authoritedMenuData = findAuthoritedMenu(menuData);
     return authoritedMenuData;
+    // return authoritedMenuData;
   };
   render() {
     const {
@@ -219,9 +221,7 @@ class BasicLayout extends React.PureComponent {
             isMobile={this.state.isMobile}
             onCollapse={this.handleMenuCollapse}
           />
-        ) : (
-          null
-        )}
+        ) : null}
 
         <Layout>
           <GlobalHeader
