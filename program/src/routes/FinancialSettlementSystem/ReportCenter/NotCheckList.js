@@ -13,10 +13,12 @@ import {
   message,
 } from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
+import DescriptionList from '../../../components/DescriptionList';
 import styles from './reportCenter.less';
 
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
+const { Description } = DescriptionList;
 const notCheckListUrl = '/v1/financial/sup/statementexdetail/unstatement';
 @Form.create()
 @connect(({ financial, loading }) => ({
@@ -32,6 +34,9 @@ export default class NotCheckList extends React.Component {
         pageSize: 10,
       },
       searchValues: {},
+      number_tot: 0, // 数量
+      amount: 0, // 货款
+      commission: 0, // 佣金
     };
   }
   componentDidMount() {
@@ -48,87 +53,96 @@ export default class NotCheckList extends React.Component {
       params,
       offset,
       limit,
+      success: (res, headers) => {
+        const { number_tot, amount, commission } = headers;
+        console.log(number_tot, amount, commission);
+        this.setState({
+          number_tot,
+          amount,
+          commission,
+        });
+      },
     });
   }
-  onPaginationChange=(pagination) => {
-      const { searchValues } = this.state;
+  onPaginationChange = (pagination) => {
+    const { searchValues } = this.state;
+    this.setState({
+      args: {
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+      },
+    });
+    this.onGetNotCheckList({
+      params: searchValues,
+      offset: (pagination.current - 1) * pagination.pageSize,
+      limit: pagination.pageSize,
+    });
+  };
+  handleSearch = (e) => {
+    e.preventDefault();
+    const { form } = this.props;
+    const { args } = this.state;
+    form.validateFields((err, fieldsValue) => {
+      const values = {};
+      const { create_time, order_code } = fieldsValue;
+      if (create_time && create_time.length > 0) {
+        values.start_dt = create_time[0].format('YYYY-MM-DD');
+        values.end_dt = create_time[1].format('YYYY-MM-DD');
+      }
+      if (order_code && order_code.trim().length > 0) {
+        values.order_code = order_code.trim();
+      }
       this.setState({
-          args: {
-              page: pagination.current,
-              pageSize: pagination.pageSize,
-          },
+        args: {
+          page: 1,
+          pageSize: args.pageSize,
+        },
+        searchValues: values,
       });
       this.onGetNotCheckList({
-          params: searchValues,
-          offset: (pagination.current - 1) * pagination.pageSize,
-          limit: pagination.pageSize,
+        params: values,
+        offset: 0,
+        limit: args.pageSize,
       });
-  }
-  handleSearch=(e) => {
-      e.preventDefault();
-      const { form } = this.props;
-      const { args } = this.state;
-      form.validateFields((err, fieldsValue) => {
-          const values = {};
-          const { create_time, order_code } = fieldsValue;
-          if (create_time && create_time.length > 0) {
-              values.start_dt = create_time[0].format('YYYY-MM-DD');
-              values.end_dt = create_time[1].format('YYYY-MM-DD');
-          }
-          if (order_code && order_code.trim().length > 0) {
-              values.order_code = order_code.trim();
-          }
-          this.setState({
-              args: {
-                  page: 1,
-                  pageSize: args.pageSize,
-              },
-              searchValues: values,
-          });
-          this.onGetNotCheckList({
-              params: values,
-              offset: 0,
-              limit: args.pageSize,
-          });
-      });
-  }
+    });
+  };
   handleFormReset = () => {
-      const { form } = this.props;
-      const { args } = this.state;
-      form.resetFields();
-      this.setState({
-          args: {
-              page: 1,
-              pageSize: args.pageSize,
-          },
-          searchValues: {},
-      });
-      this.onGetNotCheckList({
-          params: {},
-          offset: 0,
-          limit: args.pageSize,
-      });
-  }
+    const { form } = this.props;
+    const { args } = this.state;
+    form.resetFields();
+    this.setState({
+      args: {
+        page: 1,
+        pageSize: args.pageSize,
+      },
+      searchValues: {},
+    });
+    this.onGetNotCheckList({
+      params: {},
+      offset: 0,
+      limit: args.pageSize,
+    });
+  };
   // 导出列表
   exportExcelList = () => {
     const { dispatch, financial } = this.props;
     const { notCheckTotal } = financial;
     const { searchValues } = this.state;
     dispatch({
-        type: 'financial/fetchExportExcel',
-        url: notCheckListUrl,
-        offset: 0,
-        limit: notCheckTotal,
-        params: searchValues,
-        success: (res, financialUrl) => {
-            message.success('导出成功,下载中...');
-            location.href = `${financialUrl}/v1${res.data.url}`;
-        },
-        error: () => {
-            message.error('导出失败');
-        },
+      type: 'financial/fetchExportExcel',
+      url: notCheckListUrl,
+      offset: 0,
+      limit: notCheckTotal,
+      params: searchValues,
+      success: (res, financialUrl) => {
+        message.success('导出成功,下载中...');
+        location.href = `${financialUrl}/v1${res.data.url}`;
+      },
+      error: () => {
+        message.error('导出失败');
+      },
     });
-  }
+  };
   renderForm() {
     const { getFieldDecorator } = this.props.form;
     const formItemLayout = {
@@ -144,17 +158,12 @@ export default class NotCheckList extends React.Component {
         <Row gutter={{ md: 24, xs: 12 }}>
           <Col xl={8} md={12} xs={12}>
             <FormItem label="单据日期" {...formItemLayout}>
-              {getFieldDecorator('create_time')(
-                  <RangePicker />
-              )}
+              {getFieldDecorator('create_time')(<RangePicker />)}
             </FormItem>
           </Col>
           <Col xl={8} md={12} xs={12}>
             <FormItem label="订单编号" {...formItemLayout}>
-            {getFieldDecorator('order_code')(
-                   <Input placeholder="请输入" />
-              )}
-             
+              {getFieldDecorator('order_code')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col
@@ -163,8 +172,12 @@ export default class NotCheckList extends React.Component {
             xs={{ span: 8, offset: 16 }}
             style={{ textAlign: 'right' }}
           >
-            <Button type="primary" htmlType="submit">查询</Button>
-            <Button style={{ marginLeft: 10 }} onClick={this.handleFormReset}>重置</Button>
+            <Button type="primary" htmlType="submit">
+              查询
+            </Button>
+            <Button style={{ marginLeft: 10 }} onClick={this.handleFormReset}>
+              重置
+            </Button>
             <Button style={{ marginLeft: 10 }} onClick={this.exportExcelList}>
               <Icon type="export" />导出
             </Button>
@@ -175,7 +188,7 @@ export default class NotCheckList extends React.Component {
   }
   render() {
     const { financial, loading } = this.props;
-    const { args } = this.state;
+    const { args, number_tot, amount, commission } = this.state;
     const { page, pageSize } = args;
     const { notChecklist, notCheckTotal } = financial;
     const columns = [
@@ -249,8 +262,12 @@ export default class NotCheckList extends React.Component {
     };
     return (
       <PageHeaderLayout title="未对账查询">
-        <Card>
-          {this.renderForm()}
+        <Card title={this.renderForm()} style={{ paddingTop: 15, paddingBottom: 20 }}>
+        <DescriptionList col={3}>
+            <Description term="数量合计"><span>{number_tot}</span></Description>
+            <Description term="贷款合计"><span>&yen; {amount}</span></Description>
+            <Description term="佣金合计"><span>&yen; {commission}</span></Description>
+        </DescriptionList>
           <Table
             className={styles.footer}
             columns={columns}
@@ -261,27 +278,27 @@ export default class NotCheckList extends React.Component {
             pagination={paginationOptions}
             onChange={this.onPaginationChange}
             loading={loading}
-            footer={
-              notChecklist.length
-                ? (data) => {
-                    let amount = 0;
-                    let commission = 0;
-                    let number = 0;
-                    data.forEach((ele) => {
-                      amount += parseFloat(ele.amount);
-                      commission += parseFloat(ele.commission);
-                      number += parseFloat(ele.number);
-                    });
-                    return (
-                      <div className={styles.total}>
-                        <div className={styles.desc}><span className={styles.txt}>数量合计 :</span> {number} </div>
-                        <div className={styles.desc}><span className={styles.txt}>贷款合计 :</span> &yen; {amount} </div>
-                        <div className={styles.desc}><span className={styles.txt}>佣金合计 :</span> &yen; {commission} </div>
-                      </div>
-                    );
-                  }
-                : null
-            }
+            // footer={
+            //   notChecklist.length
+            //     ? (data) => {
+            //         let amount = 0;
+            //         let commission = 0;
+            //         let number = 0;
+            //         data.forEach((ele) => {
+            //           amount += parseFloat(ele.amount);
+            //           commission += parseFloat(ele.commission);
+            //           number += parseFloat(ele.number);
+            //         });
+            //         return (
+            //           <div className={styles.total}>
+            //             <div className={styles.desc}><span className={styles.txt}>数量合计 :</span> {number} </div>
+            //             <div className={styles.desc}><span className={styles.txt}>贷款合计 :</span> &yen; {amount} </div>
+            //             <div className={styles.desc}><span className={styles.txt}>佣金合计 :</span> &yen; {commission} </div>
+            //           </div>
+            //         );
+            //       }
+            //     : null
+            // }
           />
         </Card>
       </PageHeaderLayout>

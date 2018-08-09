@@ -154,8 +154,8 @@ export default class BillDetail extends React.Component {
             <Description term="对账单状态">
               {FINANCIAL_STATUS[status]}
             </Description>
-            <Description term="佣金合计"><span>￥ {goods_total}</span></Description>
-            <Description term="贷款合计"><span>￥ {commission_total}</span></Description>
+            <Description term="佣金合计"><span>￥ {commission_total}</span></Description>
+            <Description term="贷款合计"><span>￥ {goods_total}</span></Description>
             <Description term="对账周期">{cycle}</Description>
           </DescriptionList>
           <Table dataSource={detail ? detail.map((ele) => { return { ...ele, key: ele.order_code }; }) : []} columns={columns} pagination={paginationOptions} scroll={{ x: 1300 }} />
