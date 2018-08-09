@@ -143,6 +143,7 @@ const FINANCIAL_STATUS = {
     1: '待发布',
     2: '待确认',
     3: '已确认',
+    4: '待确认',
 };
 export {
   ACTION_STATUS,

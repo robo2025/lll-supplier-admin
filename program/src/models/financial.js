@@ -60,7 +60,7 @@ export default {
             const { rescode, headers } = res;
             if (rescode >> 0 === 10000) {
                 if (success) {
-                    success(res);
+                    success(res, headers);
                 } 
             } else if (error) {
                 error(res);
@@ -76,7 +76,7 @@ export default {
             const { rescode, headers } = res;
             if (rescode >> 0 === 10000) {
                 if (success) {
-                    success(res);
+                    success(res, headers);
                 } 
             } else if (error) {
                 error(res);
@@ -114,7 +114,6 @@ export default {
             };
         },
         saveNotCheck(state, action) {
-            console.log(action);
             return {
                 ...state,
                 notChecklist: action.payload,

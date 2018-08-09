@@ -13,8 +13,10 @@ import {
   message,
 } from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
+import DescriptionList from '../../../components/DescriptionList';
 import styles from './reportCenter.less';
 
+const { Description } = DescriptionList;
 const haveCheckListUrl = '/v1/financial/sup/statementexdetail/statement';
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
@@ -33,6 +35,9 @@ export default class NotCheckList extends React.Component {
         pageSize: 10,
       },
       searchValues: {},
+      number_tot: 0, // 数量
+      amount: 0, // 货款
+      commission: 0, // 佣金
     };
   }
   componentDidMount() {
@@ -49,6 +54,15 @@ export default class NotCheckList extends React.Component {
       params,
       offset,
       limit,
+      success: (res, headers) => {
+        const { number_tot, amount, commission } = headers;
+        console.log(number_tot, amount, commission);
+        this.setState({
+          number_tot,
+          amount,
+          commission,
+        });
+      },
     });
   }
   onPaginationChange=(pagination) => {
@@ -81,7 +95,6 @@ export default class NotCheckList extends React.Component {
                 values[key] = others[key].trim();
             }
           }
-          console.log(values, 123456);
           this.setState({
               args: {
                   page: 1,
@@ -185,7 +198,7 @@ export default class NotCheckList extends React.Component {
   }
   render() {
     const { financial, loading } = this.props;
-    const { args } = this.state;
+    const { args, number_tot, amount, commission } = this.state;
     const { page, pageSize } = args;
     const { haveCheckList, haveCheckTotal } = financial;
     const columns = [
@@ -274,8 +287,12 @@ export default class NotCheckList extends React.Component {
     };
     return (
       <PageHeaderLayout title="已对账查询">
-        <Card>
-          {this.renderForm()}
+        <Card title={this.renderForm()} style={{ paddingTop: 15, paddingBottom: 20 }}>
+          <DescriptionList col={3}>
+            <Description term="数量合计"><span>{number_tot}</span></Description>
+            <Description term="贷款合计"><span>&yen; {amount}</span></Description>
+            <Description term="佣金合计"><span>&yen; {commission}</span></Description>
+          </DescriptionList>
           <Table
             className={styles.footer}
             columns={columns}
@@ -286,27 +303,27 @@ export default class NotCheckList extends React.Component {
             pagination={paginationOptions}
             onChange={this.onPaginationChange}
             loading={loading}
-            footer={
-                haveCheckList.length
-                  ? (data) => {
-                      let amount = 0;
-                      let commission = 0;
-                      let number = 0;
-                      data.forEach((ele) => {
-                        amount += parseFloat(ele.amount);
-                        commission += parseFloat(ele.commission);
-                        number += parseFloat(ele.number);
-                      });
-                      return (
-                        <div className={styles.total}>
-                          <div className={styles.desc}><span className={styles.txt}>数量合计 :</span> {number} </div>
-                          <div className={styles.desc}><span className={styles.txt}>贷款合计 :</span> &yen; {amount} </div>
-                          <div className={styles.desc}><span className={styles.txt}>佣金合计 :</span> &yen; {commission} </div>
-                        </div>
-                      );
-                    }
-                  : null
-              }
+            // footer={
+            //     haveCheckList.length
+            //       ? (data) => {
+            //           let amount = 0;
+            //           let commission = 0;
+            //           let number = 0;
+            //           data.forEach((ele) => {
+            //             amount += parseFloat(ele.amount);
+            //             commission += parseFloat(ele.commission);
+            //             number += parseFloat(ele.number);
+            //           });
+            //           return (
+            //             <div className={styles.total}>
+            //               <div className={styles.desc}><span className={styles.txt}>数量合计 :</span> {number} </div>
+            //               <div className={styles.desc}><span className={styles.txt}>贷款合计 :</span> &yen; {amount} </div>
+            //               <div className={styles.desc}><span className={styles.txt}>佣金合计 :</span> &yen; {commission} </div>
+            //             </div>
+            //           );
+            //         }
+            //       : null
+            //   }
           />
         </Card>
       </PageHeaderLayout>
