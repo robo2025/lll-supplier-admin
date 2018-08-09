@@ -1,7 +1,8 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import { Modal, notification } from 'antd';
 import { login, jumpToLogin } from '../services/user';
-
+import { TOKEN_NAME } from '../constant/config';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据',
@@ -65,6 +66,7 @@ axios.interceptors.response.use((response) => {
    *   30001  无管理员权限
    * */
   if ((response.data.rescode >> 0) === 30001) {
+    Cookies.remove(TOKEN_NAME);
     // 没有权限
     alert('非供应商账号,没有此系统权限');
     jumpToLogin();
